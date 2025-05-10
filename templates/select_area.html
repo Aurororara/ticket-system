@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+{% block title %}選擇場區 - NtickeTUB{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2>這裡是節目名稱</h2>
+  <p>
+    <i class="bi bi-calendar-event"></i> 活動時間：2025/03/29(六) 19:30<br>
+    <i class="bi bi-geo-alt"></i> 活動地點：高雄巨蛋 <a href="#" class="text-danger small">點此查看交通方式</a><br>
+    主辦單位：近鐵國際
+  </p>
+
+  <!-- 進度條 -->
+<div class="progress-steps-wrapper">
+  <div class="progress-steps">
+    <div class="step completed">
+      <div class="circle">✔</div>
+      <div class="label">選擇座位</div>
+      <div class="line"></div> <!-- 線只在右邊 -->
+    </div>
+    <div class="step">
+      <div class="circle">2</div>
+      <div class="label">選擇票種</div>
+      <div class="line"></div>
+    </div>
+    <div class="step">
+      <div class="circle">3</div>
+      <div class="label">選擇交易方式</div>
+      <div class="line"></div>
+    </div>
+    <div class="step">
+      <div class="circle">4</div>
+      <div class="label">確認付款</div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- 選擇場區 -->
+  <h5>請選擇場區</h5>
+  <hr>
+  <div class="mb-3">
+    <h6 class="bg-secondary text-white p-2">搖滾區</h6>
+    <div class="list-group">
+      <button class="list-group-item list-group-item-action">NEO CITY 1</button>
+      <button class="list-group-item list-group-item-action">NEO CITY 2</button>
+      <button class="list-group-item list-group-item-action">NEO CITY 3</button>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <h6 class="bg-secondary text-white p-2">看臺區</h6>
+    <div class="list-group">
+      <button class="list-group-item list-group-item-action">二樓A區</button>
+      <button class="list-group-item list-group-item-action">二樓B區</button>
+      <button class="list-group-item list-group-item-action">二樓C區</button>
+    </div>
+  </div>
+
+  <!-- 同意條款 -->
+  <div class="form-check mb-3">
+    <input class="form-check-input" type="checkbox" id="agreeTerms">
+    <label class="form-check-label" for="agreeTerms">
+      我已閱讀並同意 <a href="#">服務條款</a> 與 <a href="#">隱私權政策</a>
+    </label>
+  </div>
+
+  <!-- 下一步 -->
+  <button class="btn btn-dark w-100" id="nextBtn" disabled>下一步</button>
+</div>
+{% endblock %}

@@ -38,5 +38,16 @@ def buy_ticket():
       return jsonify({"message": "搶票成功！剩餘：" + str(ticket['stock'])})
   return jsonify({"message": "搶票失敗，可能已售完"}), 400
 
+# 購票起始頁
+@app.route('/ticket/start')
+def view_ticket_start():
+  return render_template('ticket_start.html')
+
+# 購票選擇區域
+@app.route('/ticket/select-area')
+def select_area():
+    return render_template('select_area.html')
+
+
 if __name__ == '__main__':
   app.run(debug=True)
