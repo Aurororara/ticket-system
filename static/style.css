@@ -86,3 +86,8 @@ button {
 .step:last-child .line {
   display: none;
 }
+
+.quantity {
+  pointer-events: none;
+  /* 禁止手動輸入 */
+}

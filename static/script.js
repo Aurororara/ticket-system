@@ -47,3 +47,22 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
+
+// 控制票數增減
+document.querySelectorAll('.input-group').forEach(group => {
+  const minusBtn = group.querySelector('.minus');
+  const plusBtn = group.querySelector('.plus');
+  const quantityInput = group.querySelector('.quantity');
+
+  minusBtn.addEventListener('click', () => {
+    let val = parseInt(quantityInput.value);
+    if (val > 0) quantityInput.value = val - 1;
+  });
+
+  plusBtn.addEventListener('click', () => {
+    let val = parseInt(quantityInput.value);
+    quantityInput.value = val + 1;
+  });
+});
+
+

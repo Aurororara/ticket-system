@@ -48,6 +48,10 @@ def view_ticket_start():
 def select_area():
     return render_template('select_area.html')
 
+# 購票選擇票種
+@app.route('/ticket/select-type')
+def select_type():
+    return render_template('select_type.html')
 
 if __name__ == '__main__':
   app.run(debug=True)
