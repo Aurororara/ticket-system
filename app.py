@@ -1,7 +1,6 @@
 from flask import Flask, render_template, jsonify, request
 from config import Config
 from models import db
-from models.models import Show, Host, Location, Game, Area, GameArea, Member, Order, Ticket, Payment
 
 app = Flask(__name__)
 app.config.from_object(Config)

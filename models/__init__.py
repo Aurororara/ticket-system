@@ -1,4 +1,11 @@
-# models/__init__.py
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from .db import db
+from .show import Show
+from .host import Host
+from .location import Location
+from .game import Game
+from .area import Area
+from .game_area import GameArea
+from .member import Member
+from .order import Order
+from .ticket import Ticket
+from .payment import Payment
