@@ -65,4 +65,36 @@ document.querySelectorAll('.input-group').forEach(group => {
   });
 });
 
+// 付款方式說明切換
+document.querySelectorAll('input[name="payment"]').forEach(radio => {
+  radio.addEventListener('change', function () {
+    const description = document.getElementById('paymentDescription');
+    if (this.id === 'creditCard') {
+      description.innerHTML = `
+        <strong>信用卡付款（Credit Card）</strong>
+        <ol>
+          <li>僅限 VISA, Mastercard, JCB。</li>
+          <li>未能正常扣款請聯絡發卡銀行。</li>
+        </ol>`;
+    } else if (this.id === 'atmTransfer') {
+      description.innerHTML = `
+        <strong>ATM 付款（ATM Fund Transfer）</strong>
+        <ol>
+          <li>請於 5 日內完成付款，並保存收據。</li>
+          <li>未按時付款訂單將自動取消。</li>
+        </ol>`;
+    }
+  });
+});
+
+// 確認付款模擬跳轉
+document.addEventListener('DOMContentLoaded', function () {
+  const submitButton = document.getElementById('submitPaymentBtn');
+  if (submitButton) {
+    submitButton.addEventListener('click', function () {
+      alert('付款成功，感謝您的訂購！');
+      window.location.href = '/payment/success'; // 替換為你的完成頁面路由
+    });
+  }
+});
 

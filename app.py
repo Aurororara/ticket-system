@@ -46,12 +46,32 @@ def view_ticket_start():
 # 購票選擇區域
 @app.route('/ticket/select-area')
 def select_area():
-    return render_template('select_area.html')
+  return render_template('select_area.html')
 
 # 購票選擇票種
 @app.route('/ticket/select-type')
 def select_type():
-    return render_template('select_type.html')
+  return render_template('select_type.html')
+
+# 購票付款方式
+@app.route('/ticket/select-payment')
+def select_payment():
+  return render_template('select_payment.html')
+
+# 購票ATM方式付款
+@app.route('/ticket/select-atm')
+def select_atm():
+  return render_template('atm.html')
+
+# 購票creditcard方式付款
+@app.route('/ticket/select-creditcard')
+def select_creditcard():
+  return render_template('creditcard.html')
+
+# 購票完成頁面
+@app.route('/ticket/order-complete')
+def order_complete():
+  return render_template('order_complete.html')
 
 if __name__ == '__main__':
   app.run(debug=True)

@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block title %}信用卡付款 - NtickeTUB{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <!-- 進度條 -->
+  <div class="progress-steps-wrapper">
+    <div class="progress-steps">
+      <div class="step completed">
+        <div class="circle">✔</div>
+        <div class="label">選擇座位</div>
+        <div class="line"></div> <!-- 線只在右邊 -->
+      </div>
+      <div class="step completed">
+        <div class="circle">✔</div>
+        <div class="label">選擇票種</div>
+        <div class="line"></div>
+      </div>
+      <div class="step completed">
+        <div class="circle">✔</div>
+        <div class="label">選擇交易方式</div>
+        <div class="line"></div>
+      </div>
+      <div class="step completed">
+        <div class="circle">✔</div>
+        <div class="label">確認付款</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 訂單資訊 -->
+  <div class="border p-3 mb-4 bg-light">
+    <p>商品名稱：<span class="text-danger">NtickeTUB票務系統</span></p>
+    <p>訂單編號：<span class="text-danger">0000001</span></p>
+    <p>交易金額：<span class="text-danger">NT$1000</span></p>
+  </div>
+
+  <!-- 信用卡付款表單 -->
+  <div class="border p-3 mb-4">
+    <div class="mb-3">
+      <label class="form-label">信用卡卡號</label>
+      <input type="text" class="form-control" placeholder="請輸入卡號">
+    </div>
+
+    <div class="row g-2 mb-3">
+      <div class="col">
+        <label class="form-label">卡片到期日</label>
+        <input type="text" class="form-control" placeholder="MM/YY有效年月">
+      </div>
+      <div class="col">
+        <label class="form-label">卡片背面末三碼</label>
+        <input type="text" class="form-control" placeholder="安全碼">
+        <div class="form-text text-danger">卡片背面末三碼</div>
+      </div>
+    </div>
+
+    <!-- 置中按鈕 -->
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-dark" id="submitPaymentBtn">確定</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
