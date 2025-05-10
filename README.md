@@ -19,7 +19,7 @@ git push origin main
 ## Python
 ### 後端 python 安裝套件
 ```
-pip install -r flask
+pip install flask
 ```
 
 ### 執行服務
