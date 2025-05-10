@@ -20,6 +20,7 @@ git push origin main
 ### 後端 python 安裝套件
 ```
 pip install flask
+pip install flask-sqlalchemy
 ```
 
 ### 執行服務
