@@ -1,3 +1,4 @@
+</body>
 <!DOCTYPE html>
 <html lang="zh-Hant">
 
@@ -28,34 +29,36 @@
   </nav>
 
   <!-- 幻燈片 -->
-  <div class="container mt-5">
-    <h2 class="text-center mb-3">近期節目</h2>
+<div class="container mt-5">
+  <h2 class="text-center mb-3">近期節目</h2>
 
-    <div class="position-relative mx-auto" style="max-width: 800px;">
-      <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-        <!-- 圓點 -->
-        <div class="carousel-indicators">
-          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="1" aria-label="Slide 2"></button>
-          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="2" aria-label="Slide 3"></button>
-          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="3" aria-label="Slide 4"></button>
-        </div>
+  <div class="position-relative mx-auto" style="max-width: 800px;">
+    <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+      <!-- 圓點 -->
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="3" aria-label="Slide 4"></button>
+      </div>
 
-        <!-- 幻燈片內容 -->
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="d-block w-100" alt="節目1" style="max-height: 400px; object-fit: cover;">
-          </div>
-          <div class="carousel-item">
-            <img src="{{ url_for('static', filename='images/jak.jpeg') }}" class="d-block w-100" alt="節目2" style="max-height: 400px; object-fit: cover;">
-          </div>
-          <div class="carousel-item">
-            <img src="{{ url_for('static', filename='images/chiq.webp') }}" class="d-block w-100" alt="節目3" style="max-height: 400px; object-fit: cover;">
-          </div>
-          <div class="carousel-item">
-            <img src="{{ url_for('static', filename='images/yaju.jpg') }}" class="d-block w-100" alt="節目4" style="max-height: 400px; object-fit: cover;">
-          </div>
+      <!-- 幻燈片內容 -->
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="d-block w-100" alt="節目1" style="max-height: 400px; object-fit: cover;">
         </div>
+        <div class="carousel-item">
+          <img src="{{ url_for('static', filename='images/jak.jpeg') }}" class="d-block w-100" alt="節目2" style="max-height: 400px; object-fit: cover;">
+        </div>
+        <div class="carousel-item">
+          <img src="{{ url_for('static', filename='images/chiq.webp') }}" class="d-block w-100" alt="節目3" style="max-height: 400px; object-fit: cover;">
+        </div>
+        <div class="carousel-item">
+          <img src="{{ url_for('static', filename='images/yaju.jpg') }}" class="d-block w-100" alt="節目4" style="max-height: 400px; object-fit: cover;">
+        </div>
+      </div>
+
+
 
         <!-- 左右按鈕 -->
         <button class="carousel-control-prev custom-carousel-btn" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
@@ -76,24 +79,28 @@
   <div class="row row-cols-1 row-cols-md-3 g-4">
     <!-- 節目卡片 1 -->
     <div class="col">
-      <div class="card h-100">
-        <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="card-img-top" alt="KESHI">
-        <div class="card-body">
-          <h5 class="card-title">KESHI : Keshi Tour in Taipei</h5>
-          <p class="card-text event-date">2025/4/10(四) ~ 2025/4/11(五)</p>
-        </div>
+  <a href="/show/test" class="text-decoration-none text-dark">
+    <div class="card h-100">
+      <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="card-img-top" alt="KESHI">
+      <div class="card-body">
+        <h5 class="card-title">KESHI : Keshi Tour in Taipei</h5>
+        <p class="card-text event-date">2025/4/10(四) ~ 2025/4/11(五)</p>
       </div>
     </div>
+  </a>
+</div>
     <!-- 節目卡片 2 -->
     <div class="col">
-      <div class="card h-100">
-        <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="card-img-top" alt="TAIL">
-        <div class="card-body">
-          <h5 class="card-title">TAIL : Tail Asia Tour 2025</h5>
-          <p class="card-text event-date">2025/4/20(日)</p>
-        </div>
+  <a href="/show/test" class="text-decoration-none text-dark">
+    <div class="card h-100">
+      <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="card-img-top" alt="TAIL">
+      <div class="card-body">
+        <h5 class="card-title">TAIL : Tail Asia Tour 2025</h5>
+        <p class="card-text event-date">2025/6/10(四) ~ 2025/6/11(五)</p>
       </div>
     </div>
+  </a>
+</div>
     <!-- 節目卡片 3 -->
     <div class="col">
       <div class="card h-100">
@@ -131,3 +138,7 @@
   <footer class="bg-light text-center py-3 mt-5">
     <p>&copy; 2025 NtickeTUB. All Rights Reserved.</p>
   </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
