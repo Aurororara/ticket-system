@@ -53,5 +53,20 @@ def select_area():
 def select_type():
     return render_template('select_type.html')
 
+
+
+#節目詳情頁
+@app.route('/show/<int:show_id>')
+def show_detail(show_id):
+    show = {
+        'show_name': '台北商業大學第一屆校慶',
+        'show_desc': '一場為學生打造的熱鬧校慶活動！',
+        'show_pic': '/static/images/sample.jpg',
+        'createdAt': '2025-03-10',
+        'host': {'host_name': '近雄國際'},
+        'location': {'loc_name': '高雄巨蛋'}
+    }
+    return render_template('show_detail.html', show=show)
+
 if __name__ == '__main__':
   app.run(debug=True)
