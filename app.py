@@ -68,5 +68,15 @@ def show_detail(show_id):
     }
     return render_template('show_detail.html', show=show)
 
+#跳轉至票夾跟會員頁
+@app.route('/member')
+def member():
+    return render_template('member.html')  # 需會員介面
+
+@app.route('/ticket')
+def ticket():
+    return render_template('ticket.html')  # 需票夾頁面
+
+
 if __name__ == '__main__':
   app.run(debug=True)

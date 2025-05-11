@@ -9,7 +9,7 @@
     body {
       font-family: "Noto Sans TC", sans-serif;
       background-color: #f5f5f5;
-      padding: 30px;
+      margin: 0;
     }
     .container {
       max-width: 900px;
@@ -19,11 +19,18 @@
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+    .container h1 {
+        margin-top: 10px;
+        }
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
+    background-color: #d9d9d9; /* 灰色底 */
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+        }
     .buttons {
       display: flex;
       gap: 10px;
@@ -109,42 +116,255 @@
   </style>
 </head>
 <body>
-  <div class="container">
+ <!-- 放在 container 外面！ -->
     <div class="header">
-      <h2>NtickeTUB</h2>
-      <div class="buttons">
-        <button>我的會員</button>
-        <button>我的票券</button>
-      </div>
+        <div class="logo">NtickeTUB</div>
+        <div class="buttons">
+            <a href="/member" class="button-link">我的會員</a>
+            <a href="/ticket" class="button-link">我的票券</a>
+        </div>
+    </div>
+    <div class="container">
+        <h1>台北商業大學第一屆校慶</h1>
+
+        <div class="info">
+        <p>🕒 活動時間：2025/03/29（六）19:30</p>
+        <p>📍 活動地點：高雄巨蛋　<span class="highlight">點我查看交通方式</span></p>
+        <p>📣 主辦單位：近雄國際</p>
     </div>
 
-    <h1>台北商業大學第一屆校慶</h1>
 
-    <div class="info">
-      <p>🕒 活動時間：2025/03/29（六）19:30</p>
-      <p>📍 活動地點：高雄巨蛋　<span class="highlight">點我查看交通方式</span></p>
-      <p>📣 主辦單位：近雄國際</p>
-    </div>
+
 
     <div class="image">[節目圖片]</div>
 
-    <div class="tabs">
-      <button class="active">節目介紹</button>
-      <button>注意事項</button>
-      <button>購票提醒</button>
-      <button>取票提醒</button>
-      <button>退票說明</button>
-    </div>
+            <!-- 按鈕區 -->
+<div class="tab-buttons">
+    <button class="tab-btn active" data-tab="tab-intro">節目介紹</button>
+    <button class="tab-btn" data-tab="tab-rules">注意事項</button>
+    <button class="tab-btn" data-tab="tab-reminder">購票提醒</button>
+    <button class="tab-btn" data-tab="tab-reminder2">取票說明</button>
+    <button class="tab-btn" data-tab="tab-refund">退票說明</button>
+  </div>
+  
+  <!-- 內容區 -->
+  <div id="tab-intro" class="tab-content">
+    <p>除了總統府賴清德副總統發來賀電，包括國策顧問廖全平理事長、遠見天下文化事業群創辦人高希均教授、總統府顔志發資政、賴振昌監察委員、將捷集團林長勲總裁、臺北市立大學邱英浩校長、臺灣大學國企系陳厚銘特聘教授、永豐金陳思寬董事長、雙鶴集團古承濬執行長、臺灣夜市商圈產業工會林定國總會長、清涼音文教基金會張錦貴董事長、台越經濟文化教育發展協會吳品蓁理事長等貴賓也特別蒞校祝賀。延續優質辦學的特色 與時俱進規劃創新課程任立中校長在典禮上致詞表示，新團隊上任後積極為學校爭取資源，在推動多項政策之後成功受到教育部的肯定與挹注，通過「優化生師比值及精進教學計劃」核定連續五年每年一億元的補助，在一片少子化縮減預算的趨勢下，北商大異軍突起獲得教育部大力支持，補助經費將運用於擴充師資隊伍、增強研究能量，以及精進教學。
 
-    <div class="tab-content">
-      <p>這裡是節目介紹內容。你可以貼入詳細的活動介紹、演出團體、演出亮點等等。</p>
-      <p>後續再加上其他 tab 的切換功能（用 JS 實現）。</p>
-    </div>
+        任校長也表示，未來北商大會延續百年來優質辦學的傳統特色，隨著顛覆傳統金融業的FinTech浪潮來襲，北商大也與時俱進規劃相關課程，將數位科技應用、行銷科學、人工智慧、大數據、雲端等領域融入其中，希望帶領北商大再創輝煌，不僅要成為高教技職的模範生、臺灣高等商管人才的培訓基地，還要更進一步朝「全國商管學院標竿」的新里程碑邁進！
+        
+        當天典禮還有一項重頭戲，北商大校友高希均教授歷年來對於學校的發展都非常關注，今年特別捐贈母校250萬成立「高希均書房」的閱讀空間，以及近2500本價值超過100萬的圖書給母校圖書館典藏，高教授也親自參加書房剪綵儀式。
+        
+        北商大為校慶從10月起就展開一連串的慶祝活動，從學術論壇、講座研討會、校友活動、藝術展覽、專題發表到音樂會等，各式活動展現出學校的多元風貌和開創新局的努力和決心。當天校慶的表演活動也相當豐富多元，除了「社團聯展園遊會」之外，學生社團漾舞社也帶來精彩表演，另外還有校友合唱團獻唱，以及歌手鄧福如帶來的精彩演出，一齊祝賀北商大105周年校慶誌喜。
+        
+        ⊙單人票價：NT4500/3200/3000/2800/2400/2200/1800/1500/800/1400（非輪椅席）/400（輪椅席）
+        
+        ⊙0823號VIP包廂特區：NT3500x10人VIP包廂優惠及注意事項：
+        
+        1.包廂內提供長沙發、螢光手環、礦泉水。
+        
+        2.0823 號VIP包廂特區：每人每場限購1套(1套含10張票券，每筆訂單服務費150元。）　內含：價值3200門票 10張 及 「螢光手環 + 礦泉水」10組。
+        
+        3.除演唱會當日於現場取票外，亦可於 2/15簽票會現場領取票券。＊簽票會取票時間：2/15 13:00起＊取票地點：簽票會現場服務台＊現場取票請務必出示下列資料，以供核對購買者身份：❶訂單編號(必備)❷該筆訂單【訂購會員本人】持身份證明(僅限有效且附有照片之證件正本：身分證/健保卡/駕照（擇一）；外籍人士憑護照)，以供核對身份。⊙10年有你豪華單人套票：NT4500內含：價值3500門票 + 超好看恩梯Ｕ逼T-shirt + 校長親筆簽名紀念海報
+        
+        
+        
+        主辦：台北商業大學
+        
+        贊助商：五月花厚衛生紙</p>
+  </div>
+  
+  <div id="tab-rules" class="tab-content" style="display: none;">
+    <p> 1.請勿於拍賣網站或是其他非NtickeTUB正式授權售票之通路、網站購票、也不要透過陌生代購進行購票，主辦單位與NtickeTUB均無法保證票券真實性。除可能衍生詐騙案件或交易糾紛外，以免影響自身權益，若發生演出現場無法入場或是其他問題，主辦單位及NtickeTUB概不負責。<br><br>
+
+        2.若有任何形式非供自用而加價轉售（無論加價名目為代購費、交通費、補貼等均包含在內）之情事者，已違反社會秩序維護法第64條第2款；且依文化創意產業發展法第十條之一第二項規定，將票券超過票面金額或定價販售者，按票券張數，由直轄市政府、縣（市）政府處每張票面金額之十倍至五十倍罰鍰，請勿以身試法!<br><br>
+
+        3.一人一票、憑票入場，票券視同有價證券，請妥善保存，如發生遺失、破損、燒毀或無法辨識等狀況，恕不補發。<br><br>
+
+        4.如遇票券毀損、滅失或遺失，主辦單位將依「藝文表演票券定型化契約應記載及不得記載事項」第七項「票券毀損、滅失及遺失之入場機制：主辦單位應提供消費者票券毀損、滅失及遺失時之入場機制並詳加說明。」之規定辦理，詳情請洽NtickeTUB客服中心。<br><br>
+
+        5.請勿攜帶相機、攝影機、DV、錄音機入場，未經主辦單位同意，禁止拍照、錄影、錄音。<br><br>
+
+        6.本節目禁止攜帶外食、飲料、任何種類之金屬、玻璃、寶特瓶容器、雷射筆、煙火或任何危險物品。<br><br>
+
+        7.各表演場館各有其入場規定，請持票人遵守之，遲到觀眾需遵守館方管制。<br><br>
+
+        8.消費者必須以真實姓名購票及填寫有效個人資訊，協助親友購買票券，應取得該個資所有人同意，一旦以虛假資料購買票券已經涉及刑法第二百十條「偽造私文書罪」：「偽造、變造私文書，足以生損害於公眾或他人者，處五年以下有期徒刑。」 ；且依文化創意產業發展法第十條之一第三項規定：「以虛偽資料或其他不正方式，利用電腦或其他相關設備購買藝文表演票券，取得訂票或取票憑證者，處三年以下有期徒刑，或科或併科新臺幣三百萬以下罰金。」，主辦單位及KKTIX皆有權利立即取消該消費者訂單，請勿以身試法!<br><br>
+
+        9.購票前請詳閱注意事項，一旦購票成功視為同意上述所有活動注意事項。</p>
+  </div>
+  
+  <div id="tab-reminder" class="tab-content" style="display: none;">
+    <p>
+        1. 請提前確認節目名稱、場次時間、地點與票價，購票前請詳閱注意事項與退票規則。<br><br>
+        
+        2. 每位購票人每場限購票數依各活動規定，若超過上限，系統將自動退回多餘票券。<br><br>
+        
+        3. 選擇票區及票種後請於限定時間內完成填寫購票資訊與付款，否則將自動釋出座位。<br><br>
+        
+        4. 付款完成後，系統將寄送購票成功通知至您的 Email，並可於「我的票券」查詢。<br><br>
+        
+        5. 若選擇電子票券，請妥善保存 QR Code 供入場掃描使用；若選擇實體票券，請依指示領取。<br><br>
+        
+        6. 如遇系統異常、付款失敗或無法完成交易，請聯繫客服信箱：ntubprincess@gmail.com。<br><br>
+        
+        7. 本平台保有最終修改與解釋之權利，若有未盡事宜，依現場公告為準。
+        </p>
+        
+  </div>
+
+  <div id="tab-reminder2" class="tab-content" style="display: none;">
+    <p> 
+        1. 現場取票服務時間與地點將於活動前 3 日公告於活動官網及 Email 通知，請留意相關訊息。<br><br>
+        
+        2. 若由他人代領，須出示購票人身份證影本、委託書與代領人有效證件；若文件不齊，將無法領取票券。<br><br>
+        
+        3. 請妥善保管票券，若遺失或損毀恕不補發。
+        </p>
+        
+  </div>
+  
+  <div id="tab-refund" class="tab-content" style="display: none;">
+    <p>
+        1. 本活動售出之票券，除特殊情況外恕不接受退票或更換場次，購票前請確認節目資訊與個人行程。<br><br>
+        
+        2. 若因主辦單位取消演出，將全額退票，退費方式依付款方式辦理。<br><br>
+        
+        3. 若於購票後因個人因素無法出席，恕不提供退費；建議轉讓票券給親友（若活動允許）。<br><br>
+        
+        4. 如因不可抗力因素（如天災、疫情）影響演出，主辦單位將另行公告退票處理方式。<br><br>
+        
+        5. 退票款項將於申請成功後 7～14 個工作天內退回原付款帳戶，不另收取手續費。<br><br>
+        
+        6. 如有退票相關問題，請聯繫客服信箱：ntubprincess@gmail.com
+        </p>
+        
+  </div>
+  
+  <!-- 樣式區（可放 head 裡） -->
+  <style>
+
+    html, body {
+    margin: 0;
+    padding: 0;
+    }
+
+    .tab-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+  
+    .tab-btn {
+      padding: 12px 20px;
+      background-color: #ccc;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  
+    .tab-btn.active {
+      background-color: #333;
+      color: white;
+    }
+  
+    .tab-content {
+      padding: 20px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      background-color: #fff;
+    }
+
+
+    .header {
+    width: 100vw;
+    background-color: #d9d9d9;
+    padding: 20px; /* 改成只有 20px，不要有左右 40px */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    border-radius: 0;
+    margin-bottom: 0;
+    }
+
+
+    .logo {
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    line-height: 1;
+    }
+
+    .header h2 {
+    font-size: 32px;
+    font-weight: bold;
+    }
+
+    .header-right button {
+    margin-left: 10px;
+    padding: 10px 18px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    }
+
+
+    .container {
+    width: 100vw;
+    background: white;
+    padding: 30px 40px;
+    border-radius: 0;
+    box-shadow: none;
+    box-sizing: border-box;
+    margin: 0;        /* 確保不要有左右空白 */
+    max-width: none;  /* 拿掉限制寬度 */
+    }
+
+    .button-link {
+    padding: 8px 16px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    }
+
+</style>
+  
+  <!-- JavaScript（貼在頁面最下方） -->
+  <script>
+    const buttons = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+  
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // 按鈕樣式切換
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+  
+        // 顯示對應內容
+        const targetId = btn.getAttribute('data-tab');
+        contents.forEach(c => {
+          c.style.display = (c.id === targetId) ? 'block' : 'none';
+        });
+      });
+    });
+  </script>
+
+    
 
     <div class="warning">
       ※ 本平台所售出之活動，除非特別標示，恕不提供任何保險機制。<br>
       ※ 購票前請先了解並同意上述規範，如不同意請勿購買。
     </div>
+
+
+    
 
     <div class="buy-button">
       <a href="/ticket/purchase">前往購票</a>
