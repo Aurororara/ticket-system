@@ -2,6 +2,7 @@ from .db import db
 from .show import Show
 from .host import Host
 from .location import Location
+from .section import Section
 from .game import Game
 from .area import Area
 from .game_area import GameArea

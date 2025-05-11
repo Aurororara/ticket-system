@@ -36,17 +36,36 @@ function showTab(tabName) {
   document.querySelectorAll('.btn-group .btn')[buttons[tabName]].classList.add('active');
 }
 
-// 啟用或停用 下一步 按鈕
+// 選擇區域下一步 按鈕
 document.addEventListener('DOMContentLoaded', function () {
   const agreeCheckbox = document.getElementById('agreeTerms');
-  const nextButton = document.getElementById('nextBtn');
+  const nextButton = document.getElementById('areaNextBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const areaForm = document.getElementById('areaForm');
 
-  if (agreeCheckbox && nextButton) {
-    agreeCheckbox.addEventListener('change', function () {
-      nextButton.disabled = !this.checked;
-    });
-  }
+  areaForm.addEventListener('submit', function (event) {
+    const isAreaSelected = document.querySelector('input[name="selected_area"]:checked') !== null;
+    const isTermsChecked = agreeCheckbox.checked;
+
+    // 檢查兩個條件是否都符合
+    if (!isAreaSelected || !isTermsChecked) {
+      event.preventDefault();  // 阻止表單送出
+      errorMsg.style.display = 'block';
+
+      if (!isAreaSelected && !isTermsChecked) {
+        errorMsg.textContent = '請選擇一個區域並同意服務條款與隱私權政策';
+      } else if (!isAreaSelected) {
+        errorMsg.textContent = '請選擇一個區域';
+      } else if (!isTermsChecked) {
+        errorMsg.textContent = '請同意服務條款與隱私權政策';
+      }
+    } else {
+      errorMsg.style.display = 'none';  // 通過驗證則隱藏錯誤訊息
+    }
+  });
 });
+
+
 
 // 控制票數增減
 document.querySelectorAll('.input-group').forEach(group => {

@@ -4,10 +4,25 @@
 
 {% block content %}
 <div class="text-center my-4">
-  <img src="https://via.placeholder.com/600x300?text=Banner" class="img-fluid" alt="Banner Image">
+  <img src="{{ url_for('static', filename=s.show_pic) }}" class="img-fluid" alt="Banner Image">
 </div>
 
 <div class="container">
+  <h2>{{ s.show_name }}</h2>
+  <p>
+    <span class="d-inline-flex align-items-center">
+      <i class="bi bi-calendar-event me-1"></i> 活動時間：{{ s.createdAt.strftime('%Y/%m/%d') if s.createdAt else '未定' }}
+    </span><br>
+
+    <span class="d-inline-flex align-items-center">
+      <i class="bi bi-geo-alt me-1"></i> 活動地點：{{ location.loc_name }}
+    </span><br>
+
+    <span class="d-inline-flex align-items-center">
+      <i class="bi bi-briefcase me-1"></i> 主辦單位：{{ host.host_name }}
+    </span>
+  </p>
+
   <div class="alert alert-danger small">
     * 依票務公告先後為準<br>
     * 會員請先完成登入
@@ -16,6 +31,7 @@
   <table class="table table-bordered text-center">
     <thead class="table-light">
       <tr>
+        <th>演出日期</th>
         <th>演出時間</th>
         <th>場次名稱</th>
         <th>場地</th>
@@ -23,42 +39,26 @@
       </tr>
     </thead>
     <tbody>
+      {% for game in games %}
       <tr>
-        <td>2025/5/5 (六) 19:30</td>
-        <td>台北商業大學第一屆校慶</td>
-        <td>台北商業大學</td>
-        <td><button class="btn btn-secondary">立即訂購</button></td>
+        <td>{{ game.game_date }}</td>
+        <td>{{ game.game_time }}</td>
+        <td>{{ s.show_name }}</td>
+        <td>{{ location.loc_name }}</td>
+        <td>
+          {% if game.game_status == 'A' %}
+          <a href="{{ url_for('select_area', game_id=game.game_id) }}" class="btn btn-secondary">立即訂購</a>
+          {% else %}
+          <button class="btn btn-secondary" disabled>暫停販售</button>
+          {% endif %}
+        </td>
       </tr>
+      {% else %}
       <tr>
-        <td>2025/5/6 (日) 19:30</td>
-        <td>台北商業大學第一屆校慶</td>
-        <td>台北商業大學</td>
-        <td><button class="btn btn-secondary">立即訂購</button></td>
+        <td colspan="5">目前沒有任何場次</td>
       </tr>
+      {% endfor %}
     </tbody>
   </table>
-</div>
-
-<div class="bg-dark text-white text-center py-2">
-  <div class="btn-group" role="group">
-    <button class="btn btn-dark active" onclick="showTab('intro')">節目介紹</button>
-    <button class="btn btn-dark" onclick="showTab('notice')">注意事項</button>
-    <button class="btn btn-dark" onclick="showTab('seats')">票區座位</button>
-    <button class="btn btn-dark" onclick="showTab('pickup')">取票說明</button>
-    <button class="btn btn-dark" onclick="showTab('map')">場館說明</button>
-  </div>
-</div>
-
-<div class="container my-4">
-  <div id="tabContent" class="small">
-    <p>請選擇上方任一按鈕以檢視相關資訊。</p>
-  </div>
-</div>
-
-<div class="container mb-4">
-  <div class="alert alert-light border border-danger small">
-    * 本平台所售出之活動，除特殊說明外，皆不接受退換票，請詳閱提供的退換票辦法。<br>
-    * 活動異動聲明：主辦單位保有隨時變更、終止本活動與內容之權利，如有相關異動將於官方網站公告，請參閱最新公告資訊。
-  </div>
 </div>
 {% endblock %}
