@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>搜尋結果 - NtickeTUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 頂部導航欄 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">NtickeTUB</a>
+            <!-- 搜尋框 -->
+            <form class="d-flex ms-auto" action="/search" method="GET" style="width: 60%;">
+                <input class="form-control me-2 rounded-2" type="search" name="q" placeholder="請輸入節目名稱..." aria-label="Search" style="height: 45px;">
+                <button class="btn btn-outline-secondary rounded-2" type="submit" style="height: 45px;">搜尋</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2>搜尋結果：{{ query }}</h2>
+        
+        <!-- 如果有搜尋結果 -->
+        {% if results %}
+            <div class="row">
+                {% for program in results %}
+                    <div class="col-12 col-md-4 mb-4">
+                        <div class="card">
+                            <img src="{{ url_for('static', filename=program['image']) }}" class="card-img-top" alt="{{ program['title'] }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ program['title'] }}</h5>
+                                <p class="card-text">{{ program['date'] }}</p>
+                                <a href="{{ url_for('program_detail', slug=program['slug']) }}" class="btn btn-primary">詳細資訊</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- 如果沒有搜尋結果 -->
+            <p>未找到相關結果。</p>
+        {% endif %}
+    </div>
+
+    <footer class="bg-light text-center py-3 mt-5">
+        <p>&copy; 2025 NtickeTUB. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

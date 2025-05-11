@@ -108,3 +108,18 @@ button {
 .carousel-control-next {
   right: -20px;
 }
+
+.extra-margin-top {
+  margin-top: 100px; /* 你可以改成 120px、150px 來看你喜歡多大 */
+}
+
+.event-date {
+  text-decoration: underline;
+}
+
+/* 確保搜尋框和按鈕在同一行 */
+.search-form {
+  display: flex;
+  width: 60%;
+}
+
