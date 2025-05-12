@@ -3,18 +3,16 @@
 
 {% block content %}
 <div class="container my-5">
-  <h2>這裡是節目名稱</h2>
+  <h2>{{ show.show_name }}</h2>
   <p>
     <span class="d-inline-flex align-items-center">
-      <i class="bi bi-calendar-event me-1"></i> 活動時間：2025/03/29(六) 19:30
+      <i class="bi bi-calendar-event me-1"></i> {{ game.game_date }} {{ game.game_time }}
     </span><br>
-  
     <span class="d-inline-flex align-items-center">
-      <i class="bi bi-geo-alt me-1"></i> 活動地點：高雄巨蛋 <a href="#" class="text-danger small">點此查看交通方式</a>
+      <i class="bi bi-geo-alt me-1"></i> 活動地點：{{ location.loc_name }}
     </span><br>
-  
     <span class="d-inline-flex align-items-center">
-      <i class="bi bi-briefcase me-1"></i> 主辦單位：近鐵國際
+      <i class="bi bi-briefcase me-1"></i> 主辦單位：{{ host.host_name }}
     </span>
   </p>
 
@@ -47,33 +45,154 @@
   <!-- 選擇場區 -->
   <h5>請選擇場區</h5>
   <hr>
-  <div class="mb-3">
-    <h6 class="bg-secondary text-white p-2">搖滾區</h6>
-    <div class="list-group">
-      <button class="list-group-item list-group-item-action">NEO CITY 1</button>
-      <button class="list-group-item list-group-item-action">NEO CITY 2</button>
-      <button class="list-group-item list-group-item-action">NEO CITY 3</button>
+  <form id="areaForm">
+    {% for sect_name, areas in grouped_areas.items() %}
+    <div class="mb-3">
+      <h6 class="bg-secondary text-white p-2">{{ sect_name }}</h6>
+      <div class="list-group">
+        {% for area in areas %}
+        <label class="list-group-item">
+          <input class="form-check-input me-1" type="radio" name="selected_area" value="{{ area.area_id }}">
+          {{ area.area_name }}（共 {{ area.seat_count }} 席，票價 {{ area.price }} 元）
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <p>目前無可用場區</p>
+    {% endfor %}
+
+    <!-- 同意條款 -->
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="agreeTerms">
+      <label class="form-check-label" for="agreeTerms">
+        我已閱讀並同意
+        <a href="#" data-bs-toggle="modal"
+        data-bs-target="#termsModal">服務條款</a>
+      與
+        <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">隱私權政策</a>
+        </label>
+    </div>
+
+    <!-- 錯誤提示 -->
+    <div id="errorMsg" class="text-danger mb-2" style="display: none;"></div>
+
+    <!-- 下一步 -->
+    <button type="submit" id="areaNextBtn" class="btn btn-dark w-100">下一步</button>
+  </form>
+
+  <!-- 服務條款 Modal -->
+  <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="termsModalLabel">NtickeTUB 會員服務條款</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+        </div>
+        <div class="modal-body">
+          第1條(定義)
+          「本條款」：指「NtickeTUB 服務條款」。
+          
+          「本公司」：指NtickeTUB股份有限公司。
+          
+          「本平台」：指本公司經營之NtickeTUB網站所有頁面及本公司所設立之官方電子郵件帳號、社群媒體帳號。
+          
+          「使用者」：指使用本平台服務之所有人士，包括註冊會員、購票、瀏覽、查詢、提出聯繫等。
+          
+          「個人資料」：依據中華民國個人資料保護法所定義之個人資料。
+          
+          第2條(認知與同意接受)
+          當使用者登入或使用本平台服務，即視為已閱讀、瞭解並同意本條款。未滿7歲者不得註冊會員，7歲以上未滿18歲者需經法定代理人同意後方可使用。
+          
+          第3條(適用範圍)
+          本條款包含本平台公布之「隱私權政策」、各活動頁面資訊與其他規定。如各活動頁面有特別規定，則優先適用該規定。
+          
+          第4條(變更)
+          本公司得隨時公告修訂本條款，並自公告日起生效，使用者不得以未通知為由拒絕適用。
+          
+          第5條(通知)
+          以本平台公告為主要通知方式，必要時可透過電子郵件、電話等方式聯繫。網站公告視為通知已達成效力。
+          
+          第6條(會員資料登錄)
+          每位使用者限申請一個會員帳號並需綁定證件字號與手機號碼。
+          
+          可使用第三方帳號登入，但如第三方帳號服務異常或停用，本公司不負責。
+          
+          使用者須提供真實、正確、最新資料，否則本公司得暫停或終止服務。
+          
+          第7條(會員資料變更)
+          使用者應即時更新會員資料，因未更新導致訂單錯誤或其他損害，本公司不負責。
+          
+          第8條(使用環境)
+          使用者須自備上網設備及負擔相關費用。本公司不保證網路順暢或不中斷。
+          
+          第9條(禁止事項)
+          禁止違法使用本平台，包括但不限於侵犯智慧財產權、詐欺、攻擊系統、冒用他人資料等，違反者本公司得終止服務並求償。
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 隱私權政策 Modal -->
+  <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="privacyModalLabel">NtickeTUB 隱私權政策</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+        </div>
+        <div class="modal-body">
+          1. 資料蒐集項目
+          基本資料：姓名、電話、電子郵件、地址、證件號碼。
+          
+          交易資料：訂單、付款、票券寄送資訊。
+          
+          使用紀錄：網站操作記錄、瀏覽資訊、裝置資訊等。
+          
+          2. 蒐集目的
+          完成購票及相關服務。
+          
+          提供客戶支援與售後服務。
+          
+          行銷推廣與活動資訊通知。
+          
+          服務品質與系統安全提升。
+          
+          3. 資料利用與保存
+          依法保留並僅用於上述目的。
+          
+          提供給合作之活動主辦單位或物流、金流、技術服務商。
+          
+          4. 第三方資料分享
+          僅於合作業務或依法要求時分享。
+          
+          不會販售使用者個人資料。
+                    
+          5. 使用者權利
+          查詢或請求閱覽。
+          
+          請求補充或更正。
+          
+          請求停止蒐集、處理或利用。
+          
+          請求刪除。
+          
+          6. 隱私權政策變更
+          本公司得隨時修訂隱私權政策，並於網站公告。
+          
+          7. 聯絡方式
+          如有任何隱私權問題，請聯繫本公司客服。
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="mb-3">
-    <h6 class="bg-secondary text-white p-2">看臺區</h6>
-    <div class="list-group">
-      <button class="list-group-item list-group-item-action">二樓A區</button>
-      <button class="list-group-item list-group-item-action">二樓B區</button>
-      <button class="list-group-item list-group-item-action">二樓C區</button>
-    </div>
-  </div>
-
-  <!-- 同意條款 -->
-  <div class="form-check mb-3">
-    <input class="form-check-input" type="checkbox" id="agreeTerms">
-    <label class="form-check-label" for="agreeTerms">
-      我已閱讀並同意 <a href="#">服務條款</a> 與 <a href="#">隱私權政策</a>
-    </label>
-  </div>
-
-  <!-- 下一步 -->
-  <button class="btn btn-dark w-100" id="nextBtn" disabled>下一步</button>
 </div>
 {% endblock %}

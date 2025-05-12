@@ -91,3 +91,33 @@ button {
   pointer-events: none;
   /* 禁止手動輸入 */
 }
+
+.selectable-option {
+  cursor: pointer;
+  border: 2px solid #ddd;
+  background-color: #f8f9fa;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+/*
+input[type="radio"]:checked+.selectable-option {
+  border-color: #4f46e5;
+  background-color: #e9ecef;
+}
+*/
+
+.selectable-option {
+  cursor: pointer;
+  border: 2px solid #ddd;
+  background-color: #f8f9fa;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.selectable-option:hover {
+  background-color: #e9ecef;
+  border-color: #4f46e5;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}

@@ -36,17 +36,36 @@ function showTab(tabName) {
   document.querySelectorAll('.btn-group .btn')[buttons[tabName]].classList.add('active');
 }
 
-// 啟用或停用 下一步 按鈕
+// 選擇區域下一步 按鈕
 document.addEventListener('DOMContentLoaded', function () {
   const agreeCheckbox = document.getElementById('agreeTerms');
-  const nextButton = document.getElementById('nextBtn');
+  const nextButton = document.getElementById('areaNextBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const areaForm = document.getElementById('areaForm');
 
-  if (agreeCheckbox && nextButton) {
-    agreeCheckbox.addEventListener('change', function () {
-      nextButton.disabled = !this.checked;
-    });
-  }
+  areaForm.addEventListener('submit', function (event) {
+    const isAreaSelected = document.querySelector('input[name="selected_area"]:checked') !== null;
+    const isTermsChecked = agreeCheckbox.checked;
+
+    // 檢查兩個條件是否都符合
+    if (!isAreaSelected || !isTermsChecked) {
+      event.preventDefault();  // 阻止表單送出
+      errorMsg.style.display = 'block';
+
+      if (!isAreaSelected && !isTermsChecked) {
+        errorMsg.textContent = '請選擇一個區域並同意服務條款與隱私權政策';
+      } else if (!isAreaSelected) {
+        errorMsg.textContent = '請選擇一個區域';
+      } else if (!isTermsChecked) {
+        errorMsg.textContent = '請同意服務條款與隱私權政策';
+      }
+    } else {
+      errorMsg.style.display = 'none';  // 通過驗證則隱藏錯誤訊息
+    }
+  });
 });
+
+
 
 // 控制票數增減
 document.querySelectorAll('.input-group').forEach(group => {
@@ -65,4 +84,36 @@ document.querySelectorAll('.input-group').forEach(group => {
   });
 });
 
+// 付款方式說明切換
+document.querySelectorAll('input[name="payment"]').forEach(radio => {
+  radio.addEventListener('change', function () {
+    const description = document.getElementById('paymentDescription');
+    if (this.id === 'creditCard') {
+      description.innerHTML = `
+        <strong>信用卡付款（Credit Card）</strong>
+        <ol>
+          <li>僅限 VISA, Mastercard, JCB。</li>
+          <li>未能正常扣款請聯絡發卡銀行。</li>
+        </ol>`;
+    } else if (this.id === 'atmTransfer') {
+      description.innerHTML = `
+        <strong>ATM 付款（ATM Fund Transfer）</strong>
+        <ol>
+          <li>請於 5 日內完成付款，並保存收據。</li>
+          <li>未按時付款訂單將自動取消。</li>
+        </ol>`;
+    }
+  });
+});
+
+// 確認付款模擬跳轉
+document.addEventListener('DOMContentLoaded', function () {
+  const submitButton = document.getElementById('submitPaymentBtn');
+  if (submitButton) {
+    submitButton.addEventListener('click', function () {
+      alert('付款成功，感謝您的訂購！');
+      window.location.href = '/payment/success'; // 替換為你的完成頁面路由
+    });
+  }
+});
 

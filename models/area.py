@@ -7,5 +7,6 @@ class Area(db.Model):
   seat_count = db.Column(db.Integer)
   price = db.Column(db.Integer)
   loc_id = db.Column(db.Integer, db.ForeignKey('location.loc_id'))
+  sect_id = db.Column(db.Integer, db.ForeignKey('section.sect_id'))
   createdAt = db.Column(db.Date)
   updatedAt = db.Column(db.Date)

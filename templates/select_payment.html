@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block title %}選擇付款方式 - NtickeTUB{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2>這裡是節目名稱</h2>
+  <p>
+    <i class="bi bi-calendar-event me-1"></i> 活動時間：2025/03/29(六) 19:30<br>
+    <i class="bi bi-geo-alt me-1"></i> 活動地點：高雄巨蛋 <a href="#" class="text-danger small">點此查看交通方式</a><br>
+    <i class="bi bi-people-fill me-1"></i> 主辦單位：近鐵國際
+  </p>
+
+  <!-- 進度條 -->
+  <div class="progress-steps-wrapper">
+    <div class="progress-steps">
+      <div class="step completed">
+        <div class="circle">✔</div>
+        <div class="label">選擇座位</div>
+        <div class="line"></div> <!-- 線只在右邊 -->
+      </div>
+      <div class="step completed">
+        <div class="circle">✔</div>
+        <div class="label">選擇票種</div>
+        <div class="line"></div>
+      </div>
+      <div class="step completed">
+        <div class="circle">✔</div>
+        <div class="label">選擇交易方式</div>
+        <div class="line"></div>
+      </div>
+      <div class="step">
+        <div class="circle">4</div>
+        <div class="label">確認付款</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 聯絡資訊 -->
+  <div class="border p-3 mb-4">
+    <h5>購票會員聯絡資訊</h5>
+    <div class="mb-2">
+      <label class="form-label">會員姓名：</label>
+      <input type="text" class="form-control" value="萬延興">
+    </div>
+    <div class="mb-2">
+      <label class="form-label">電子郵件：</label>
+      <input type="email" class="form-control" value="abc@gmail.com">
+    </div>
+    <div class="mb-2">
+      <label class="form-label">聯絡電話：</label>
+      <input type="text" class="form-control" value="0918674057">
+    </div>
+  </div>
+
+  <h5>付款方式</h5>
+  <div class="row g-3">
+    <div class="col-12">
+      <button class="card p-3 selectable-option w-100 text-start" onclick="location.href='/checkout/credit-card'">
+        <strong>信用卡付款（Credit Card）</strong>
+        <ol class="mb-0">
+          <li>僅限 VISA, Mastercard, JCB, 銀聯卡。</li>
+          <li>刷卡資料送出後，請務必回到本系統網站。</li>
+        </ol>
+      </button>
+    </div>
+    <div class="col-12">
+      <button class="card p-3 selectable-option w-100 text-start" onclick="location.href='/checkout/atm'">
+        <strong>ATM 付款（ATM Fund Transfer）</strong>
+        <ol class="mb-0">
+          <li>需另付轉帳手續費 $15 元。</li>
+          <li>不接受臨櫃匯款。</li>
+        </ol>
+      </button>
+    </div>
+  </div>
+
+{% endblock %}
