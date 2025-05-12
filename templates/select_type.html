@@ -2,83 +2,87 @@
 {% block title %}選擇票種 - NtickeTUB{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-  <h2>這裡是節目名稱</h2>
-  <p>
-    <i class="bi bi-calendar-event me-1"></i> 活動時間：2025/03/29(六) 19:30<br>
-    <i class="bi bi-geo-alt me-1"></i> 活動地點：高雄巨蛋 <a href="#" class="text-danger small">點此查看交通方式</a><br>
-    <i class="bi bi-people-fill me-1"></i> 主辦單位：近鐵國際
-  </p>
-
-  <!-- 進度條 -->
-  <div class="progress-steps-wrapper">
-    <div class="progress-steps">
-      <div class="step completed">
-        <div class="circle">✔</div>
-        <div class="label">選擇座位</div>
-        <div class="line"></div> <!-- 線只在右邊 -->
-      </div>
-      <div class="step completed">
-        <div class="circle">✔</div>
-        <div class="label">選擇票種</div>
-        <div class="line"></div>
-      </div>
-      <div class="step">
-        <div class="circle">3</div>
-        <div class="label">選擇交易方式</div>
-        <div class="line"></div>
-      </div>
-      <div class="step">
-        <div class="circle">4</div>
-        <div class="label">確認付款</div>
+<form method="POST" action="{{ url_for('lock_order', game_id=game.game_id, area_id=area.area_id) }}" id="ticketForm">
+  <div class="container my-5">
+    <h2>{{ show.show_name }}</h2>
+    <p>
+      <i class="bi bi-calendar-event me-1"></i> 活動時間：{{ game.game_date }} {{ game.game_time }}<br>
+      <i class="bi bi-geo-alt me-1"></i> 活動地點： {{ location.loc_name }}<br>
+      <i class="bi bi-people-fill me-1"></i> 主辦單位：{{ host.host_name }}
+    </p>
+  
+    <!-- 進度條 -->
+    <div class="progress-steps-wrapper">
+      <div class="progress-steps">
+        <div class="step completed">
+          <div class="circle">✔</div>
+          <div class="label">選擇座位</div>
+          <div class="line"></div> <!-- 線只在右邊 -->
+        </div>
+        <div class="step completed">
+          <div class="circle">✔</div>
+          <div class="label">選擇票種</div>
+          <div class="line"></div>
+        </div>
+        <div class="step">
+          <div class="circle">3</div>
+          <div class="label">選擇交易方式</div>
+          <div class="line"></div>
+        </div>
+        <div class="step">
+          <div class="circle">4</div>
+          <div class="label">確認付款</div>
+        </div>
       </div>
     </div>
+  
+    <!-- 票種表格 -->
+  
+    <table class="table table-bordered text-center">
+      <thead class="table-light">
+        <tr>
+          <th>票種</th>
+          <th>票價</th>
+          <th>數量</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>全票</td>
+          <td>TWD${{ area.price }}</td>
+          <td>
+            <div class="input-group justify-content-center">
+              <button type="button" class="btn btn-secondary btn-sm quantity-btn" data-target="fullTicketQty"
+                data-hidden="hiddenFullTicketQty" data-action="decrease">-</button>
+              <input type="text" id="fullTicketQty" class="form-control text-center" value="0" readonly style="max-width: 50px;">
+              <button type="button" class="btn btn-secondary btn-sm quantity-btn" data-target="fullTicketQty"
+                data-hidden="hiddenFullTicketQty" data-action="increase">+</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>身障票</td>
+          <td>TWD$2000</td>
+          <td>
+            <div class="input-group justify-content-center">
+              <button type="button" class="btn btn-secondary btn-sm quantity-btn" data-target="disabledTicketQty"
+                data-hidden="hiddenDisabledTicketQty" data-action="decrease">-</button>
+              <input type="text" id="disabledTicketQty" class="form-control text-center" value="0" readonly
+                style="max-width: 50px;">
+              <button type="button" class="btn btn-secondary btn-sm quantity-btn" data-target="disabledTicketQty"
+                data-hidden="hiddenDisabledTicketQty" data-action="increase">+</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 隱藏欄位 -->
+    <input type="hidden" name="full_ticket_quantity" id="hiddenFullTicketQty" value="0">
+    <input type="hidden" name="disabled_ticket_quantity" id="hiddenDisabledTicketQty" value="0">
+  
+    <!-- 下一步 -->
+    <button class="btn btn-dark w-100" id="typenextBtn" disabled>下一步</button>
   </div>
-
-  <!-- 票種表格 -->
-  <table class="table table-bordered text-center">
-    <thead class="table-light">
-      <tr>
-        <th>票種</th>
-        <th>票價</th>
-        <th>數量</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>全票</td>
-        <td>TWD$2200</td>
-        <td>
-          <div class="input-group justify-content-center">
-            <button class="btn btn-secondary btn-sm minus">-</button>
-            <input type="text" class="form-control text-center quantity" value="0" readonly style="max-width: 50px;">
-            <button class="btn btn-secondary btn-sm plus">+</button>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>身障票</td>
-        <td>TWD$2200</td>
-        <td>
-          <div class="input-group justify-content-center">
-            <button class="btn btn-secondary btn-sm minus">-</button>
-            <input type="text" class="form-control text-center quantity" value="0" readonly style="max-width: 50px;">
-            <button class="btn btn-secondary btn-sm plus">+</button>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- 同意條款 -->
-  <div class="form-check mb-3">
-    <input class="form-check-input" type="checkbox" id="agreeTerms">
-    <label class="form-check-label" for="agreeTerms">
-      我已閱讀並同意 <a href="#">服務條款</a> 與 <a href="#">隱私權政策</a>
-    </label>
-  </div>
-
-  <!-- 下一步 -->
-  <button class="btn btn-dark w-100" id="nextBtn" disabled>下一步</button>
-</div>
+</form>
 {% endblock %}
