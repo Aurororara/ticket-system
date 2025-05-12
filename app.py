@@ -1,6 +1,9 @@
 from flask import Flask, render_template, jsonify, request
 from config import Config
 from models import db
+from models.show import Show
+from models.host import Host
+from models.location import Location
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -58,15 +61,25 @@ def select_type():
 #節目詳情頁
 @app.route('/show/<int:show_id>')
 def show_detail(show_id):
-    show = {
-        'show_name': '台北商業大學第一屆校慶',
-        'show_desc': '一場為學生打造的熱鬧校慶活動！',
-        'show_pic': '/static/images/sample.jpg',
-        'createdAt': '2025-03-10',
-        'host': {'host_name': '近雄國際'},
-        'location': {'loc_name': '高雄巨蛋'}
+    show = Show.query.get_or_404(show_id)
+    host = Host.query.get(show.host_id)
+    location = Location.query.get(show.location_id)
+
+    show_data = {
+        'show_name': show.show_name,
+        'show_desc': show.show_desc,
+        'show_pic': show.show_pic,
+        'createdAt': show.createdAt,
+        'host': {'host_name': host.host_name if host else "未知主辦"},
+        'location': {'loc_name': location.loc_name if location else "未知地點"}
     }
-    return render_template('show_detail.html', show=show)
+
+    return render_template('show_detail.html', show=show_data)
+
+
+
+
+
 
 #跳轉至票夾跟會員頁
 @app.route('/member')

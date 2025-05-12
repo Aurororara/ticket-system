@@ -1,5 +1,8 @@
 from models.db import db
 
+def __repr__(self):
+    return f'<Show {self.show_name}>'
+
 class Show(db.Model):
     __tablename__ = 'show'
     show_id = db.Column(db.Integer, primary_key=True)
