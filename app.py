@@ -53,5 +53,21 @@ def select_area():
 def select_type():
     return render_template('select_type.html')
 
+#退款表單
+@app.route('/ticket/refund', methods=['GET', 'POST'])
+def refund_form():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+
+        print("收到退款申請：")
+        print("姓名：", name)
+        print("信箱：", email)
+        print("電話：", phone)
+
+        return "退款申請送出成功，請留意您的信箱通知。"
+    return render_template('refund_form.html')
+
 if __name__ == '__main__':
   app.run(debug=True)

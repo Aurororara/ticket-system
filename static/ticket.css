@@ -1,0 +1,82 @@
+body {
+    font-family: "微軟正黑體", sans-serif;
+    padding: 40px;
+    background-color: #fff;
+    color: #333;
+  }
+  
+  .form-container {
+    max-width: 700px;
+    margin: auto;
+  }
+  
+  h1, h2 {
+    margin-top: 40px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 5px;
+  }
+  
+  .box {
+    background-color: #eee;
+    padding: 20px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+  }
+  
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  
+  input[type="text"],
+  input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+  }
+  
+  .red {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .small-red {
+    color: red;
+    font-size: 0.9em;
+  }
+  
+  .policy-box {
+    background-color: #eee;
+    padding: 15px;
+    margin-top: 15px;
+    border: 1px solid #ccc;
+  }
+  
+  .policy-box ul {
+    padding-left: 20px;
+    list-style-type: disc;
+  }
+  
+  .btns {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .black-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 14px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .black-btn:hover {
+    background-color: #000;
+  }
+

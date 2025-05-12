@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>退款申請表單</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='ticket.css') }}">
+</head>
+<body>
+  <div class="form-container">
+    <h1>退款資訊</h1>
+    <div class="box">
+      <p>訂單編號：<span class="red">00001</span></p>
+      <p>節目名稱：台北商業大學第一屆校慶</p>
+      <p>活動地點：台北商業大學</p>
+      <p>活動時間：2025/6/6（六） 19:30</p>
+      <p>退款金額：<span class="red">TWD$2180</span>
+        <span class="small-red">**退款需自行支付20元手續費，詳情請見 <a href="#">退票說明</a>**</span>
+      </p>
+    </div>
+
+    <h2>付款人資訊</h2>
+    <form method="POST" action="/ticket/refund">
+      <div class="box">
+        <label>會員姓名</label>
+        <input type="text" name="name" required />
+
+        <label>電子信箱</label>
+        <input type="email" name="email" required />
+
+        <label>電話號碼</label>
+        <input type="text" name="phone" required />
+      </div>
+
+      <h2>NtickeTUB退款政策</h2>
+      <div class="policy-box">
+        <ul>
+          <li>請注意此交易金額將於退票步驟完成後，即刻於您的信用卡帳戶中進行線上付款。</li>
+          <li>退款處理完成後，款項將於三個工作日內退回至您的帳戶。</li>
+          <li>其餘未盡事宜依活動現場公告為主。</li>
+          <li>退換票恕不退回手續費。</li>
+        </ul>
+      </div>
+
+      <div class="btns">
+        <button type="submit" class="black-btn">我同意上述NtickeTUB退款政策</button>
+        <button type="button" class="black-btn" onclick="history.back()">回前頁</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
