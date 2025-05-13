@@ -12,6 +12,7 @@ from models.section import Section
 from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
 from models.location import Location
+from models.order import Order  #
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -182,6 +183,12 @@ def test_detail():
 # 執行伺服器
 # =======================
 
+#我的票夾
+@app.route('/my-tickets')
+@login_required
+def my_tickets():
+    user_orders = Order.query.filter_by(user_id=current_user.id).all()
+    return render_template('my_tickets.html', orders=user_orders)
 
 
 #節目詳情頁
