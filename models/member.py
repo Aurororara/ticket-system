@@ -1,3 +1,4 @@
+from flask_login import UserMixin
 from models.db import db
 
 class Member(db.Model):
@@ -11,3 +12,6 @@ class Member(db.Model):
   mem_phone = db.Column(db.String(20))
   createdAt = db.Column(db.Date)
   updatedAt = db.Column(db.Date)
+
+  def get_id(self):
+    return str(self.mem_id)  # Flask-Login 預設要能回傳 id

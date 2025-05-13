@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <title>搶票系統</title>
-  <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-  <h1>演唱會搶票系統</h1>
+{% extends "layout_2.html" %}
+
+{% block title %}主畫面 - NtickeTUB{% endblock %}
+
+{% block content %}
   <div id="ticket-list">載入中...</div>
 
   <script src="/static/main.js"></script>
-</body>
-</html>
+{% endblock %}

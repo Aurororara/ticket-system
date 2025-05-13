@@ -1,6 +1,7 @@
 roro.md
 __pycache__
 .DS_Store
+
 ticket-system.db
 requirements.txt
 *.sql

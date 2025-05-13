@@ -121,3 +121,36 @@ input[type="radio"]:checked+.selectable-option {
 .bg-light {
   background-color: #f8f9fa !important;
 }
+
+/* 左右按鈕靠近圖片 + 圓底樣式 */
+.custom-carousel-btn {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: rgba(200, 200, 200, 0.7);
+  border-radius: 50%;
+}
+
+.carousel-control-prev {
+  left: -20px;
+}
+
+.carousel-control-next {
+  right: -20px;
+}
+
+.extra-margin-top {
+  margin-top: 100px; /* 你可以改成 120px、150px 來看你喜歡多大 */
+}
+
+.event-date {
+  text-decoration: underline;
+}
+
+/* 確保搜尋框和按鈕在同一行 */
+.search-form {
+  display: flex;
+  width: 60%;
+}
+

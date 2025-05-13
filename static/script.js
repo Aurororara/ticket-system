@@ -36,6 +36,7 @@ function showTab(tabName) {
   document.querySelectorAll('.btn-group .btn')[buttons[tabName]].classList.add('active');
 }
 
+
 // 選擇區域下一步 按鈕
 document.addEventListener('DOMContentLoaded', function () {
   const agreeCheckbox = document.getElementById('agreeTerms');
@@ -65,7 +66,17 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+// 啟用或停用 下一步 按鈕
+document.addEventListener('DOMContentLoaded', function () {
+  const agreeCheckbox = document.getElementById('agreeTerms');
+  const nextButton = document.getElementById('nextBtn');
 
+  if (agreeCheckbox && nextButton) {
+    agreeCheckbox.addEventListener('change', function () {
+      nextButton.disabled = !this.checked;
+    });
+  }
+});
 
 // 控制票數增減
 document.querySelectorAll('.input-group').forEach(group => {
@@ -116,4 +127,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
+
 

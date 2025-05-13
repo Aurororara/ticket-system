@@ -1,0 +1,20 @@
+{% extends "layout_2.html" %}
+
+{% block title %}搜尋結果 - NtickeTUB{% endblock %}
+
+{% block content %}
+    <h2>搜尋結果</h2>
+    
+    {% if events %}
+        <ul>
+            {% for event in events %}
+                <li>
+                    <h5>{{ event.show_name }}</h5>
+                    <p>{{ event.show_desc }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>沒有找到符合條件的節目。</p>
+    {% endif %}
+{% endblock %}
