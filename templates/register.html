@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}註冊 - NtickeTUB{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center py-5">
+  <div class="card shadow-lg" style="max-width: 550px; width: 100%;">
+    <div class="card-body">
+      <h3 class="card-title text-center mb-4">加入會員</h3>
+      <form method="POST" action="{{ url_for('register') }}">
+
+        <div class="mb-3">
+          <label for="name" class="form-label">用戶名稱</label>
+          <input type="text" class="form-control" id="name" name="name" placeholder="請輸入用戶名稱" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">電子郵件信箱</label>
+          <input type="email" class="form-control" id="email" name="email" placeholder="請輸入電子郵件" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="phone" class="form-label">電話號碼</label>
+          <input type="tel" class="form-control" id="phone" name="phone" placeholder="請輸入電話號碼" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="birthdate" class="form-label">出生年月日</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+            <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">設定密碼</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="請輸入密碼" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="confirm_password" class="form-label">確認密碼</label>
+          <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="請再次輸入密碼" required>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-success">註冊</button>
+        </div>
+      </form>
+
+      <div class="text-center mt-3">
+        已經是會員？<a href="{{ url_for('login') }}" class="text-decoration-underline">登入會員</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

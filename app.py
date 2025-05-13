@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from config import Config
@@ -11,7 +11,6 @@ from models.area import Area
 from models.section import Section
 from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
-from models.location import Location
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -23,12 +22,20 @@ with app.app_context():
   db.create_all()
   print("資料表已建立完成")
 
-
 # 模擬票券資料（你也可以接資料庫）
 tickets = [
   {"id": 1, "title": "ENHYPEN 演唱會", "stock": 10},
   {"id": 2, "title": "IU 台北場", "stock": 5}
 ]
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # 這裡以後你會處理資料寫入資料庫
+        # 現在就先讓他跳轉回首頁
+        return redirect(url_for('index'))
+    return render_template('register.html')
+
 
 @app.route('/')
 def index():
@@ -83,7 +90,7 @@ def select_area(game_id):
 
   game, show, host, location = game_result
 
-   # 查詢 Area 與 Section
+  # 查詢 Area 與 Section
   area_results = db.session.query(Area, Section)\
   .join(Section, Area.sect_id == Section.sect_id)\
   .filter(Area.loc_id == show.location_id)\
@@ -153,9 +160,21 @@ def load_user(user_id):
     return Member.query.get(int(user_id))
 
 # =======================
+# 會員資料
+# =======================
+@app.route('/member-info')
+def member_info():
+    user = {
+        "name": "小明",
+        "phone": "0912345678",
+        "birthdate": "2006-03-25",
+        "disability": "無"  # 或 "有"
+    }
+    return render_template('member_info.html', user=user)
+
+# =======================
 # 登入登出
 # =======================
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -163,12 +182,14 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
+        # 查找用戶
         user = Member.query.filter_by(mem_email=email).first()
         if user and check_password_hash(user.mem_pwd, password):
             login_user(user)
-            return redirect(url_for('index'))
+            return redirect(url_for('member_info'))  # 登入成功後跳轉到 member_info 頁面
         else:
             error = '電子郵件或密碼錯誤'
+    
     return render_template('login.html', error=error)
 
 @app.route('/logout')
@@ -178,26 +199,36 @@ def logout():
     return redirect(url_for('login'))
 
 # =======================
+# 修改密碼
+# =======================
+@app.route('/change-password', methods=['GET', 'POST'])
+def change_password():
+    # 模擬目前登入的使用者資料
+    user = {
+        "name": "小明",
+        "phone": "0912345678",
+        "birthdate": "2006-03-25"  # 格式：YYYY-MM-DD
+    }
+
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if new_password != confirm_password:
+            flash('密碼不一致，請重新輸入', 'danger')
+            return render_template('change_password.html', user=user)
+
+        # 這裡應該寫密碼更新的資料庫邏輯
+        flash('密碼已成功更新！', 'success')
+        return redirect(url_for('change_password'))
+
+    return render_template('change_password.html', user=user)
+
+# =======================
 # 主頁與其他頁面
 # =======================
-
-@app.route('/show/<program_name>')
-def show_detail(program_name):
-    return f"這是 {program_name} 的節目詳情頁"
-
-@app.route('/show/test')
-def test_detail():
-    return "這是節目詳情測試頁"
-
-# =======================
-# 執行伺服器
-# =======================
-
-
-
-#節目詳情頁
 @app.route('/show/<int:show_id>')
-def show_detail(show_id):
+def show_detail(show_id):  # 這裡改為 show_detail_by_id
     show = Show.query.get_or_404(show_id)
     host = Host.query.get(show.host_id)
     location = Location.query.get(show.location_id)
@@ -213,12 +244,7 @@ def show_detail(show_id):
 
     return render_template('show_detail.html', show=show_data)
 
-
-
-
-
-
-#跳轉至票夾跟會員頁
+# 跳轉至票夾跟會員頁
 @app.route('/member')
 def member():
     return render_template('member.html')  # 需會員介面
@@ -226,7 +252,6 @@ def member():
 @app.route('/ticket')
 def ticket():
     return render_template('ticket.html')  # 需票夾頁面
-
 
 if __name__ == '__main__':
     app.run(debug=True)
