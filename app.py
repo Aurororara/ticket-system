@@ -11,6 +11,7 @@ from models.area import Area
 from models.section import Section
 from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
+from models.location import Location
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -191,6 +192,41 @@ def test_detail():
 # =======================
 # 執行伺服器
 # =======================
+
+
+
+#節目詳情頁
+@app.route('/show/<int:show_id>')
+def show_detail(show_id):
+    show = Show.query.get_or_404(show_id)
+    host = Host.query.get(show.host_id)
+    location = Location.query.get(show.location_id)
+
+    show_data = {
+        'show_name': show.show_name,
+        'show_desc': show.show_desc,
+        'show_pic': show.show_pic,
+        'createdAt': show.createdAt,
+        'host': {'host_name': host.host_name if host else "未知主辦"},
+        'location': {'loc_name': location.loc_name if location else "未知地點"}
+    }
+
+    return render_template('show_detail.html', show=show_data)
+
+
+
+
+
+
+#跳轉至票夾跟會員頁
+@app.route('/member')
+def member():
+    return render_template('member.html')  # 需會員介面
+
+@app.route('/ticket')
+def ticket():
+    return render_template('ticket.html')  # 需票夾頁面
+
 
 if __name__ == '__main__':
     app.run(debug=True)
