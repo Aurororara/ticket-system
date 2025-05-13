@@ -12,6 +12,7 @@ from models.section import Section
 from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
 from models.location import Location
+from models.order import Order  
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -120,20 +121,27 @@ def order_complete():
   return render_template('order_complete.html')
 
 #退款表單
-@app.route('/ticket/refund', methods=['GET', 'POST'])
-def refund_form():
+@app.route('/ticket/refund/<order_id>', methods=['GET', 'POST'])
+def refund_detail(order_id):
+    order = Order.query.filter_by(id=order_id).first()
+
+    if not order:
+        return "找不到此訂單", 404
+
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
         phone = request.form.get('phone')
 
-        print("收到退款申請：")
+        print("✅ 收到退款申請：")
         print("姓名：", name)
         print("信箱：", email)
         print("電話：", phone)
 
         return "退款申請送出成功，請留意您的信箱通知。"
-    return render_template('refund_form.html')
+
+    return render_template("refund_form.html", order_id=order.id, order=order)
+
 
 # 初始化登入管理
 login_manager = LoginManager()
