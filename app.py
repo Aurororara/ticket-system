@@ -12,7 +12,8 @@ from models.section import Section
 from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
 from models.location import Location
-from models.order import Order  
+from models.order import Order 
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -230,6 +231,23 @@ def change_password():
 # =======================
 # 主頁與其他頁面
 # =======================
+@app.route('/show/test')
+def test_detail():
+    return "這是節目詳情測試頁"
+
+# =======================
+# 執行伺服器
+# =======================
+
+#我的票夾
+@app.route('/my-tickets')
+@login_required
+def my_tickets():
+    user_orders = Order.query.filter_by(user_id=current_user.id).all()
+    return render_template('my_tickets.html', orders=user_orders)
+
+
+#節目詳情頁
 @app.route('/show/<int:show_id>')
 def show_detail(show_id):  # 這裡改為 show_detail_by_id
     show = Show.query.get_or_404(show_id)

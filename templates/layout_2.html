@@ -22,9 +22,10 @@
       </form>
 
       <div class="d-flex">
-      <a href="{{ url_for('login') }}" class="btn btn-outline-secondary me-2">我的會員</a>
-      <button class="btn btn-outline-secondary">我的票券</button>
-</div>
+        <button class="btn btn-outline-secondary me-2">我的會員</button>
+        <button class="btn btn-outline-secondary"><a href="{{ url_for('my_tickets') }}">我的票券</button></a>
+      </div>
+    </div>
   </nav>
 
   <!-- 幻燈片 -->
