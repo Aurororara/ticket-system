@@ -180,10 +180,6 @@ def logout():
 # 主頁與其他頁面
 # =======================
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 @app.route('/show/<program_name>')
 def show_detail(program_name):
     return f"這是 {program_name} 的節目詳情頁"
@@ -191,18 +187,6 @@ def show_detail(program_name):
 @app.route('/show/test')
 def test_detail():
     return "這是節目詳情測試頁"
-
-@app.route('/ticket/start')
-def view_ticket_start():
-    return render_template('ticket_start.html')
-
-@app.route('/ticket/select-area')
-def select_area():
-    return render_template('select_area.html')
-
-@app.route('/ticket/select-type')
-def select_type():
-    return render_template('select_type.html')
 
 # =======================
 # 執行伺服器
