@@ -23,13 +23,6 @@ with app.app_context():
   db.create_all()
   print("資料表已建立完成")
 
-
-# 模擬票券資料（你也可以接資料庫）
-tickets = [
-  {"id": 1, "title": "ENHYPEN 演唱會", "stock": 10},
-  {"id": 2, "title": "IU 台北場", "stock": 5}
-]
-
 @app.route('/')
 def index():
   return render_template('index.html')
@@ -181,10 +174,6 @@ def logout():
 # 主頁與其他頁面
 # =======================
 
-@app.route('/show/<program_name>')
-def show_detail(program_name):
-    return f"這是 {program_name} 的節目詳情頁"
-
 @app.route('/show/test')
 def test_detail():
     return "這是節目詳情測試頁"
@@ -212,10 +201,6 @@ def show_detail(show_id):
     }
 
     return render_template('show_detail.html', show=show_data)
-
-
-
-
 
 
 #跳轉至票夾跟會員頁
