@@ -58,15 +58,10 @@
       text-decoration: underline;
       cursor: pointer;
     }
-    .image {
-      width: 100%;
-      height: 800px;
-      background-color: #ddd;
+    .image{
       display: flex;
-      align-items: center;
       justify-content: center;
-      color: #888;
-      font-size: 20px;
+      align-items: center;
       margin: 20px 0;
     }
     .tabs {
@@ -136,8 +131,8 @@
 
 
 
-    <div class="image">
-      <img src="{{ show['show_pic'] }}" alt="節目圖片" style="width:100%; height:100%; object-fit: cover;">
+    <div class="image" style="text-align: center;">
+      <img src="{{ show['show_pic'] }}" alt="節目圖片" style="width: 100%; height: 800px; object-fit: cover; border-radius: 12px;">
     </div>
 
             <!-- 按鈕區 -->
