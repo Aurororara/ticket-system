@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
@@ -9,8 +10,7 @@ from models.section import Section
 from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
 from models.location import Location
-from models import Ticket, Order, Game, Show, Area
-
+from models import Ticket, Order, Game, Show, Area, GameArea
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -103,9 +103,93 @@ def select_area(game_id):
   grouped_areas=grouped_areas)
 
 # 購票選擇票種
-@app.route('/ticket/select-type')
-def select_type():
-  return render_template('select_type.html')
+@app.route('/ticket/<int:game_id>/<int:area_id>/select-type')
+def select_type(game_id, area_id):
+  # 查詢場次與區域對應的 GameArea
+  game_area = db.session.query(GameArea, Game, Show, Host, Location, Area)\
+  .join(Game, GameArea.game_id == Game.game_id)\
+  .join(Show, Game.show_id == Show.show_id)\
+  .join(Host, Show.host_id == Host.host_id)\
+  .join(Location, Show.location_id == Location.loc_id)\
+  .join(Area, GameArea.area_id == Area.area_id)\
+  .filter(GameArea.game_id == game_id, GameArea.area_id == area_id)\
+  .first()
+
+  if not game_area:
+    return "查無此場次或區域", 404
+
+  game_area_data, game, show, host, location, area = game_area
+  
+  # 檢查剩餘座位
+  if game_area_data.available_seats <= 0: return "此區已售完" , 400
+  # 傳遞資料至模板
+  return render_template( 'select_type.html' ,
+    game=game, show=show, host=host, location=location, area=area, available_seats=game_area_data.available_seats )
+
+# 購票選擇票種
+@app.route('/ticket/<int:game_id>/<int:area_id>/lock-order', methods = ['POST'])
+def lock_order(game_id, area_id):
+  full_quantity = int(request.form.get('full_ticket_quantity', 0))
+  disabled_quantity = int(request.form.get('disabled_ticket_quantity', 0))
+  total_quantity = full_quantity + disabled_quantity
+
+  # 檢查票數
+  game_area = db.session.query(GameArea).filter_by(game_id = game_id, area_id = area_id).first()
+  if not game_area or game_area.available_seats < total_quantity:
+    return "票數不足或區域無效", 400
+
+  # 扣除可售票數
+  game_area.available_seats -= total_quantity
+
+# 查詢票價
+  area = db.session.query(Area).filter_by(area_id=area_id).first()
+  ticket_price = area.price if area else 0
+
+  # 建立訂單
+  new_order = Order(
+    order_status='N',  # N: 未付款
+    buyer_name='待填寫',
+    buyer_email='待填寫',
+    buyer_phone='待填寫',
+    total_price= (ticket_price * full_quantity) + (2000 * disabled_quantity),
+    mem_id=None,
+    payment_id=None
+  )
+  db.session.add(new_order)
+  db.session.flush()  # 取得 new_order.order_id
+
+  # 取得該區域已用過的 seat_no
+  used_seat_nos = db.session.query(Ticket.seat_no)\
+    .filter_by(game_id=game_id, area_id=area_id)\
+    .all()
+  used_seat_nos = {seat_no for (seat_no,) in used_seat_nos}
+
+  # 預設座位池（例：A001 ~ A1000）
+  seat_pool = [f"A{i:03}" for i in range(1, game_area.total_seats + 1)]
+
+  # 選擇尚未使用的座位
+  available_seat_nos = [seat for seat in seat_pool if seat not in used_seat_nos]
+
+  if len(available_seat_nos) < total_quantity:
+    return "剩餘座位不足", 400
+
+  # 建立 Ticket
+  for i in range(total_quantity):
+    seat_no = available_seat_nos[i]
+    ticket = Ticket(
+      seat_no=seat_no,
+      ticket_status='L',
+      order_id=new_order.order_id,
+      game_id=game_id,
+      area_id=area_id
+    )
+    db.session.add(ticket)
+
+  # 提交所有變更
+  db.session.commit()
+
+  # 跳轉到選擇交易方式
+  return redirect(url_for('select_payment', order_id=new_order.order_id))
 
 # 購票付款方式
 @app.route('/ticket/select-payment')

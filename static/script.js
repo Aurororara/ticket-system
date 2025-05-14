@@ -1,69 +1,45 @@
-function showTab(tabName) {
-  const tabContent = document.getElementById('tabContent');
-  let content = '';
-
-  switch (tabName) {
-    case 'intro':
-      content = '這裡是節目介紹內容。';
-      break;
-    case 'notice':
-      content = '這裡是注意事項內容。';
-      break;
-    case 'seats':
-      content = '這裡是票區座位內容。';
-      break;
-    case 'pickup':
-      content = '這裡是取票說明內容。';
-      break;
-    case 'map':
-      content = '這裡是場館說明內容。';
-      break;
-    default:
-      content = '請選擇上方任一按鈕以檢視相關資訊。';
-  }
-
-  tabContent.innerHTML = `<p>${content}</p>`;
-
-  // Update button states
-  document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
-  const buttons = {
-    'intro': 0,
-    'notice': 1,
-    'seats': 2,
-    'pickup': 3,
-    'map': 4
-  };
-  document.querySelectorAll('.btn-group .btn')[buttons[tabName]].classList.add('active');
-}
 
 
 // 選擇區域下一步 按鈕
 document.addEventListener('DOMContentLoaded', function () {
-  const agreeCheckbox = document.getElementById('agreeTerms');
-  const nextButton = document.getElementById('areaNextBtn');
-  const errorMsg = document.getElementById('errorMsg');
-  const areaForm = document.getElementById('areaForm');
+  function setupQuantityControl(minusBtn, plusBtn, qtyInput, hiddenInput) {
+    minusBtn.addEventListener('click', function (event) {
+      event.preventDefault();
+      let qty = parseInt(qtyInput.value);
+      if (qty > 0) qtyInput.value = qty - 1;
+      hiddenInput.value = qtyInput.value;
+      toggleNextButton();
+    });
 
-  areaForm.addEventListener('submit', function (event) {
-    const isAreaSelected = document.querySelector('input[name="selected_area"]:checked') !== null;
-    const isTermsChecked = agreeCheckbox.checked;
+    plusBtn.addEventListener('click', function (event) {
+      event.preventDefault();
+      let qty = parseInt(qtyInput.value);
+      qtyInput.value = qty + 1;
+      hiddenInput.value = qtyInput.value;
+      toggleNextButton();
+    });
+  }
 
-    // 檢查兩個條件是否都符合
-    if (!isAreaSelected || !isTermsChecked) {
-      event.preventDefault();  // 阻止表單送出
-      errorMsg.style.display = 'block';
+  function toggleNextButton() {
+    const totalQty = parseInt(fullTicketQty.value) + parseInt(disabledTicketQty.value);
+    const nextBtn = document.getElementById('typenextBtn');
+    nextBtn.disabled = totalQty <= 0;
+  }
 
-      if (!isAreaSelected && !isTermsChecked) {
-        errorMsg.textContent = '請選擇一個區域並同意服務條款與隱私權政策';
-      } else if (!isAreaSelected) {
-        errorMsg.textContent = '請選擇一個區域';
-      } else if (!isTermsChecked) {
-        errorMsg.textContent = '請同意服務條款與隱私權政策';
-      }
-    } else {
-      errorMsg.style.display = 'none';  // 通過驗證則隱藏錯誤訊息
-    }
-  });
+  const fullTicketMinus = document.querySelectorAll('.minus')[0];
+  const fullTicketPlus = document.querySelectorAll('.plus')[0];
+  const fullTicketQty = document.getElementById('fullTicketQty');
+  const hiddenFullTicketQty = document.getElementById('hiddenFullTicketQty');
+
+  const disabledTicketMinus = document.querySelectorAll('.minus')[1];
+  const disabledTicketPlus = document.querySelectorAll('.plus')[1];
+  const disabledTicketQty = document.getElementById('disabledTicketQty');
+  const hiddenDisabledTicketQty = document.getElementById('hiddenDisabledTicketQty');
+
+  setupQuantityControl(fullTicketMinus, fullTicketPlus, fullTicketQty, hiddenFullTicketQty);
+  setupQuantityControl(disabledTicketMinus, disabledTicketPlus, disabledTicketQty, hiddenDisabledTicketQty);
+
+  toggleNextButton();
 });
 
 // 啟用或停用 下一步 按鈕
@@ -71,29 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const agreeCheckbox = document.getElementById('agreeTerms');
   const nextButton = document.getElementById('nextBtn');
 
-  if (agreeCheckbox && nextButton) {
-    agreeCheckbox.addEventListener('change', function () {
-      nextButton.disabled = !this.checked;
-    });
-  }
-});
-
-// 控制票數增減
-document.querySelectorAll('.input-group').forEach(group => {
-  const minusBtn = group.querySelector('.minus');
-  const plusBtn = group.querySelector('.plus');
-  const quantityInput = group.querySelector('.quantity');
-
-  minusBtn.addEventListener('click', () => {
-    let val = parseInt(quantityInput.value);
-    if (val > 0) quantityInput.value = val - 1;
-  });
-
-  plusBtn.addEventListener('click', () => {
-    let val = parseInt(quantityInput.value);
-    quantityInput.value = val + 1;
-  });
-});
 
 // 付款方式說明切換
 document.querySelectorAll('input[name="payment"]').forEach(radio => {
@@ -128,4 +81,37 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+// 選擇票種
+document.addEventListener('DOMContentLoaded', function () {
+  const nextBtn = document.getElementById('typenextBtn');
 
+  function updateButtonState() {
+    const totalQty = parseInt(document.getElementById('fullTicketQty').value) + parseInt(document.getElementById('disabledTicketQty').value);
+    nextBtn.disabled = totalQty <= 0;
+  }
+
+  document.querySelectorAll('.quantity-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const targetId = this.dataset.target;
+      const hiddenId = this.dataset.hidden;
+      const action = this.dataset.action;
+
+      const qtyInput = document.getElementById(targetId);
+      const hiddenInput = document.getElementById(hiddenId);
+
+      let qty = parseInt(qtyInput.value);
+
+      if (action === 'increase') {
+        qty += 1;
+      } else if (action === 'decrease' && qty > 0) {
+        qty -= 1;
+      }
+
+      qtyInput.value = qty;
+      hiddenInput.value = qty;
+      updateButtonState();
+    });
+  });
+
+  updateButtonState();
+})})
