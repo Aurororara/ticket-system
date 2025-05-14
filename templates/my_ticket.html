@@ -7,14 +7,13 @@
 
 {% if orders %}
   <div class="ticket-list">
-    {% for order in orders %}
-      <div class="ticket-card">
-        <p><strong>活動名稱：</strong>{{ order.event }}</p>
-        <p><strong>活動地點：</strong>{{ order.location }}</p>
-        <p><strong>活動時間：</strong>{{ order.datetime }}</p>
-        <p><strong>票券金額：</strong>TWD ${{ order.amount }}</p>
-        <a href="/ticket/refund/{{ order.id }}">申請退款</a>
-      </div>
+    {% for ticket, game, show, area in tickets %}
+        <div class="ticket-card">
+            <p>活動名稱：{{ show.show_name }}</p>
+            <p>活動時間：{{ game.game_date }} {{ game.game_time }}</p>
+            <p>座位區域：{{ area.area_name }}</p>
+            <p>票券編號：{{ ticket.ticket_id }}｜座位：{{ ticket.seat_no }}</p>
+        </div>
     {% endfor %}
   </div>
 {% else %}

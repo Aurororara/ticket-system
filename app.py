@@ -3,16 +3,13 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import check_password_hash
 from config import Config
 from models import db
-from models.show import Show
 from models.host import Host
-from models.game import Game
 from models.location import Location
-from models.area import Area
 from models.section import Section
 from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
 from models.location import Location
-from models.order import Order 
+from models import Ticket, Order, Game, Show, Area
 
 
 app = Flask(__name__)
@@ -243,8 +240,17 @@ def test_detail():
 @app.route('/my-tickets')
 @login_required
 def my_tickets():
-    user_orders = Order.query.filter_by(user_id=current_user.id).all()
-    return render_template('my_tickets.html', orders=user_orders)
+    tickets = (
+        db.session.query(Ticket, Game, Show, Area)
+        .join(Order, Ticket.order_id == Order.order_id)
+        .join(Game, Ticket.game_id == Game.game_id)
+        .join(Show, Game.show_id == Show.show_id)
+        .join(Area, Ticket.area_id == Area.area_id)
+        .filter(Order.mem_id == current_user.id)
+        .all()
+    )
+    return render_template('my_tickets.html', tickets=tickets)
+
 
 
 #節目詳情頁
