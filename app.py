@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
+from datetime import datetime
 from config import Config
 from models import db
 from models.show import Show
@@ -32,10 +33,6 @@ tickets = [
 # =======================
 # 註冊會員
 # =======================
-from werkzeug.security import generate_password_hash
-from datetime import datetime
-from datetime import datetime
-
 
 
 @app.route('/register', methods=['GET', 'POST'])
