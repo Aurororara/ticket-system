@@ -14,6 +14,7 @@ from models.member import Member  # Member model，記得有繼承 UserMixin
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config['SECRET_KEY'] = 'nanarosearca'
 
 # 初始化資料庫
 db.init_app(app)
@@ -28,13 +29,67 @@ tickets = [
   {"id": 2, "title": "IU 台北場", "stock": 5}
 ]
 
+# =======================
+# 註冊會員
+# =======================
+from werkzeug.security import generate_password_hash
+from datetime import datetime
+from datetime import datetime
+
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # 這裡以後你會處理資料寫入資料庫
-        # 現在就先讓他跳轉回首頁
-        return redirect(url_for('index'))
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        birthday_str = request.form.get('birthday')
+        
+        # 驗證 birthday 是否有填寫
+        if not birthday_str:
+            flash('請填寫出生年月日', 'danger')
+            return render_template('register.html')
+
+        try:
+            # 嘗試將 birthday 字符串轉換為 datetime 物件
+            birthday = datetime.strptime(birthday_str, '%Y-%m-%d').date()  # ✅ 轉成 datetime.date 物件
+        except ValueError:
+            flash('日期格式錯誤，請使用YYYY-MM-DD格式', 'danger')
+            return render_template('register.html')
+
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if password != confirm_password:
+            flash('密碼不一致，請重新輸入', 'danger')
+            return render_template('register.html')
+
+        if Member.query.filter_by(mem_email=email).first():
+            flash('此電子郵件已被註冊', 'danger')
+            return render_template('register.html')
+
+        hashed_pwd = generate_password_hash(password)
+
+        new_member = Member(
+            mem_name=name,
+            mem_email=email,
+            mem_pwd=hashed_pwd,
+            mem_phone=phone,
+            birthday=birthday,
+            createdAt=datetime.now(),
+            updatedAt=datetime.now()
+        )
+
+        db.session.add(new_member)
+        db.session.commit()
+        print(new_member)
+        flash('註冊成功，請登入', 'success')
+        return redirect(url_for('login'))
+    
+
     return render_template('register.html')
+
 
 
 @app.route('/')

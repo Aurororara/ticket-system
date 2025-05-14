@@ -7,7 +7,7 @@
     <div class="card shadow-lg" style="max-width: 400px; width: 100%;">
       <div class="card-body">
         <h3 class="card-title text-center mb-4">登入會員</h3>
-        <form method="POST" id="login-form">
+        <form method="POST" action="{{ url_for('login') }}">
           <div class="mb-3">
             <label for="email" class="form-label">電子郵件信箱</label>
             <input type="email" class="form-control" id="email" name="email" placeholder="請輸入電子郵件" required>
@@ -28,13 +28,5 @@
     </div>
   </div>
 
-  <script>
-    // JavaScript 用來處理登入按鈕點擊事件
-    document.getElementById('login-form').addEventListener('submit', function(event) {
-      event.preventDefault();  // 防止表單提交
-
-      // 假設登入成功，跳轉到會員資料頁面
-      window.location.href = "{{ url_for('index') }}";  // 前端跳轉到 member_info 頁面
-    });
-  </script>
+  
 {% endblock %}
