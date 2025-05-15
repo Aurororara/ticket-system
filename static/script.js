@@ -1,51 +1,38 @@
 
-
 // 選擇區域下一步 按鈕
 document.addEventListener('DOMContentLoaded', function () {
-  function setupQuantityControl(minusBtn, plusBtn, qtyInput, hiddenInput) {
-    minusBtn.addEventListener('click', function (event) {
-      event.preventDefault();
-      let qty = parseInt(qtyInput.value);
-      if (qty > 0) qtyInput.value = qty - 1;
-      hiddenInput.value = qtyInput.value;
-      toggleNextButton();
-    });
+  const agreeCheckbox = document.getElementById('agreeTerms');
+  const nextButton = document.getElementById('areaNextBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const areaForm = document.getElementById('areaForm');
 
-    plusBtn.addEventListener('click', function (event) {
-      event.preventDefault();
-      let qty = parseInt(qtyInput.value);
-      qtyInput.value = qty + 1;
-      hiddenInput.value = qtyInput.value;
-      toggleNextButton();
-    });
-  }
+  nextButton.addEventListener('click', function (event) {
+    const selectedAreaInput = document.querySelector('input[name="selected_area"]:checked');
+    const isAreaSelected = selectedAreaInput !== null;
+    const isTermsChecked = agreeCheckbox.checked;
 
-  function toggleNextButton() {
-    const totalQty = parseInt(fullTicketQty.value) + parseInt(disabledTicketQty.value);
-    const nextBtn = document.getElementById('typenextBtn');
-    nextBtn.disabled = totalQty <= 0;
-  }
+    if (!isAreaSelected || !isTermsChecked) {
+      event.preventDefault();  // 阻止預設行為
+      errorMsg.style.display = 'block';
 
-  const fullTicketMinus = document.querySelectorAll('.minus')[0];
-  const fullTicketPlus = document.querySelectorAll('.plus')[0];
-  const fullTicketQty = document.getElementById('fullTicketQty');
-  const hiddenFullTicketQty = document.getElementById('hiddenFullTicketQty');
+      if (!isAreaSelected && !isTermsChecked) {
+        errorMsg.textContent = '請選擇一個區域並同意服務條款與隱私權政策';
+      } else if (!isAreaSelected) {
+        errorMsg.textContent = '請選擇一個區域';
+      } else if (!isTermsChecked) {
+        errorMsg.textContent = '請同意服務條款與隱私權政策';
+      }
+      return;
+    }
 
-  const disabledTicketMinus = document.querySelectorAll('.minus')[1];
-  const disabledTicketPlus = document.querySelectorAll('.plus')[1];
-  const disabledTicketQty = document.getElementById('disabledTicketQty');
-  const hiddenDisabledTicketQty = document.getElementById('hiddenDisabledTicketQty');
-
-  setupQuantityControl(fullTicketMinus, fullTicketPlus, fullTicketQty, hiddenFullTicketQty);
-  setupQuantityControl(disabledTicketMinus, disabledTicketPlus, disabledTicketQty, hiddenDisabledTicketQty);
-
-  toggleNextButton();
+    // 驗證成功，取得區域與場次 ID 進行跳轉
+    errorMsg.style.display = 'none';
+    const areaId = selectedAreaInput.value;
+    const gameId = areaForm.dataset.gameId;
+    window.location.href = `/ticket/${gameId}/${areaId}/select-type`;
+  });
 });
 
-// 啟用或停用 下一步 按鈕
-document.addEventListener('DOMContentLoaded', function () {
-  const agreeCheckbox = document.getElementById('agreeTerms');
-  const nextButton = document.getElementById('nextBtn');
 
 
 // 付款方式說明切換
@@ -86,7 +73,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const nextBtn = document.getElementById('typenextBtn');
 
   function updateButtonState() {
-    const totalQty = parseInt(document.getElementById('fullTicketQty').value) + parseInt(document.getElementById('disabledTicketQty').value);
+    const fullQtyEl = document.getElementById('fullTicketQty');
+    const disabledQtyEl = document.getElementById('disabledTicketQty');
+
+    if (!fullQtyEl || !disabledQtyEl) return;
+
+    const totalQty = parseInt(fullQtyEl.value) + parseInt(disabledQtyEl.value);
     nextBtn.disabled = totalQty <= 0;
   }
 
@@ -114,4 +106,4 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   updateButtonState();
-})})
+});
