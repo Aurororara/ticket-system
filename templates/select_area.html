@@ -81,6 +81,36 @@
     <button type="button" id="areaNextBtn" class="btn btn-dark w-100">下一步</button>
   </form>
 
+ <script>
+    document.getElementById("areaNextBtn").addEventListener("click", function () {
+      const selected = document.querySelector('input[name="selected_area"]:checked');
+      const agreed = document.getElementById("agreeTerms").checked;
+      const errorMsg = document.getElementById("errorMsg");
+
+      if (!selected) {
+        errorMsg.textContent = "請選擇一個場區。";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      if (!agreed) {
+        errorMsg.textContent = "請勾選同意服務條款與隱私權政策。";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      errorMsg.style.display = "none";
+
+      const gameId = document.getElementById("areaForm").dataset.gameId;
+      const areaId = selected.value;
+
+      // 設定 action 並提交表單
+      const form = document.getElementById("areaForm");
+      form.action = `/ticket/${game.game_id}/${area_id}/lock-order`;
+      form.submit();
+    });
+  </script>
+
   <!-- 服務條款 Modal -->
   <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
@@ -91,44 +121,29 @@
         </div>
         <div class="modal-body">
           第1條(定義)
-          「本條款」：指「NtickeTUB 服務條款」。
-          
-          「本公司」：指NtickeTUB股份有限公司。
-          
-          「本平台」：指本公司經營之NtickeTUB網站所有頁面及本公司所設立之官方電子郵件帳號、社群媒體帳號。
-          
-          「使用者」：指使用本平台服務之所有人士，包括註冊會員、購票、瀏覽、查詢、提出聯繫等。
-          
-          「個人資料」：依據中華民國個人資料保護法所定義之個人資料。
-          
-          第2條(認知與同意接受)
-          當使用者登入或使用本平台服務，即視為已閱讀、瞭解並同意本條款。未滿7歲者不得註冊會員，7歲以上未滿18歲者需經法定代理人同意後方可使用。
-          
-          第3條(適用範圍)
-          本條款包含本平台公布之「隱私權政策」、各活動頁面資訊與其他規定。如各活動頁面有特別規定，則優先適用該規定。
-          
-          第4條(變更)
-          本公司得隨時公告修訂本條款，並自公告日起生效，使用者不得以未通知為由拒絕適用。
-          
-          第5條(通知)
-          以本平台公告為主要通知方式，必要時可透過電子郵件、電話等方式聯繫。網站公告視為通知已達成效力。
-          
-          第6條(會員資料登錄)
-          每位使用者限申請一個會員帳號並需綁定證件字號與手機號碼。
-          
-          可使用第三方帳號登入，但如第三方帳號服務異常或停用，本公司不負責。
-          
-          使用者須提供真實、正確、最新資料，否則本公司得暫停或終止服務。
-          
-          第7條(會員資料變更)
-          使用者應即時更新會員資料，因未更新導致訂單錯誤或其他損害，本公司不負責。
-          
-          第8條(使用環境)
-          使用者須自備上網設備及負擔相關費用。本公司不保證網路順暢或不中斷。
-          
-          第9條(禁止事項)
-          禁止違法使用本平台，包括但不限於侵犯智慧財產權、詐欺、攻擊系統、冒用他人資料等，違反者本公司得終止服務並求償。
-
+          「本條款」：指「NtickeTUB 服務條款」。<br>
+          「本公司」：指NtickeTUB股份有限公司。<br>
+          「本平台」：指本公司經營之NtickeTUB網站所有頁面及本公司所設立之官方電子郵件帳號、社群媒體帳號。<br>
+          「使用者」：指使用本平台服務之所有人士，包括註冊會員、購票、瀏覽、查詢、提出聯繫等。<br>
+          「個人資料」：依據中華民國個人資料保護法所定義之個人資料。<br>
+          第2條(認知與同意接受)<br>
+          當使用者登入或使用本平台服務，即視為已閱讀、瞭解並同意本條款。未滿7歲者不得註冊會員，7歲以上未滿18歲者需經法定代理人同意後方可使用。<br>
+          第3條(適用範圍)<br>
+          本條款包含本平台公布之「隱私權政策」、各活動頁面資訊與其他規定。如各活動頁面有特別規定，則優先適用該規定。<br>
+          第4條(變更)<br>
+          本公司得隨時公告修訂本條款，並自公告日起生效，使用者不得以未通知為由拒絕適用。<br>
+          第5條(通知)<br>
+          以本平台公告為主要通知方式，必要時可透過電子郵件、電話等方式聯繫。網站公告視為通知已達成效力。<br>
+          第6條(會員資料登錄)<br>
+          每位使用者限申請一個會員帳號並需綁定證件字號與手機號碼。<br>
+          可使用第三方帳號登入，但如第三方帳號服務異常或停用，本公司不負責。<br>
+          使用者須提供真實、正確、最新資料，否則本公司得暫停或終止服務。<br>
+          第7條(會員資料變更)<br>
+          使用者應即時更新會員資料，因未更新導致訂單錯誤或其他損害，本公司不負責。<br>
+          第8條(使用環境)<br>
+          使用者須自備上網設備及負擔相關費用。本公司不保證網路順暢或不中斷。<br>
+          第9條(禁止事項)<br>
+          禁止違法使用本平台，包括但不限於侵犯智慧財產權、詐欺、攻擊系統、冒用他人資料等，違反者本公司得終止服務並求償。<br>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
@@ -146,46 +161,30 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
         </div>
         <div class="modal-body">
-          1. 資料蒐集項目
-          基本資料：姓名、電話、電子郵件、地址、證件號碼。
-          
-          交易資料：訂單、付款、票券寄送資訊。
-          
-          使用紀錄：網站操作記錄、瀏覽資訊、裝置資訊等。
-          
-          2. 蒐集目的
-          完成購票及相關服務。
-          
-          提供客戶支援與售後服務。
-          
-          行銷推廣與活動資訊通知。
-          
-          服務品質與系統安全提升。
-          
-          3. 資料利用與保存
-          依法保留並僅用於上述目的。
-          
-          提供給合作之活動主辦單位或物流、金流、技術服務商。
-          
-          4. 第三方資料分享
-          僅於合作業務或依法要求時分享。
-          
-          不會販售使用者個人資料。
-                    
-          5. 使用者權利
-          查詢或請求閱覽。
-          
-          請求補充或更正。
-          
-          請求停止蒐集、處理或利用。
-          
-          請求刪除。
-          
-          6. 隱私權政策變更
-          本公司得隨時修訂隱私權政策，並於網站公告。
-          
-          7. 聯絡方式
-          如有任何隱私權問題，請聯繫本公司客服。
+          1. 資料蒐集項目<br>
+          基本資料：姓名、電話、電子郵件、地址、證件號碼。<br>
+          交易資料：訂單、付款、票券寄送資訊。<br>
+          使用紀錄：網站操作記錄、瀏覽資訊、裝置資訊等。<br>
+          2. 蒐集目的<br>
+          完成購票及相關服務。<br>
+          提供客戶支援與售後服務。<br>
+          行銷推廣與活動資訊通知。<br>
+          服務品質與系統安全提升。<br>
+          3. 資料利用與保存<br>
+          依法保留並僅用於上述目的。<br>
+          提供給合作之活動主辦單位或物流、金流、技術服務商。<br>
+          4. 第三方資料分享<br>
+          僅於合作業務或依法要求時分享。<br>
+          不會販售使用者個人資料。<br>
+          5. 使用者權利<br>
+          查詢或請求閱覽。<br>
+          請求補充或更正。<br>
+          請求停止蒐集、處理或利用。<br>
+          請求刪除。<br>
+          6. 隱私權政策變更<br>
+          本公司得隨時修訂隱私權政策，並於網站公告。<br>
+          7. 聯絡方式<br>
+          如有任何隱私權問題，請聯繫本公司客服。<br>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
