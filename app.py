@@ -83,7 +83,7 @@ def load_user(user_id):
     return Member.query.get(int(user_id))
 
 # =======================
-# 登入
+# 登入登出
 # =======================
 @app.route('/login', methods=['GET', 'POST'])
 def login():
