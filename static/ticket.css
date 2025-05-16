@@ -79,4 +79,21 @@ body {
   .black-btn:hover {
     background-color: #000;
   }
-
+  
+  .container {
+    max-width: 400px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  select,
+  button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    font-size: 16px;
+  }
+  
