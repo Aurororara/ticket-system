@@ -10,22 +10,19 @@
       <form>
         <div class="mb-3">
           <label for="name" class="form-label">用戶名稱</label>
-          <input type="text" class="form-control bg-light text-muted" id="name" name="name" value="{{ user.name }}" readonly>
+          <input type="text" class="form-control bg-light text-muted" id="name" name="name" value="{{ current_user.mem_name }}" readonly>
         </div>
         <div class="mb-3">
           <label for="phone" class="form-label">電話號碼</label>
-          <input type="text" class="form-control bg-light text-muted" id="phone" name="phone" value="{{ user.phone }}" readonly>
+          <input type="text" class="form-control bg-light text-muted" id="phone" name="phone" value="{{ current_user.mem_phone }}" readonly>
         </div>
         <div class="mb-3">
           <label for="birthdate" class="form-label">出生年月日</label>
-          <input type="date" class="form-control bg-light text-muted" id="birthdate" name="birthdate" value="{{ user.birthdate }}" readonly>
+          <input type="date" class="form-control bg-light text-muted" id="birthdate" name="birthdate" value="{{ current_user.birthday }}" readonly>
         </div>
         <div class="mb-3">
           <label for="disability" class="form-label">身心障礙認證</label>
-          <select id="disability" name="disability" class="form-select">
-            <option value="無" {% if user.disability == '無' %}selected{% endif %}>無</option>
-            <option value="有" {% if user.disability == '有' %}selected{% endif %}>有</option>
-          </select>
+          <input type="text" class="form-control bg-light text-muted" id="disability" name="disability" value="{{ current_user.disability or '無' }}" readonly>
         </div>
         <div class="d-grid gap-2">
           <a href="{{ url_for('change_password') }}" class="btn btn-outline-primary">修改密碼？</a>

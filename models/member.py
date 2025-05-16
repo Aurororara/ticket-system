@@ -1,7 +1,7 @@
 from flask_login import UserMixin
 from models.db import db
 
-class Member(db.Model):
+class Member(UserMixin, db.Model):  # ← 加上 UserMixin
   __tablename__ = 'member'
   mem_id = db.Column(db.Integer, primary_key=True)
   mem_name = db.Column(db.String(255))
@@ -14,4 +14,4 @@ class Member(db.Model):
   updatedAt = db.Column(db.Date)
 
   def get_id(self):
-    return str(self.mem_id)  # Flask-Login 預設要能回傳 id
+    return str(self.mem_id)  # 這樣 Flask-Login 才知道登入的是誰

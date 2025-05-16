@@ -3,7 +3,6 @@
 
 {% block content %}
 <div class="container my-5">
-<<<<<<< HEAD
   <h2>{{ show.show_name }}</h2>
   <p>
     <span class="d-inline-flex align-items-center">
@@ -46,7 +45,7 @@
   <!-- 選擇場區 -->
   <h5>請選擇場區</h5>
   <hr>
-  <form id="areaForm">
+  <form id="areaForm" data-game-id="{{ game.game_id }}">
     {% for sect_name, areas in grouped_areas.items() %}
     <div class="mb-3">
       <h6 class="bg-secondary text-white p-2">{{ sect_name }}</h6>
@@ -79,7 +78,7 @@
     <div id="errorMsg" class="text-danger mb-2" style="display: none;"></div>
 
     <!-- 下一步 -->
-    <button type="submit" id="areaNextBtn" class="btn btn-dark w-100">下一步</button>
+    <button type="button" id="areaNextBtn" class="btn btn-dark w-100">下一步</button>
   </form>
 
   <!-- 服務條款 Modal -->
@@ -196,18 +195,4 @@
   </div>
 
 </div>
-{% endblock %}<div class="mb-3">
-    <h6 class="bg-secondary text-white p-2">搖滾區</h6>
-    <div class="list-group">
-      <button class="list-group-item list-group-item-action">NEO CITY 1</button>
-      <button class="list-group-item list-group-item-action">NEO CITY 2</button>
-      <button class="list-group-item list-group-item-action">NEO CITY 3</button>
-    </div>
-  </div>
-
-  <div class="mb-3">
-    <h6 class="bg-secondary text-white p-2">看臺區</h6>
-    <div class="list-group">
-      <button class="list-group-item list-group-item-action">二樓A區</button>
-      <button class="list-group-item list-group-item-action">二樓B區</button>
-      <button class="list-group-item lis
+{% endblock %}

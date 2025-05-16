@@ -9,11 +9,11 @@
   <div class="form-container">
     <h1>退款資訊</h1>
     <div class="box">
-      <p>訂單編號：<span class="red">00001</span></p>
-      <p>節目名稱：台北商業大學第一屆校慶</p>
-      <p>活動地點：台北商業大學</p>
-      <p>活動時間：2025/6/6（六） 19:30</p>
-      <p>退款金額：<span class="red">TWD$2180</span>
+      <<p>訂單編號：<span class="red">{{ order_id }}</span></p>
+      <p>節目名稱：{{ order.event }}</p>
+      <p>活動地點：{{ order.location }}</p>
+      <p>活動時間：{{ order.datetime }}</p>
+      <p>退款金額：<span class="red">TWD${{ order.amount }}</span>
         <span class="small-red">**退款需自行支付20元手續費，詳情請見 <a href="#">退票說明</a>**</span>
       </p>
     </div>

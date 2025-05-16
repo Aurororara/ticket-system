@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}我的票券 - NtickeTUB{% endblock %}
+
+{% block content %}
+<h2>🎟 我的票券</h2>
+
+{% if orders %}
+  <div class="ticket-list">
+    {% for ticket, game, show, area in tickets %}
+        <div class="ticket-card">
+            <p>活動名稱：{{ show.show_name }}</p>
+            <p>活動時間：{{ game.game_date }} {{ game.game_time }}</p>
+            <p>座位區域：{{ area.area_name }}</p>
+            <p>票券編號：{{ ticket.ticket_id }}｜座位：{{ ticket.seat_no }}</p>
+        </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>目前沒有任何票券。</p>
+{% endif %}
+
+<style>
+  .ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .ticket-card {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 1rem;
+    background-color: #f9f9f9;
+  }
+  .ticket-card a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+</style>
+{% endblock %}
