@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from flask_login import LoginManager, login_user, login_required, current_user
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify,session
+from flask_login import LoginManager, login_user,logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from config import Config
@@ -98,6 +98,14 @@ def login():
         else:
             error = '電子郵件或密碼錯誤'
     return render_template('login.html', error=error)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    flash("您已成功登出")
+    return redirect(url_for('index'))
+
 
 # =======================
 # 修改密碼
