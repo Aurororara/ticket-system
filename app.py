@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from config import Config
@@ -10,7 +10,9 @@ from models.section import Section
 from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
 from models.location import Location
-from models import Ticket, Order, Game, Show, Area, GameArea
+from models import Ticket, Order, Game, Show, Area, GameArea, Payment
+from datetime import datetime,timedelta
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -191,25 +193,57 @@ def lock_order(game_id, area_id):
   # 跳轉到選擇交易方式
   return redirect(url_for('select_payment', order_id=new_order.order_id))
 
-# 購票付款方式
-@app.route('/ticket/select-payment')
-def select_payment():
-  return render_template('select_payment.html')
 
 # 購票ATM方式付款
-@app.route('/ticket/select-atm')
-def select_atm():
-  return render_template('atm.html')
+@app.route('/ticket/select-atm/<int:order_id>')
+def select_atm(order_id):
+  # 根據 order_id 取得訂單資訊顯示
+    order = Order.query.get_or_404(order_id)
+    payment = Payment.query.filter_by(payment_id=order.payment_id).first()
+
+    # 設定繳費期限為當前時間 + 15 分鐘
+    due_time = datetime.now() + timedelta(minutes=15)
+    formatted_due_time = due_time.strftime('%Y/%m/%d %H:%M')
+
+    return render_template('atm.html', order=order, payment=payment,payment_due_time=formatted_due_time)
 
 # 購票creditcard方式付款
-@app.route('/ticket/select-creditcard')
-def select_creditcard():
-  return render_template('creditcard.html')
+@app.route('/ticket/select-creditcard/<int:order_id>')
+def select_creditcard(order_id):
+  order = Order.query.get_or_404(order_id)
+  payment = Payment.query.filter_by
+  tickets = Ticket.query.filter_by(order_id=order_id).all()
+  show = None
+  if tickets:
+      game = Game.query.get(tickets[0].game_id)
+      show = Show.query.get(game.show_id)
+  return render_template('creditcard.html', order=order, payment=payment, show=show)
+
+
 
 # 購票完成頁面
-@app.route('/ticket/order-complete')
-def order_complete():
-  return render_template('order_complete.html')
+@app.route('/ticket/order-complete/<int:order_id>')
+def order_complete(order_id):
+  order = Order.query.get_or_404(order_id)
+  tickets = Ticket.query.filter_by(order_id=order_id).all()
+
+  # 預設使用第一張票取得相關資訊
+  if tickets:
+    game = Game.query.get(tickets[0].game_id)
+    show = Show.query.get(game.show_id)
+    location = Location.query.get(show.location_id)
+  else:
+    game = show = location = None
+
+  return render_template(
+    'order_complete.html',
+    order=order,
+    tickets=tickets,
+    show=show,
+    game=game,
+    location=location
+    )
+  # return render_template('order_complete.html')
 
 #退款表單
 @app.route('/ticket/refund/<order_id>', methods=['GET', 'POST'])
@@ -363,5 +397,83 @@ def member():
 def ticket():
     return render_template('ticket.html')  # 需票夾頁面
 
+@app.route('/ticket/select-payment/<int:order_id>')
+def select_payment(order_id):
+    order = Order.query.get_or_404(order_id)
+    tickets = Ticket.query.filter_by(order_id=order_id).all()
+    if not tickets:
+        return "找不到此訂單的票券", 404
+   
+    game = Game.query.get(tickets[0].game_id)
+    show = Show.query.get(game.show_id)
+    host = Host.query.get(show.host_id)
+    location = Location.query.get(show.location_id)
+
+    # 暫時用假資料 - 抓第一筆會員
+    member = Member.query.first()
+    if not member:
+      return "尚未建立會員資料，請先新增會員", 404
+
+    return render_template(
+        'select_payment.html',
+        show=show,
+        game=game,
+        host=host,
+        location=location,
+        member=member,
+        order=order
+    )
+
+@app.route('/ticket/select-payment-method', methods=['POST'])
+def select_payment_method():
+  order_id = request.form.get('order_id')
+  pay_method = request.form.get('pay_method')
+
+  order = Order.query.get_or_404(order_id)
+
+  # 建立 Payment 記錄
+  payment = Payment(
+      pay_method='C' if pay_method == 'creditcard' else 'A',  # C:信用卡, A:ATM
+      pay_status='N',  # N:未付款
+      amount=order.total_price,
+      paid_time=None,
+      createdAt=datetime.now(),
+      updatedAt=datetime.now()
+  )
+  db.session.add(payment)
+  db.session.flush()  # 讓 payment_id 生成，但還沒 commit
+
+  # 更新 Order 紀錄
+  order.payment_id = payment.payment_id
+  order.updatedAt = datetime.now()
+
+  db.session.commit()  # 一次性提交所有變更
+
+  # 根據付款方式導向相應頁面
+  if pay_method == 'creditcard':
+      return redirect(url_for('select_creditcard', order_id=order_id))
+  elif pay_method == 'atm':
+      return redirect(url_for('select_atm', order_id=order_id))
+  else:
+      return "未知的付款方式", 400
+  
+@app.route('/ticket/confirm-payment', methods=['POST'])
+def confirm_payment():
+  order_id = request.form.get('order_id')
+  order = Order.query.get_or_404(order_id)
+  payment = Payment.query.filter_by(payment_id=order.payment_id).first()
+
+  if payment:
+    payment.pay_status = 'Y'
+    payment.paid_time = datetime.now()
+    payment.updatedAt = datetime.now()
+
+  order.order_status = 'Y'
+  order.updatedAt = datetime.now()
+
+  db.session.commit()
+
+  return redirect(url_for('order_complete', order_id=order_id))
+
 if __name__ == '__main__':
-    app.run(debug=True)
+  app.run(debug=True)
