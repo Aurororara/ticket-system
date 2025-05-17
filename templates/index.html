@@ -1,9 +1,17 @@
 {% extends "layout_2.html" %}
 
-{% block title %}主畫面 - NtickeTUB{% endblock %}
+{% block title %}主頁 - NtickeTUB{% endblock %}
 
 {% block content %}
-  <div id="ticket-list">載入中...</div>
+  <div class="container">
+    <h1>歡迎來到 NtickeTUB！</h1>
 
-  <script src="/static/main.js"></script>
+    <!-- 顯示登入狀態 -->
+    {% if current_user.is_authenticated %}
+      <p>歡迎您，{{ current_user.mem_name }}！</p>
+      <a href="{{ url_for('member_info') }}" class="btn btn-primary">我的會員</a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="btn btn-primary">登入</a>
+    {% endif %}
+  </div>
 {% endblock %}

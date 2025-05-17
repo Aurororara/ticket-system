@@ -1,0 +1,30 @@
+[33m0d34be7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: pull origin main: Fast-forward
+[33m99650df[m HEAD@{1}: checkout: moving from member-nana to main
+[33mf289d79[m[33m ([m[1;31morigin/member-nana[m[33m, [m[1;32mmember-nana[m[33m)[m HEAD@{2}: checkout: moving from member-nana to member-nana
+[33mf289d79[m[33m ([m[1;31morigin/member-nana[m[33m, [m[1;32mmember-nana[m[33m)[m HEAD@{3}: commit: 修改日期圖示
+[33ma8fd119[m HEAD@{4}: checkout: moving from member-nana to member-nana
+[33ma8fd119[m HEAD@{5}: commit: 註冊會員後端-2
+[33me89d723[m HEAD@{6}: commit: 註冊會員後端
+[33m7cf5864[m HEAD@{7}: checkout: moving from main to member-nana
+[33m99650df[m HEAD@{8}: checkout: moving from member-nana to main
+[33m7cf5864[m HEAD@{9}: checkout: moving from main to member-nana
+[33m99650df[m HEAD@{10}: pull origin main: Fast-forward
+[33m3b966b2[m[33m ([m[1;31morigin/refund-dynamic-aurora[m[33m)[m HEAD@{11}: checkout: moving from member-nana to main
+[33m7cf5864[m HEAD@{12}: checkout: moving from main to member-nana
+[33m3b966b2[m[33m ([m[1;31morigin/refund-dynamic-aurora[m[33m)[m HEAD@{13}: pull origin main: Fast-forward
+[33m2078771[m HEAD@{14}: checkout: moving from member-nana to main
+[33m7cf5864[m HEAD@{15}: commit: 會員管理前端all
+[33m2078771[m HEAD@{16}: checkout: moving from main to member-nana
+[33m2078771[m HEAD@{17}: checkout: moving from main to main
+[33m2078771[m HEAD@{18}: reset: moving to HEAD
+[33m2078771[m HEAD@{19}: pull origin main: Fast-forward
+[33m0a344cf[m HEAD@{20}: checkout: moving from ticket-home-mika to main
+[33m1f4ea90[m[33m ([m[1;32mticket-home-mika[m[33m)[m HEAD@{21}: commit: 修改 layout_2.html，尚未完成
+[33m57427ff[m[33m ([m[1;31morigin/ticket-home-mika[m[33m)[m HEAD@{22}: commit: 會員登入前端
+[33m7d56b3c[m HEAD@{23}: checkout: moving from ticket-home-mika to ticket-home-mika
+[33m7d56b3c[m HEAD@{24}: commit: 切換節目詳情測試
+[33m78753e5[m HEAD@{25}: checkout: moving from ticket-home-mika to ticket-home-mika
+[33m78753e5[m HEAD@{26}: commit: 所有節目卡片
+[33m02dc384[m HEAD@{27}: checkout: moving from main to ticket-home-mika
+[33m0a344cf[m HEAD@{28}: checkout: moving from ticket-home-mika to main
+[33m02dc384[m HEAD@{29}: commit (initial): 幻燈片效果
