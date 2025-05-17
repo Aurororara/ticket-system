@@ -7,10 +7,23 @@
   <div class="card shadow-lg" style="max-width: 550px; width: 100%;">
     <div class="card-body">
       <h3 class="card-title text-center mb-4">加入會員</h3>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-3">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
       <form method="POST" action="{{ url_for('register') }}">
 
         <div class="mb-3">
-          <label for="name" class="form-label">用戶名稱</label>
+          <label for="name" class="form-label">用戶姓名</label>
           <input type="text" class="form-control" id="name" name="name" placeholder="請輸入用戶名稱" required>
         </div>
 
@@ -25,11 +38,8 @@
         </div>
 
         <div class="mb-3">
-          <label for="birthdate" class="form-label">出生年月日</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
-            <input type="date" class="form-control" id="birthdate" name="birthdate" required>
-          </div>
+          <label for="birthday" class="form-label">出生年月日</label>
+          <input type="date" class="form-control" id="birthday" name="birthday" required>
         </div>
 
         <div class="mb-3">
