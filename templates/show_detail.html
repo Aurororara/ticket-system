@@ -58,17 +58,32 @@
       text-decoration: underline;
       cursor: pointer;
     }
-    .image {
-      width: 100%;
-      height: 300px;
-      background-color: #ddd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #888;
-      font-size: 20px;
-      margin: 20px 0;
-    }
+  
+  .banner {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px;
+}
+
+
+.cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+
     .tabs {
       display: flex;
       gap: 10px;
@@ -116,16 +131,21 @@
   </style>
 </head>
 <body>
+
+<!-- ✅ 橫幅圖片先出現 -->
+<div class="banner">
+  <img src="{{ show.show_pic }}" alt="節目圖片">
+</div>
  <!-- 放在 container 外面！ -->
-    <div class="header">
-        <div class="logo">NtickeTUB</div>
-        <div class="buttons">
-            <a href="/member" class="button-link">我的會員</a>
-            <a href="/ticket" class="button-link">我的票券</a>
-        </div>
+<div class="header">
+    <div class="logo">NtickeTUB</div>
+    <div class="buttons">
+        <a href="/member" class="button-link">我的會員</a>
+        <a href="/ticket" class="button-link">我的票券</a>
     </div>
-    <div class="container">
-        <h1>{{ show.show_name }}</h1>
+</div>
+<div class="container">
+    <h1>{{ show.show_name }}</h1>
 
 <div class="info">
   <p>🕒 活動時間：{{ show.createdAt.strftime('%Y/%m/%d') }}（六）19:30</p>
@@ -138,9 +158,10 @@
   <p>📣 主辦單位：{{ show.host.host_name }}</p>
 </div>
 
-<div class="image" style="text-align: center;">
-  <img src="{{ show.show_pic }}" alt="節目圖片" style="max-width: 60%; height: auto; border-radius: 12px;">
+<div class="banner">
+  <img src="{{ show.show_pic }}" alt="節目圖片">
 </div>
+
 
 
 
@@ -151,23 +172,55 @@
     <button class="tab-btn" data-tab="tab-reminder">購票提醒</button>
     <button class="tab-btn" data-tab="tab-reminder2">取票說明</button>
     <button class="tab-btn" data-tab="tab-refund">退票說明</button>
-  </div>
+</div>
   
   <!-- 內容區 -->
   <div id="tab-intro" class="tab-content">
     <p>{{ show['show_desc'] }}</p>
   </div>
+
+  <div id="tab-rules" class="tab-content" style="display: none;">
+    <p> 
+      1.請勿於拍賣網站或是其他非NtickeTUB正式授權售票之通路、網站購票、也不要透過陌生代購進行購票，主辦單位與NtickeTUB均無法保證票券真實性。除可能衍生詐騙案件或交易糾紛外，以免影響自身權益，若發生演出現場無法入場或是其他問題，主辦單位及KKTIX概不負責。<br><br>
+      2.若有任何形式非供自用而加價轉售（無論加價名目為代購費、交通費、補貼等均包含在內）之情事者，已違反社會秩序維護法第64條第2款；且依文化創意產業發展法第十條之一第二項規定，將票券超過票面金額或定價販售者，按票券張數，由直轄市政府、縣（市）政府處每張票面金額之十倍至五十倍罰鍰，請勿以身試法!<br><br>
+      3.一人一票、憑票入場，票券視同有價證券，請妥善保存，如發生遺失、破損、燒毀或無法辨識等狀況，恕不補發。<br><br>
+      4.如遇票券毀損、滅失或遺失，主辦單位將依「藝文表演票券定型化契約應記載及不得記載事項」第七項「票券毀損、滅失及遺失之入場機制：主辦單位應提供消費者票券毀損、滅失及遺失時之入場機制並詳加說明。」之規定辦理，詳情請洽NtickeTUB客服中心。<br><br>
+      5.請勿攜帶相機、攝影機、DV、錄音機入場，未經主辦單位同意，禁止拍照、錄影、錄音。<br><br>
+      6.本節目禁止攜帶外食、飲料、任何種類之金屬、玻璃、寶特瓶容器、雷射筆、煙火或任何危險物品。<br><br>
+      7.各表演場館各有其入場規定，請持票人遵守之，遲到觀眾需遵守館方管制。<br><br>
+      8.消費者必須以真實姓名購票及填寫有效個人資訊，協助親友購買票券，應取得該個資所有人同意，一旦以虛假資料購買票券已經涉及刑法第二百十條「偽造私文書罪」：「偽造、變造私文書，足以生損害於公眾或他人者，處五年以下有期徒刑。」 ；且依文化創意產業發展法第十條之一第三項規定：「以虛偽資料或其他不正方式，利用電腦或其他相關設備購買藝文表演票券，取得訂票或取票憑證者，處三年以下有期徒刑，或科或併科新臺幣三百萬以下罰金。」，主辦單位及NtickeTUB皆有權利立即取消該消費者訂單，請勿以身試法!<br><br>
+      9.購票前請詳閱注意事項，一旦購票成功視為同意上述所有活動注意事項。<br><br>
+        </p>
+  </div>
+
+  <div id="tab-reminder" class="tab-content" style="display: none;">
+        <p> 
+          1. 現場取票服務時間與地點將於活動前 3 日公告於活動官網及 Email 通知，請留意相關訊息。<br><br>
+              
+          2. 若由他人代領，須出示購票人身份證影本、委託書與代領人有效證件；若文件不齊，將無法領取票券。<br><br>
+              
+          3. 請妥善保管票券，若遺失或損毀恕不補發。
+        </p>
+              
+  </div>
   
   <div id="tab-reminder2" class="tab-content" style="display: none;">
-    <p> 
-        1. 現場取票服務時間與地點將於活動前 3 日公告於活動官網及 Email 通知，請留意相關訊息。<br><br>
+      <p>
+        1. 購票前請詳細閱讀節目資訊、票價與入場規定，購票成功視為同意所有條款。<br><br>
         
-        2. 若由他人代領，須出示購票人身份證影本、委託書與代領人有效證件；若文件不齊，將無法領取票券。<br><br>
+        2. 每筆訂單最多限購數量依活動規定，超過上限將自動取消多餘票券。<br><br>
         
-        3. 請妥善保管票券，若遺失或損毀恕不補發。
+        3. 選擇票種後，請於時間內完成付款流程，逾時未付款座位將自動釋出。<br><br>
+        
+        4. 成功付款後系統將寄出確認信，可至「我的票券」查詢訂單狀態。<br><br>
+        
+        5. 若選擇電子票券，請妥善保存 QR Code 供現場掃描入場；若選擇實體票券，請依通知時間地點領取。<br><br>
+        
+        6. 如遇付款異常或無法完成交易，請立即聯繫客服信箱：ntubprincess@gmail.com。<br><br>
+        
+        7. 主辦單位及本平台保留活動變更及最終解釋之權利。
         </p>
-        
-  </div>
+    </div>
   
   <div id="tab-refund" class="tab-content" style="display: none;">
     <p>
