@@ -107,6 +107,7 @@ def view_ticket_start(show_id):
 
 # 購票選擇區域
 @app.route('/ticket/<int:game_id>/select-area')
+@login_required
 def select_area(game_id):
     game_result = db.session.query(Game, Show, Host, Location)\
         .join(Show, Game.show_id == Show.show_id)\
@@ -126,6 +127,7 @@ def select_area(game_id):
 
 # 購票選擇票種
 @app.route('/ticket/<int:game_id>/<int:area_id>/select-type')
+@login_required
 def select_type(game_id, area_id):
     game_area = db.session.query(GameArea, Game, Show, Host, Location, Area)\
         .join(Game, GameArea.game_id == Game.game_id)\
@@ -141,8 +143,9 @@ def select_type(game_id, area_id):
         return "此區已售完", 400
     return render_template('select_type.html', game=game, show=show, host=host, location=location, area=area, available_seats=game_area_data.available_seats)
 
-# 購票選擇票種
+# 鎖定訂單
 @app.route('/ticket/<int:game_id>/<int:area_id>/lock-order', methods=['POST'])
+@login_required
 def lock_order(game_id, area_id):
     full_quantity = int(request.form.get('full_ticket_quantity', 0))
     disabled_quantity = int(request.form.get('disabled_ticket_quantity', 0))
@@ -157,12 +160,11 @@ def lock_order(game_id, area_id):
     area = db.session.query(Area).filter_by(area_id=area_id).first()
     ticket_price = area.price if area else 0
     new_order = Order(
-        order_status='N',
-        buyer_name='待填寫',
-        buyer_email='待填寫',
-        buyer_phone='待填寫',
+        buyer_name=current_user.mem_name,
+        buyer_email=current_user.mem_email,
+        buyer_phone=current_user.mem_phone,
         total_price=(ticket_price * full_quantity) + (2000 * disabled_quantity),
-        mem_id=None,
+        mem_id=current_user.mem_id,
         payment_id=None
     )
     db.session.add(new_order)
@@ -194,6 +196,7 @@ def lock_order(game_id, area_id):
 
 # 購票ATM方式付款
 @app.route('/ticket/select-atm/<int:order_id>')
+@login_required
 def select_atm(order_id):
   # 根據 order_id 取得訂單資訊顯示
     order = Order.query.get_or_404(order_id)
@@ -207,6 +210,7 @@ def select_atm(order_id):
 
 # 購票creditcard方式付款
 @app.route('/ticket/select-creditcard/<int:order_id>')
+@login_required
 def select_creditcard(order_id):
   order = Order.query.get_or_404(order_id)
   payment = Payment.query.filter_by
@@ -221,6 +225,7 @@ def select_creditcard(order_id):
 
 # 購票完成頁面
 @app.route('/ticket/order-complete/<int:order_id>')
+@login_required
 def order_complete(order_id):
   order = Order.query.get_or_404(order_id)
   tickets = Ticket.query.filter_by(order_id=order_id).all()
@@ -375,7 +380,7 @@ def select_payment(order_id):
     location = Location.query.get(show.location_id)
 
     # 暫時用假資料 - 抓第一筆會員
-    member = Member.query.first()
+    member = Member.query.get(order.mem_id)
     if not member:
       return "尚未建立會員資料，請先新增會員", 404
 
@@ -441,4 +446,4 @@ def confirm_payment():
   return redirect(url_for('order_complete', order_id=order_id))
 
 if __name__ == '__main__':
-  app.run(debug=True)
+    app.run(debug=True)
