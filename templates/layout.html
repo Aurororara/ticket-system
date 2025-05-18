@@ -17,15 +17,32 @@
     </h1>
 
     <div>
-      <a href="{{ url_for('member_info') }}" class="btn btn-outline-secondary me-2">我的會員</a>
-      <a href="{{ url_for('my_tickets') }}" class="btn btn-outline-secondary">我的票券</a>
+      <div class="d-flex">
+        {% if current_user.is_authenticated %}
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="userDropdown"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            {{ current_user.mem_name }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="{{ url_for('member_info') }}">會員資料</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">登出</a></li>
+          </ul>
+        </div>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-outline-secondary me-2">我的會員</a>
+        {% endif %}
+        <a href="{{ url_for('my_tickets') }}" class="btn btn-outline-secondary">我的票券</a>
+      </div>
     </div>
   </nav>
 
   <main>
     {% block content %}{% endblock %}
   </main>
-
   <!-- 頁腳 -->
   <footer class="bg-light text-center py-3">
     <p>&copy; 2025 NtickeTUB. All Rights Reserved.</p>

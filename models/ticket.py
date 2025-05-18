@@ -10,3 +10,5 @@ class Ticket(db.Model):
   area_id = db.Column(db.Integer, db.ForeignKey('area.area_id'))
   createdAt = db.Column(db.Date)
   updatedAt = db.Column(db.Date)
+
+  area = db.relationship('Area', backref='tickets')
