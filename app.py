@@ -424,49 +424,6 @@ def update_refund_status(refund_id):
 def load_user(user_id):
     return Member.query.get(int(user_id))
 
-# 登入登出
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        user = Member.query.filter_by(mem_email=email).first()
-        if user and check_password_hash(user.mem_pwd, password):
-            login_user(user)
-            return redirect(url_for('index'))
-        else:
-            error = '電子郵件或密碼錯誤'
-    return render_template('login.html', error=error)
-
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    flash("您已成功登出")
-    return redirect(url_for('index'))
-
-# 修改密碼
-@app.route('/change-password', methods=['GET', 'POST'])
-@login_required
-def change_password():
-    if request.method == 'POST':
-        new_password = request.form['new_password']
-        confirm_password = request.form['confirm_password']
-
-        if new_password != confirm_password:
-            flash('密碼不一致，請重新輸入', 'danger')
-            return render_template('change_password.html', user=current_user)
-
-        hashed_pwd = generate_password_hash(new_password)
-        current_user.mem_pwd = hashed_pwd
-        current_user.updatedAt = datetime.now()
-        db.session.commit()
-
-        flash('密碼已成功更新！', 'success')
-        return redirect(url_for('change_password'))
-
-    return render_template('change_password.html', user=current_user)
 
 # 會員資料頁
 @app.route('/member')
