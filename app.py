@@ -24,6 +24,13 @@ with app.app_context():
 # =======================
 # 註冊會員
 # =======================
+import re
+
+def validate_password(password):
+    # 至少8碼，至少一個大寫和一個小寫字母
+    pattern = r'^(?=.*[a-z])(?=.*[A-Z]).{8,}$'
+    return re.match(pattern, password)
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -44,6 +51,11 @@ def register():
 
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
+
+        # 密碼格式驗證
+        if not validate_password(password):
+            flash('密碼必須至少8碼且包含大小寫字母', 'danger')
+            return render_template('register.html')
 
         if password != confirm_password:
             flash('密碼不一致，請重新輸入', 'danger')
@@ -70,6 +82,7 @@ def register():
         return redirect(url_for('index'))
 
     return render_template('register.html')
+
 
 # =======================
 # 登入管理初始化
@@ -110,26 +123,38 @@ def logout():
 # =======================
 # 修改密碼
 # =======================
+from werkzeug.security import check_password_hash
+
 @app.route('/change-password', methods=['GET', 'POST'])
 @login_required
 def change_password():
     if request.method == 'POST':
+        old_password = request.form['old_password']
         new_password = request.form['new_password']
         confirm_password = request.form['confirm_password']
+
+        if not check_password_hash(current_user.mem_pwd, old_password):
+            flash('舊密碼錯誤', 'danger')
+            return render_template('change_password.html', user=current_user)
 
         if new_password != confirm_password:
             flash('密碼不一致，請重新輸入', 'danger')
             return render_template('change_password.html', user=current_user)
 
-        hashed_pwd = generate_password_hash(new_password)
-        current_user.mem_pwd = hashed_pwd
+        current_user.mem_pwd = generate_password_hash(new_password)
         current_user.updatedAt = datetime.now()
         db.session.commit()
 
-        flash('密碼已成功更新！', 'success')
-        return redirect(url_for('change_password'))
+        flash('密碼已成功更新，請重新登入', 'success')
+        
+        # 強制登出
+        logout_user()
+        return redirect(url_for('login'))  # 登出後導向登入頁面
 
     return render_template('change_password.html', user=current_user)
+
+
+
 
 # =======================
 # 會員資料頁
