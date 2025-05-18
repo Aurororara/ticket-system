@@ -4,6 +4,7 @@ from models import (
     Order, Payment, Ticket, GameArea
 )
 from datetime import datetime, date, time
+from werkzeug.security import generate_password_hash
 
 with app.app_context():
     # ❗清空資料表（開發時用，正式環境不要加）
@@ -14,9 +15,8 @@ with app.app_context():
     member = Member(
         mem_id=1,
         mem_name="玟潔",
-        mem_acc="aurora",
         mem_email="aurora@test.com",
-        mem_pwd="yeah123456",  # 若有加密請自行加密
+        mem_pwd=generate_password_hash("123456"),  # 密碼已加密
         birthday=date(2000, 1, 1),
         mem_phone="0912345678"
     )

@@ -3,22 +3,31 @@
 {% block title %}我的票券 - NtickeTUB{% endblock %}
 
 {% block content %}
-<h2>🎟 我的票券</h2>
+<h2>個人帳務清單</h2>
 
-{% if orders %}
+{% if tickets %}
   <div class="ticket-list">
     {% for ticket, game, show, area in tickets %}
+      <a href="{{ url_for('order_detail', order_id=ticket.order_id) }}" class="ticket-card-link" style="text-decoration:none; color: inherit;">
         <div class="ticket-card">
-            <p>活動名稱：{{ show.show_name }}</p>
-            <p>活動時間：{{ game.game_date }} {{ game.game_time }}</p>
-            <p>座位區域：{{ area.area_name }}</p>
-            <p>票券編號：{{ ticket.ticket_id }}｜座位：{{ ticket.seat_no }}</p>
+          <div class="ticket-card-left">
+            <img src="{{ url_for('static', filename='img/show1.jpg') }}" alt="活動圖片" class="ticket-image" />
+          </div>
+          <div class="ticket-card-right">
+            <h3 style="color: #e74c3c;">{{ show.show_name }}</h3>
+            <p>訂單編號：{{ '%05d'|format(ticket.order_id) }}</p>
+            <p>購買日期：{{ ticket.createdAt.strftime('%Y/%m/%d') if ticket.createdAt else '未知' }}</p>
+            <p>活動日期：{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }}</p>
+            <p>活動地點：{{ area.area_name }}</p>
+          </div>
         </div>
+      </a>
     {% endfor %}
   </div>
 {% else %}
   <p>目前沒有任何票券。</p>
 {% endif %}
+
 
 <style>
   .ticket-list {
@@ -28,15 +37,26 @@
     padding: 1rem;
   }
   .ticket-card {
+    display: flex;
     border: 1px solid #ccc;
     border-radius: 12px;
     padding: 1rem;
     background-color: #f9f9f9;
   }
-  .ticket-card a {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
+  .ticket-card-left {
+    flex: 1;
+    max-width: 200px;
+  }
+  .ticket-image {
+    width: 100%;
+    border-radius: 12px;
+  }
+  .ticket-card-right {
+    flex: 2;
+    padding-left: 1rem;
+  }
+  .ticket-card-right h3 {
+    margin-top: 0;
   }
 </style>
 {% endblock %}

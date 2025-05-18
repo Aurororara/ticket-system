@@ -10,6 +10,8 @@ from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
 from datetime import datetime
 from models.location import Location
+from models.refund import Refund
+from datetime import datetime
 from models import Ticket, Order, Game, Show, Area, GameArea
 
 app = Flask(__name__)
@@ -18,6 +20,12 @@ app.config['SECRET_KEY'] = 'nanarosearca'
 
 # 初始化資料庫
 db.init_app(app)
+
+# 初始化登入管理
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
 with app.app_context():
   db.create_all()
   print("資料表已建立完成")
@@ -208,31 +216,81 @@ def select_creditcard():
 def order_complete():
     return render_template('order_complete.html')
 
+
+
 #退款表單
-@app.route('/ticket/refund/<order_id>', methods=['GET', 'POST'])
+@app.route('/ticket/refund/<int:order_id>', methods=['GET', 'POST'])
 def refund_detail(order_id):
-    order = Order.query.filter_by(id=order_id).first()
+    order = Order.query.filter_by(order_id=order_id).first()
     if not order:
-        return "找不到此訂單", 404
+        abort(404, description="找不到此訂單")
+
+    # Check if refund request already exists for this order
+    existing_refund = Refund.query.filter_by(order_id=order_id).first()
+    if existing_refund:
+        return "此訂單已申請退款，請勿重複申請。", 400
+
+    # 透過訂單編號查詢票券
+    ticket = db.session.query(Ticket).filter_by(order_id=order_id).first()
+    show = None
+    location = None
+    datetime_str = None
+    if ticket:
+        show = Show.query.get(ticket.game_id)
+        location = Location.query.get(show.location_id) if show else None
+        datetime_str = show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') if show and show.createdAt else None
+
+    # Check if current time is at least 1 hour before show start time
+    if show and show.createdAt:
+        from datetime import datetime, timedelta
+        now = datetime.utcnow()
+        show_start = show.createdAt
+        if now > show_start - timedelta(hours=1):
+            return "退款申請必須在演出開始前一小時提出。", 400
+
+    amount = order.total_price - 20  # 扣除20元手續費
 
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
         phone = request.form.get('phone')
 
-        print("✅ 收到退款申請：")
-        print("姓名：", name)
-        print("信箱：", email)
-        print("電話：", phone)
+        if not name or not email or not phone:
+            return "請填寫完整退款資訊", 400
+
+        refund_request = Refund(
+            order_id=order.order_id,
+            name=name,
+            email=email,
+            phone=phone,
+            refund_status='pending',
+            createdAt=datetime.utcnow(),
+            updatedAt=datetime.utcnow()
+        )
+        db.session.add(refund_request)
+        db.session.commit()
 
         return "退款申請送出成功，請留意您的信箱通知。"
 
-    return render_template("refund_form.html", order_id=order.id, order=order)
+    return render_template("refund_form.html", order={
+        'order_id': order.order_id,
+        'event': show.show_name if show else '未知',
+        'location': location.loc_name if location else '未知',
+        'datetime': datetime_str if datetime_str else '未知',
+        'amount': amount
+    })
 
-# 登入管理初始化
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
+# 管理員更新退款狀態
+@app.route('/admin/refund/<int:refund_id>/update', methods=['POST'])
+def update_refund_status(refund_id):
+    refund = Refund.query.get_or_404(refund_id)
+    new_status = request.form.get('refund_status')
+    if new_status not in ['pending', 'approved', 'rejected']:
+        return "無效的退款狀態", 400
+    refund.refund_status = new_status
+    refund.updatedAt = datetime.utcnow()
+    db.session.commit()
+    return f"退款狀態已更新為 {new_status}"
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -298,10 +356,10 @@ def my_tickets():
         .join(Game, Ticket.game_id == Game.game_id)
         .join(Show, Game.show_id == Show.show_id)
         .join(Area, Ticket.area_id == Area.area_id)
-        .filter(Order.mem_id == current_user.id)
+        .filter(Order.mem_id == current_user.mem_id)
         .all()
     )
-    return render_template('my_tickets.html', tickets=tickets)
+    return render_template('my_ticket.html', tickets=tickets)
 
 # 節目詳情
 @app.route('/show/test')
@@ -326,6 +384,17 @@ def show_detail(show_id):
 
     return render_template('show_detail.html', show=show_data)
 
+
+# 訂單詳情頁
+@app.route('/order/<int:order_id>')
+def order_detail(order_id):
+    order = Order.query.get_or_404(order_id)
+    tickets = db.session.query(Ticket, Game, Show, Area)\
+        .join(Game, Ticket.game_id == Game.game_id)\
+        .join(Show, Game.show_id == Show.show_id)\
+        .join(Area, Ticket.area_id == Area.area_id)\
+        .filter(Ticket.order_id == order_id).all()
+    return render_template('order_detail.html', order=order, tickets=tickets)
 
 # 啟動伺服器
 if __name__ == '__main__':

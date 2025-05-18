@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}訂單詳情 - NtickeTUB{% endblock %}
+
+{% block content %}
+<h2>訂單詳情</h2>
+
+<div>
+  <p>訂單編號：{{ '%05d'|format(order.order_id) }}</p>
+  <p>訂購時間：{{ order.createdAt.strftime('%Y/%m/%d %H:%M') if order.createdAt else '未知' }}</p>
+  <p>訂單狀態：{{ order.order_status }}</p>
+</div>
+
+{% if tickets %}
+  <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+    <thead style="background-color: #f0f0f0;">
+      <tr>
+        <th>購買節目</th>
+        <th>場次 / 日期 / 場地</th>
+        <th>區域</th>
+        <th>座位</th>
+        <th>票種 / 價格 (NTD)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ticket, game, show, area in tickets %}
+      <tr>
+        <td>{{ show.show_name }}</td>
+        <td>{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }} / {{ show.location.loc_name if show.location else '未知' }}</td>
+        <td>{{ area.area_name }}</td>
+        <td>{{ ticket.seat_no }}</td>
+        <td>{{ ticket.ticket_type if ticket.ticket_type else '一般票' }} / {{ area.price if area.price else '未知' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" style="text-align: right; font-weight: bold;">訂購張數</td>
+        <td>{{ tickets|length }}</td>
+      </tr>
+      <tr>
+        <td colspan="4" style="text-align: right; font-weight: bold;">總計 (NTD)</td>
+        <td>{{ order.total_price }}</td>
+      </tr>
+    </tfoot>
+  </table>
+{% else %}
+  <p>此訂單沒有票券。</p>
+{% endif %}
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="{{ url_for('refund_detail', order_id=order.order_id) }}" class="btn-refund" style="background-color: #e74c3c; color: white; padding: 0.8rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold;">申請退款</a>
+</div>
+
+<style>
+  table th, table td {
+    padding: 8px 12px;
+  }
+  table th {
+    background-color: #f7f7f7;
+  }
+  .btn-refund:hover {
+    background-color: #c0392b;
+  }
+</style>
+{% endblock %}
