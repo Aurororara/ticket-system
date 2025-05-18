@@ -130,9 +130,11 @@
 <div class="info">
   <p>🕒 活動時間：{{ show.createdAt.strftime('%Y/%m/%d') }}（六）19:30</p>
   <p>
-    📍 活動地點：{{ show.location.loc_name }}
-    <a class="highlight" href="https://www.google.com/maps?q={{ show.location.loc_name }}" target="_blank">點我查看交通方式</a>
-  </p>
+    📍 活動地點：{{ show['location']['loc_name'] }}　
+    <a class="highlight" href="https://www.google.com/maps?q={{ show['location']['loc_name'] }}" target="_blank">
+      點我查看交通方式
+    </a>
+    </p>    
   <p>📣 主辦單位：{{ show.host.host_name }}</p>
 </div>
 
@@ -141,9 +143,6 @@
 </div>
 
 
-
-
-    <div class="image">[節目圖片]</div>
 
             <!-- 按鈕區 -->
 <div class="tab-buttons">
