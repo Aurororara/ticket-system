@@ -4,6 +4,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import check_password_hash, generate_password_hash
 from config import Config
 from models import db
+import re
 from models.host import Host
 from models.location import Location
 from models.section import Section
@@ -36,6 +37,11 @@ with app.app_context():
 # 註冊會員
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    def validate_password(password):
+        # 至少8碼，包含至少一個大寫與一個小寫字母
+        pattern = r'^(?=.*[a-z])(?=.*[A-Z]).{8,}$'
+        return re.match(pattern, password)
+
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
@@ -83,6 +89,7 @@ def register():
         login_user(new_member)
         flash('註冊成功，歡迎加入！', 'success')
         return redirect(url_for('index'))
+    
     return render_template('register.html')
 
 # =======================
@@ -424,12 +431,6 @@ def update_refund_status(refund_id):
 def load_user(user_id):
     return Member.query.get(int(user_id))
 
-
-# 會員資料頁
-@app.route('/member')
-@login_required
-def member_info():
-    return render_template('member_info.html', user=current_user)
 
 # 我的票夾
 @app.route('/my-tickets')
