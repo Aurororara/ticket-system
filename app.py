@@ -4,6 +4,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import check_password_hash, generate_password_hash
 from config import Config
 from models import db
+import re
 from models.host import Host
 from models.location import Location
 from models.section import Section
@@ -34,8 +35,14 @@ with app.app_context():
   print("資料表已建立完成")
 
 # 註冊會員
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    def validate_password(password):
+        # 密碼至少8碼，包含至少一個大寫與一個小寫字母
+        pattern = r'^(?=.*[a-z])(?=.*[A-Z]).{8,}$'
+        return re.match(pattern, password)
+
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
@@ -64,11 +71,15 @@ def register():
             flash('密碼不一致，請重新輸入', 'danger')
             return render_template('register.html')
 
+        # 檢查電子郵件是否已註冊
         if Member.query.filter_by(mem_email=email).first():
             flash('此電子郵件已被註冊', 'danger')
             return render_template('register.html')
 
+        # 密碼雜湊
         hashed_pwd = generate_password_hash(password)
+
+        # 建立新會員
         new_member = Member(
             mem_name=name,
             mem_email=email,
@@ -78,11 +89,15 @@ def register():
             createdAt=datetime.now(),
             updatedAt=datetime.now()
         )
+
         db.session.add(new_member)
         db.session.commit()
+
         login_user(new_member)
         flash('註冊成功，歡迎加入！', 'success')
         return redirect(url_for('index'))
+
+    # GET 請求呈現註冊頁面
     return render_template('register.html')
 
 # =======================
@@ -424,13 +439,6 @@ def update_refund_status(refund_id):
 def load_user(user_id):
     return Member.query.get(int(user_id))
 
-
-# 會員資料頁
-@app.route('/member')
-@login_required
-def member_info():
-    return render_template('member_info.html', user=current_user)
-
 # 我的票夾
 @app.route('/my-tickets')
 @login_required
@@ -446,10 +454,6 @@ def my_tickets():
     )
     return render_template('my_ticket.html', tickets=tickets)
 
-# 節目詳情
-@app.route('/show/test')
-def test_detail():
-    return "這是節目詳情測試頁"
 
 #節目詳情頁
 @app.route('/show/<int:show_id>')

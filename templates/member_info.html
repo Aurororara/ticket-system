@@ -20,10 +20,6 @@
           <label for="birthdate" class="form-label">出生年月日</label>
           <input type="date" class="form-control bg-light text-muted" id="birthdate" name="birthdate" value="{{ current_user.birthday }}" readonly>
         </div>
-        <div class="mb-3">
-          <label for="disability" class="form-label">身心障礙認證</label>
-          <input type="text" class="form-control bg-light text-muted" id="disability" name="disability" value="{{ current_user.disability or '無' }}" readonly>
-        </div>
         <div class="d-grid gap-2">
           <a href="{{ url_for('change_password') }}" class="btn btn-outline-primary">修改密碼？</a>
           <a href="{{ url_for('index') }}" class="btn btn-secondary">回首頁</a>

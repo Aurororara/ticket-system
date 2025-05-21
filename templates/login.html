@@ -8,6 +8,19 @@
       <div class="card-body">
         <h3 class="card-title text-center mb-4">登入會員</h3>
 
+        {# 顯示 flash 訊息 #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {# 顯示單純 error 變數訊息（原本的） #}
         {% if error %}
         <div class="alert alert-danger">{{ error }}</div>
         {% endif %}
