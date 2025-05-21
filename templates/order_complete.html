@@ -37,9 +37,23 @@
                 <i class="bi bi-ticket-perforated me-1"></i>
                 {{ ticket.area.area_name }} - 座位 {{ ticket.seat_no }}
               </div>
-              <div class="small text-muted">票價：NT${{ ticket.area.price }}</div>
+              <div class="small text-muted">
+                票價：NT$
+                {% if ticket.is_disabled %}
+                {{ ticket.area.disabled_price }}
+                {% else %}
+                {{ ticket.area.price }}
+                {% endif %}
+              </div>
             </div>
-            <div class="fw-bold text-danger">NT${{ ticket.area.price }}</div>
+            <div class="fw-bold text-danger">
+              NT$
+              {% if ticket.is_disabled %}
+              {{ ticket.area.disabled_price }}
+              {% else %}
+              {{ ticket.area.price }}
+              {% endif %}
+            </div>
           </div>
         </div>
         {% endfor %}

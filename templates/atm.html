@@ -30,14 +30,18 @@
 
   <!-- 訂單資訊 -->
   <div class="border p-3 mb-4">
+    <div class="text-end small mt-2">訂單編號：{{ order.order_id }}</div>
     <h6>票券</h6>
     {% for ticket in tickets %}
     <div class="d-flex justify-content-between">
       <span>{{ ticket.area.area_name }} {{ show.show_name }} {{ ticket.seat_no }}</span>
-      <span>TWD{{ ticket.area.price }}</span>
+      {% if ticket.is_disabled %}
+        <span>TWD{{ ticket.area.disabled_price }}</span>
+      {% else %}
+        <span>TWD{{ ticket.area.price }}</span>
+      {% endif %}
     </div>
     {% endfor %}
-    <div class="text-end small mt-2">訂單編號：{{ order.order_id }}</div>
     <div class="pt-3 mt-3 d-flex justify-content-end align-items-center bg-light p-2">
       <div class="border-top pt-3 d-flex justify-content-between align-items-center bg-light p-2">
         <span>項目小計</span>
