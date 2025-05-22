@@ -7,7 +7,7 @@
 
 {% if tickets %}
   <div class="ticket-list">
-    {% for ticket, game, show, area in tickets %}
+    {% for ticket, game, show, area, order in tickets %}
       <a href="{{ url_for('order_detail', order_id=ticket.order_id) }}" class="ticket-card-link" style="text-decoration:none; color: inherit;">
         <div class="ticket-card">
           <div class="ticket-card-left">
@@ -19,6 +19,14 @@
             <p>購買日期：{{ ticket.createdAt.strftime('%Y/%m/%d') if ticket.createdAt else '未知' }}</p>
             <p>活動日期：{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }}</p>
             <p>活動地點：{{ area.area_name }}</p>
+            <p>
+              退款狀態：
+              {% if refund_status_map[ticket.order_id] is defined %}
+                {{ refund_status_map[ticket.order_id] }}
+              {% else %}
+                無退款申請
+              {% endif %}
+            </p>
           </div>
         </div>
       </a>

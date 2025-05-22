@@ -1,4 +1,5 @@
 from models.db import db
+from sqlalchemy.orm import relationship
 
 class Order(db.Model):
   __tablename__ = 'order'
@@ -12,3 +13,5 @@ class Order(db.Model):
   payment_id = db.Column(db.Integer, db.ForeignKey('payment.payment_id'))
   createdAt = db.Column(db.Date)
   updatedAt = db.Column(db.Date)
+
+  payment = relationship('Payment', back_populates='order')
