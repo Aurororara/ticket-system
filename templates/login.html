@@ -8,7 +8,6 @@
       <div class="card-body">
         <h3 class="card-title text-center mb-4">登入會員</h3>
 
-        {# 顯示 flash 訊息 #}
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
@@ -20,9 +19,8 @@
           {% endif %}
         {% endwith %}
 
-        {# 顯示單純 error 變數訊息（原本的） #}
         {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
+          <div class="alert alert-danger">{{ error }}</div>
         {% endif %}
 
         <form method="POST" action="{{ url_for('login') }}">
@@ -32,7 +30,10 @@
           </div>
           <div class="mb-3">
             <label for="password" class="form-label">密碼</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="請輸入密碼" required>
+            <div class="input-group">
+              <input type="password" class="form-control" id="password" name="password" placeholder="請輸入密碼" required>
+              <button type="button" class="btn btn-light border" id="togglePassword" aria-label="切換密碼顯示">👁️</button>
+            </div>
           </div>
           <div class="d-grid">
             <button type="submit" class="btn btn-primary">登入</button>
@@ -46,4 +47,17 @@
       </div>
     </div>
   </div>
+
+  <script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const passwordInput = document.getElementById('password');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        this.textContent = '🙈';
+      } else {
+        passwordInput.type = 'password';
+        this.textContent = '👁️';
+      }
+    });
+  </script>
 {% endblock %}
