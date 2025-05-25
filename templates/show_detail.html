@@ -145,14 +145,15 @@
     <h1>{{ show.show_name }}</h1>
 
 <div class="info">
-  <p>🕒 活動時間：{{ show.createdAt.strftime('%Y/%m/%d') }}（六）19:30</p>
+  <p>🕒 活動時間：{{ show.createdAt.strftime('%Y/%m/%d') }} </p>
   <p>
     📍 活動地點：{{ show['location']['loc_name'] }}　
     <a class="highlight" href="https://www.google.com/maps?q={{ show['location']['loc_name'] }}" target="_blank">
       點我查看交通方式
     </a>
     </p>    
-  <p>📣 主辦單位：{{ show.host.host_name }}</p>
+  <p>📣 主辦單位：{{ show['host']['host_name'] }}</p>  <!-- ✅ -->
+
 </div>
 
 <div class="banner">
@@ -173,7 +174,7 @@
   
   <!-- 內容區 -->
   <div id="tab-intro" class="tab-content">
-    <p>{{ show['show_desc'] }}</p>
+    <p>{{ show['show_desc'] | nl2br }}</p>
   </div>
 
   <div id="tab-rules" class="tab-content" style="display: none;">

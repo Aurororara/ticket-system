@@ -17,6 +17,7 @@ from datetime import datetime
 from models import Ticket, Order, Game, Show, Area, GameArea
 from models import Ticket, Order, Game, Show, Area, GameArea, Payment
 from datetime import datetime,timedelta
+from markupsafe import Markup
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -539,6 +540,12 @@ def show_detail(show_id):
     }
 
     return render_template('show_detail.html', show=show_data)
+#換行
+@app.template_filter('nl2br')
+def nl2br_filter(s):
+    if s is None:
+        return ''
+    return Markup(s.replace("\n", "<br>\n"))
 
 
 # 訂單詳情頁
