@@ -1,51 +1,94 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <title>退款申請表單</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='ticket.css') }}">
-</head>
-<body>
-  <div class="form-container">
-    <h1>退款資訊</h1>
-    <div class="box">
-      <<p>訂單編號：<span class="red">{{ order_id }}</span></p>
-      <p>節目名稱：{{ order.event }}</p>
-      <p>活動地點：{{ order.location }}</p>
-      <p>活動時間：{{ order.datetime }}</p>
-      <p>退款金額：<span class="red">TWD${{ order.amount }}</span>
-        <span class="small-red">**退款需自行支付20元手續費，詳情請見 <a href="#">退票說明</a>**</span>
-      </p>
-    </div>
+{% extends "layout.html" %}
 
-    <h2>付款人資訊</h2>
-    <form method="POST" action="/ticket/refund">
-      <div class="box">
-        <label>會員姓名</label>
-        <input type="text" name="name" required />
+{% block title %}退款申請 - NtickeTUB{% endblock %}
 
-        <label>電子信箱</label>
-        <input type="email" name="email" required />
+{% block content %}
+<nav class="navbar navbar-light bg-light justify-content-between px-4">
+  <a class="navbar-brand" href="#">退款申請</a>
+</nav>
 
-        <label>電話號碼</label>
-        <input type="text" name="phone" required />
-      </div>
+{% if message %}
+<div class="alert alert-warning mt-3 mx-4" role="alert">
+  {{ message }}
+</div>
+{% endif %}
 
-      <h2>NtickeTUB退款政策</h2>
-      <div class="policy-box">
-        <ul>
-          <li>請注意此交易金額將於退票步驟完成後，即刻於您的信用卡帳戶中進行線上付款。</li>
-          <li>退款處理完成後，款項將於三個工作日內退回至您的帳戶。</li>
-          <li>其餘未盡事宜依活動現場公告為主。</li>
-          <li>退換票恕不退回手續費。</li>
-        </ul>
-      </div>
+<h2>退款資訊</h2>
 
-      <div class="btns">
-        <button type="submit" class="black-btn">我同意上述NtickeTUB退款政策</button>
-        <button type="button" class="black-btn" onclick="history.back()">回前頁</button>
-      </div>
-    </form>
+<div class="refund-info">
+  <p>訂單編號：<span class="highlight">{{ '%05d'|format(order.order_id) }}</span></p>
+  <p>節目名稱：{{ order.show.show_name if order.show else '未知' }}</p>
+  <p>活動地點：{{ order.show.location.loc_name if order.show and order.show.location else '未知' }}</p>
+  <p>活動時間：{{ order.show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') if order.show and order.show.createdAt else '未知' }}</p>
+  <p>退款金額：TWD${{ order.total_price }}</p>
+  <p class="note">**退款需自行支付20(元)手續費，詳情請見 退票說明**</p>
+</div>
+
+{% if not message or message == "退款申請送出成功，請留意您的信箱通知。" %}
+<form method="POST" action="{{ url_for('refund_detail', order_id=order.order_id) }}">
+  <div class="form-group">
+    <label for="name">姓名</label>
+    <input type="text" id="name" name="name" required />
   </div>
-</body>
-</html>
+  <div class="form-group">
+    <label for="email">電子郵件</label>
+    <input type="email" id="email" name="email" required />
+  </div>
+  <div class="form-group">
+    <label for="phone">電話</label>
+    <input type="tel" id="phone" name="phone" required />
+  </div>
+  <button type="submit" class="btn-submit">送出退款申請</button>
+</form>
+{% endif %}
+
+<style>
+  .refund-info {
+    background-color: #ddd;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  .refund-info p {
+    margin: 0.3rem 0;
+  }
+  .highlight {
+    color: #e74c3c;
+    font-weight: bold;
+  }
+  .note {
+    color: #e74c3c;
+    font-size: 0.9rem;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+  }
+  input {
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  .btn-submit {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .btn-submit:hover {
+    background-color: #c0392b;
+  }
+</style>
+{% endblock %}

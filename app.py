@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from config import Config
 from models import db
+import re
 from models.host import Host
 from models.location import Location
 from models.section import Section
@@ -10,7 +12,11 @@ from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
 from datetime import datetime
 from models.location import Location
+from models.refund import Refund
+from datetime import datetime
 from models import Ticket, Order, Game, Show, Area, GameArea
+from models import Ticket, Order, Game, Show, Area, GameArea, Payment
+from datetime import datetime,timedelta
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -18,6 +24,12 @@ app.config['SECRET_KEY'] = 'nanarosearca'
 
 # 初始化資料庫
 db.init_app(app)
+
+# 初始化登入管理
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
 with app.app_context():
   db.create_all()
   print("資料表已建立完成")
@@ -25,6 +37,11 @@ with app.app_context():
 # 註冊會員
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    def validate_password(password):
+        # 至少8碼，包含至少一個大寫與一個小寫字母
+        pattern = r'^(?=.*[a-z])(?=.*[A-Z]).{8,}$'
+        return re.match(pattern, password)
+
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
@@ -43,6 +60,11 @@ def register():
 
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
+
+        # 密碼格式驗證
+        if not validate_password(password):
+            flash('密碼必須至少8碼且包含大小寫字母', 'danger')
+            return render_template('register.html')
 
         if password != confirm_password:
             flash('密碼不一致，請重新輸入', 'danger')
@@ -67,8 +89,92 @@ def register():
         login_user(new_member)
         flash('註冊成功，歡迎加入！', 'success')
         return redirect(url_for('index'))
+    
     return render_template('register.html')
 
+# =======================
+# 登入管理初始化
+# =======================
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Member.query.get(int(user_id))
+
+# =======================
+# 登入
+# =======================
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = Member.query.filter_by(mem_email=email).first()
+        if user and check_password_hash(user.mem_pwd, password):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            error = '電子郵件或密碼錯誤'
+    return render_template('login.html', error=error)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    flash("您已成功登出")
+    return redirect(url_for('index'))
+
+
+# =======================
+# 修改密碼
+# =======================
+from werkzeug.security import check_password_hash
+
+@app.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        old_password = request.form['old_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if not check_password_hash(current_user.mem_pwd, old_password):
+            flash('舊密碼錯誤', 'danger')
+            return render_template('change_password.html', user=current_user)
+
+        if new_password != confirm_password:
+            flash('密碼不一致，請重新輸入', 'danger')
+            return render_template('change_password.html', user=current_user)
+
+        current_user.mem_pwd = generate_password_hash(new_password)
+        current_user.updatedAt = datetime.now()
+        db.session.commit()
+
+        flash('密碼已成功更新，請重新登入', 'success')
+        
+        # 強制登出
+        logout_user()
+        return redirect(url_for('login'))  # 登出後導向登入頁面
+
+    return render_template('change_password.html', user=current_user)
+
+
+
+
+# =======================
+# 會員資料頁
+# =======================
+@app.route('/member')
+@login_required
+def member_info():
+    return render_template('member_info.html', user=current_user)
+
+# =======================
+# 首頁
+# =======================
 @app.route('/')
 def index():
   return render_template('index.html')
@@ -104,6 +210,7 @@ def view_ticket_start(show_id):
 
 # 購票選擇區域
 @app.route('/ticket/<int:game_id>/select-area')
+@login_required
 def select_area(game_id):
     game_result = db.session.query(Game, Show, Host, Location)\
         .join(Show, Game.show_id == Show.show_id)\
@@ -123,6 +230,7 @@ def select_area(game_id):
 
 # 購票選擇票種
 @app.route('/ticket/<int:game_id>/<int:area_id>/select-type')
+@login_required
 def select_type(game_id, area_id):
     game_area = db.session.query(GameArea, Game, Show, Host, Location, Area)\
         .join(Game, GameArea.game_id == Game.game_id)\
@@ -138,8 +246,9 @@ def select_type(game_id, area_id):
         return "此區已售完", 400
     return render_template('select_type.html', game=game, show=show, host=host, location=location, area=area, available_seats=game_area_data.available_seats)
 
-# 購票選擇票種
+# 鎖定訂單
 @app.route('/ticket/<int:game_id>/<int:area_id>/lock-order', methods=['POST'])
+@login_required
 def lock_order(game_id, area_id):
     full_quantity = int(request.form.get('full_ticket_quantity', 0))
     disabled_quantity = int(request.form.get('disabled_ticket_quantity', 0))
@@ -154,12 +263,11 @@ def lock_order(game_id, area_id):
     area = db.session.query(Area).filter_by(area_id=area_id).first()
     ticket_price = area.price if area else 0
     new_order = Order(
-        order_status='N',
-        buyer_name='待填寫',
-        buyer_email='待填寫',
-        buyer_phone='待填寫',
+        buyer_name=current_user.mem_name,
+        buyer_email=current_user.mem_email,
+        buyer_phone=current_user.mem_phone,
         total_price=(ticket_price * full_quantity) + (2000 * disabled_quantity),
-        mem_id=None,
+        mem_id=current_user.mem_id,
         payment_id=None
     )
     db.session.add(new_order)
@@ -188,120 +296,226 @@ def lock_order(game_id, area_id):
     db.session.commit()
     return redirect(url_for('select_payment', order_id=new_order.order_id))
 
-# 購票付款方式
-@app.route('/ticket/select-payment')
-def select_payment():
-    return render_template('select_payment.html')
 
 # 購票ATM方式付款
-@app.route('/ticket/select-atm')
-def select_atm():
-    return render_template('atm.html')
+@app.route('/ticket/select-atm/<int:order_id>')
+@login_required
+def select_atm(order_id):
+  # 根據 order_id 取得訂單資訊顯示
+    order = Order.query.get_or_404(order_id)
+    payment = Payment.query.filter_by(payment_id=order.payment_id).first()
+
+    # 設定繳費期限為當前時間 + 15 分鐘
+    due_time = datetime.now() + timedelta(minutes=15)
+    formatted_due_time = due_time.strftime('%Y/%m/%d %H:%M')
+
+    return render_template('atm.html', order=order, payment=payment,payment_due_time=formatted_due_time)
 
 # 購票creditcard方式付款
-@app.route('/ticket/select-creditcard')
-def select_creditcard():
-    return render_template('creditcard.html')
+@app.route('/ticket/select-creditcard/<int:order_id>')
+@login_required
+def select_creditcard(order_id):
+  order = Order.query.get_or_404(order_id)
+  payment = Payment.query.filter_by
+  tickets = Ticket.query.filter_by(order_id=order_id).all()
+  show = None
+  if tickets:
+      game = Game.query.get(tickets[0].game_id)
+      show = Show.query.get(game.show_id)
+  return render_template('creditcard.html', order=order, payment=payment, show=show)
+
+
 
 # 購票完成頁面
-@app.route('/ticket/order-complete')
-def order_complete():
-    return render_template('order_complete.html')
+@app.route('/ticket/order-complete/<int:order_id>')
+@login_required
+def order_complete(order_id):
+  order = Order.query.get_or_404(order_id)
+  tickets = Ticket.query.filter_by(order_id=order_id).all()
+
+  # 預設使用第一張票取得相關資訊
+  if tickets:
+    game = Game.query.get(tickets[0].game_id)
+    show = Show.query.get(game.show_id)
+    location = Location.query.get(show.location_id)
+  else:
+    game = show = location = None
+
+  return render_template(
+    'order_complete.html',
+    order=order,
+    tickets=tickets,
+    show=show,
+    game=game,
+    location=location
+    )
+  # return render_template('order_complete.html')
+
+
 
 #退款表單
-@app.route('/ticket/refund/<order_id>', methods=['GET', 'POST'])
+@app.route('/ticket/refund/<int:order_id>', methods=['GET', 'POST'])
 def refund_detail(order_id):
-    order = Order.query.filter_by(id=order_id).first()
+    order = Order.query.filter_by(order_id=order_id).first()
     if not order:
-        return "找不到此訂單", 404
+        message = "找不到此訂單"
+        return render_template("refund_form.html", message=message, order={
+            'order_id': 0,
+            'show': None,
+            'location': None,
+            'datetime': '未知',
+            'amount': 0
+        }), 404
+
+    # Check if refund request already exists for this order
+    existing_refund = Refund.query.filter_by(order_id=order_id).first()
+    if existing_refund:
+        message = "此訂單已申請退款，請勿重複申請。"
+        order = Order.query.filter_by(order_id=order_id).first()
+        ticket = db.session.query(Ticket).filter_by(order_id=order_id).first()
+        show = None
+        location = None
+        datetime_str = None
+        if ticket:
+            show = Show.query.get(ticket.game_id)
+            location = Location.query.get(show.location_id) if show else None
+            datetime_str = show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') if show and show.createdAt else None
+        amount = order.total_price - 20 if order else 0
+        return render_template("refund_form.html", message=message, order={
+            'order_id': order.order_id if order else 0,
+            'show': show,
+            'location': location,
+            'datetime': datetime_str if datetime_str else '未知',
+            'amount': amount
+        }), 400
+
+    # 透過訂單編號查詢票券
+    ticket = db.session.query(Ticket).filter_by(order_id=order_id).first()
+    show = None
+    location = None
+    datetime_str = None
+    if ticket:
+        show = Show.query.get(ticket.game_id)
+        location = Location.query.get(show.location_id) if show else None
+        datetime_str = show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') if show and show.createdAt else None
+
+    # Check if current time is at least 1 hour before show start time
+    if show and show.createdAt:
+        from datetime import datetime, timedelta, date
+        now = datetime.utcnow()
+        show_start = datetime.combine(show.createdAt, datetime.min.time()) if isinstance(show.createdAt, date) else show.createdAt
+        if now > show_start - timedelta(hours=1):
+            message = "退款申請必須在演出開始前一小時提出。"
+            return render_template("refund_form.html", message=message, order={
+                'order_id': order.order_id if order else 0,
+                'show': show,
+                'location': Location.query.get(show.location_id) if show else None,
+                'datetime': show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') if show and show.createdAt else '未知',
+                'amount': order.total_price - 20 if order else 0
+            }), 400
+
+    amount = order.total_price - 20  # 扣除20元手續費
 
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
         phone = request.form.get('phone')
 
-        print("✅ 收到退款申請：")
-        print("姓名：", name)
-        print("信箱：", email)
-        print("電話：", phone)
+        if not name or not email or not phone:
+            message = "請填寫完整退款資訊"
+            return render_template("refund_form.html", message=message, order={
+                'order_id': order.order_id if order else 0,
+                'show': show,
+                'location': location,
+                'datetime': datetime_str if datetime_str else '未知',
+                'amount': amount
+            }), 400
 
-        return "退款申請送出成功，請留意您的信箱通知。"
+        # Determine refund status based on date difference
+        from datetime import datetime, timedelta, date
+        now = datetime.utcnow()
+        refund_status = 'pending'
+        if show and show.createdAt:
+            show_datetime = datetime.combine(show.createdAt, datetime.min.time()) if isinstance(show.createdAt, date) else show.createdAt
+            if now > show_datetime - timedelta(days=1):
+                refund_status = 'rejected'
 
-    return render_template("refund_form.html", order_id=order.id, order=order)
+        refund_request = Refund(
+            order_id=order.order_id,
+            name=name,
+            email=email,
+            phone=phone,
+            refund_status=refund_status,
+            createdAt=datetime.utcnow(),
+            updatedAt=datetime.utcnow()
+        )
+        db.session.add(refund_request)
+        db.session.commit()
 
-# 登入管理初始化
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
+        # Add ticket quantity back to GameArea for the whale order
+        tickets = Ticket.query.filter_by(order_id=order.order_id).all()
+        for ticket in tickets:
+            game_area = db.session.query(GameArea).filter_by(game_id=ticket.game_id, area_id=ticket.area_id).first()
+            if game_area:
+                game_area.available_seats += 1
+        db.session.commit()
+
+        message = "退款申請送出成功，請留意您的信箱通知。"
+        return render_template("refund_form.html", message=message, order={
+            'order_id': order.order_id,
+            'show': show,
+            'location': location,
+            'datetime': datetime_str if datetime_str else '未知',
+            'amount': amount
+        })
+
+    return render_template("refund_form.html", order={
+        'order_id': order.order_id,
+        'show': show,
+        'location': location,
+        'datetime': datetime_str if datetime_str else '未知',
+        'amount': amount
+    })
+
+# 管理員更新退款狀態
+@app.route('/admin/refund/<int:refund_id>/update', methods=['POST'])
+def update_refund_status(refund_id):
+    refund = Refund.query.get_or_404(refund_id)
+    new_status = request.form.get('refund_status')
+    if new_status not in ['pending', 'approved', 'rejected']:
+        return "無效的退款狀態", 400
+    refund.refund_status = new_status
+    refund.updatedAt = datetime.utcnow()
+    db.session.commit()
+    return f"退款狀態已更新為 {new_status}"
 
 @login_manager.user_loader
 def load_user(user_id):
     return Member.query.get(int(user_id))
 
-# 登入登出
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        user = Member.query.filter_by(mem_email=email).first()
-        if user and check_password_hash(user.mem_pwd, password):
-            login_user(user)
-            return redirect(url_for('index'))
-        else:
-            error = '電子郵件或密碼錯誤'
-    return render_template('login.html', error=error)
-
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    flash("您已成功登出")
-    return redirect(url_for('index'))
-
-# 修改密碼
-@app.route('/change-password', methods=['GET', 'POST'])
-@login_required
-def change_password():
-    if request.method == 'POST':
-        new_password = request.form['new_password']
-        confirm_password = request.form['confirm_password']
-
-        if new_password != confirm_password:
-            flash('密碼不一致，請重新輸入', 'danger')
-            return render_template('change_password.html', user=current_user)
-
-        hashed_pwd = generate_password_hash(new_password)
-        current_user.mem_pwd = hashed_pwd
-        current_user.updatedAt = datetime.now()
-        db.session.commit()
-
-        flash('密碼已成功更新！', 'success')
-        return redirect(url_for('change_password'))
-
-    return render_template('change_password.html', user=current_user)
-
-# 會員資料頁
-@app.route('/member')
-@login_required
-def member_info():
-    return render_template('member_info.html', user=current_user)
 
 # 我的票夾
 @app.route('/my-tickets')
 @login_required
 def my_tickets():
     tickets = (
-        db.session.query(Ticket, Game, Show, Area)
+        db.session.query(Ticket, Game, Show, Area, Order)
         .join(Order, Ticket.order_id == Order.order_id)
         .join(Game, Ticket.game_id == Game.game_id)
         .join(Show, Game.show_id == Show.show_id)
         .join(Area, Ticket.area_id == Area.area_id)
-        .filter(Order.mem_id == current_user.id)
+        .filter(Order.mem_id == current_user.mem_id)
         .all()
     )
-    return render_template('my_tickets.html', tickets=tickets)
+    # Get refund status for each order
+    order_ids = {ticket.Order.order_id for ticket in tickets}
+    refunds = Refund.query.filter(Refund.order_id.in_(order_ids)).all()
+    refund_status_map = {refund.order_id: refund.refund_status for refund in refunds}
+
+    # Debug print to verify refund_status_map content
+    print("Refund status map:", refund_status_map)
+
+    return render_template('my_ticket.html', tickets=tickets, refund_status_map=refund_status_map)
 
 # 節目詳情
 @app.route('/show/test')
@@ -327,6 +541,97 @@ def show_detail(show_id):
     return render_template('show_detail.html', show=show_data)
 
 
+# 訂單詳情頁
+@app.route('/order/<int:order_id>')
+def order_detail(order_id):
+    order = Order.query.get_or_404(order_id)
+    tickets = db.session.query(Ticket, Game, Show, Area)\
+        .join(Game, Ticket.game_id == Game.game_id)\
+        .join(Show, Game.show_id == Show.show_id)\
+        .join(Area, Ticket.area_id == Area.area_id)\
+        .filter(Ticket.order_id == order_id).all()
+    refund = Refund.query.filter_by(order_id=order_id).first()
+    refund_status = refund.refund_status if refund else None
+    return render_template('order_detail.html', order=order, tickets=tickets, refund_status=refund_status)
+
 # 啟動伺服器
+@app.route('/ticket/select-payment/<int:order_id>')
+def select_payment(order_id):
+    order = Order.query.get_or_404(order_id)
+    tickets = Ticket.query.filter_by(order_id=order_id).all()
+    if not tickets:
+        return "找不到此訂單的票券", 404
+   
+    game = Game.query.get(tickets[0].game_id)
+    show = Show.query.get(game.show_id)
+    host = Host.query.get(show.host_id)
+    location = Location.query.get(show.location_id)
+
+    # 暫時用假資料 - 抓第一筆會員
+    member = Member.query.get(order.mem_id)
+    if not member:
+      return "尚未建立會員資料，請先新增會員", 404
+
+    return render_template(
+        'select_payment.html',
+        show=show,
+        game=game,
+        host=host,
+        location=location,
+        member=member,
+        order=order
+    )
+
+@app.route('/ticket/select-payment-method', methods=['POST'])
+def select_payment_method():
+  order_id = request.form.get('order_id')
+  pay_method = request.form.get('pay_method')
+
+  order = Order.query.get_or_404(order_id)
+
+  # 建立 Payment 記錄
+  payment = Payment(
+      pay_method='C' if pay_method == 'creditcard' else 'A',  # C:信用卡, A:ATM
+      pay_status='N',  # N:未付款
+      amount=order.total_price,
+      paid_time=None,
+      createdAt=datetime.now(),
+      updatedAt=datetime.now()
+  )
+  db.session.add(payment)
+  db.session.flush()  # 讓 payment_id 生成，但還沒 commit
+
+  # 更新 Order 紀錄
+  order.payment_id = payment.payment_id
+  order.updatedAt = datetime.now()
+
+  db.session.commit()  # 一次性提交所有變更
+
+  # 根據付款方式導向相應頁面
+  if pay_method == 'creditcard':
+      return redirect(url_for('select_creditcard', order_id=order_id))
+  elif pay_method == 'atm':
+      return redirect(url_for('select_atm', order_id=order_id))
+  else:
+      return "未知的付款方式", 400
+  
+@app.route('/ticket/confirm-payment', methods=['POST'])
+def confirm_payment():
+  order_id = request.form.get('order_id')
+  order = Order.query.get_or_404(order_id)
+  payment = Payment.query.filter_by(payment_id=order.payment_id).first()
+
+  if payment:
+    payment.pay_status = 'Y'
+    payment.paid_time = datetime.now()
+    payment.updatedAt = datetime.now()
+
+  order.order_status = 'Y'
+  order.updatedAt = datetime.now()
+
+  db.session.commit()
+
+  return redirect(url_for('order_complete', order_id=order_id))
+
 if __name__ == '__main__':
     app.run(debug=True)

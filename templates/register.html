@@ -44,7 +44,7 @@
 
         <div class="mb-3">
           <label for="password" class="form-label">設定密碼</label>
-          <input type="password" class="form-control" id="password" name="password" placeholder="請輸入密碼" required>
+          <input type="password" class="form-control" id="password" name="password" placeholder="密碼必須至少8碼，包含大小寫字母" pattern="(?=.*[a-z])(?=.*[A-Z]).{8,}" title="密碼必須至少8碼，包含大小寫字母" required>
         </div>
 
         <div class="mb-3">
