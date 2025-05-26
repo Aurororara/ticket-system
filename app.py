@@ -204,7 +204,8 @@ def member_info():
 # =======================
 @app.route('/')
 def index():
-  return render_template('index.html')
+    shows = Show.query.all()  # 撈出所有節目資料
+    return render_template('index.html', shows=shows)
 
 @app.route('/api/buy', methods=['POST'])
 def buy_ticket():
