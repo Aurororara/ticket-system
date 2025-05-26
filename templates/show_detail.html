@@ -145,8 +145,16 @@
     <h1>{{ show.show_name }}</h1>
 
 <div class="info">
-  <p>🕒 活動時間：{{ show.createdAt.strftime('%Y/%m/%d') }} </p>
-  <p>
+  <p>🕒 活動時間：
+    {% if show.end_date and show.start_date != show.end_date %}
+      {{ show.start_date.strftime('%Y/%m/%d') }} ～ {{ show.end_date.strftime('%Y/%m/%d') }}
+    {% else %}
+      {{ show.start_date.strftime('%Y/%m/%d') }}
+    {% endif %}
+  </p>  
+
+
+<p>
     📍 活動地點：{{ show['location']['loc_name'] }}　
     <a class="highlight" href="https://www.google.com/maps?q={{ show['location']['loc_name'] }}" target="_blank">
       點我查看交通方式
@@ -157,7 +165,7 @@
 </div>
 
 <div class="banner">
-  <img src="{{ show.show_pic }}" alt="節目圖片">
+  <img src="{{ show['show_pic'] }}" alt="節目圖片">
 </div>
 
 
