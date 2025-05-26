@@ -4,7 +4,6 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import check_password_hash, generate_password_hash
 from config import Config
 from models import db
-import re
 from models.host import Host
 from models.location import Location
 from models.section import Section
@@ -19,6 +18,7 @@ from models import Ticket, Order, Game, Show, Area, GameArea, Payment
 from datetime import datetime,timedelta
 from markupsafe import Markup
 from models.game import Game
+from flask_migrate import Migrate
 
 
 app = Flask(__name__)
@@ -27,6 +27,9 @@ app.config['SECRET_KEY'] = 'nanarosearca'
 
 # 初始化資料庫
 db.init_app(app)
+
+# ✅ 正確順序：app 建立好後，再傳給 Migrate
+migrate = Migrate(app, db)
 
 # 初始化登入管理
 login_manager = LoginManager()
@@ -539,6 +542,8 @@ def show_detail(show_id):
         'show_id': show.show_id,
         'show_name': show.show_name,
         'show_desc': show.show_desc,
+        "start_date": show.start_date,
+        "end_date": show.end_date,
         'show_pic': show.show_pic,
         'createdAt': show.createdAt,
         'host': {'host_name': host.host_name if host else "未知主辦"},
