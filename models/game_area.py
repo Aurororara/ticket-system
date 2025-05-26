@@ -5,6 +5,7 @@ class GameArea(db.Model):
   game_area_id = db.Column(db.Integer, primary_key=True)
   total_seats = db.Column(db.Integer)
   available_seats = db.Column(db.Integer)
+  disabled_available_seats = db.Column(db.Integer)
   game_id = db.Column(db.Integer, db.ForeignKey('game.game_id'))
   area_id = db.Column(db.Integer, db.ForeignKey('area.area_id'))
   createdAt = db.Column(db.Date)

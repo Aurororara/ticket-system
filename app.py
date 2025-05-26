@@ -265,26 +265,29 @@ def lock_order(game_id, area_id):
     total_quantity = full_quantity + disabled_quantity
 
     game_area = db.session.query(GameArea).filter_by(game_id=game_id, area_id=area_id).first()
-    if not game_area or game_area.available_seats < total_quantity:
+    if not game_area or game_area.available_seats < full_quantity:
         return "票數不足或區域無效", 400
+    if game_area.disabled_available_seats < disabled_quantity:
+        return "超過此區可售身障票數量", 400
 
-    game_area.available_seats -= total_quantity
+    game_area.available_seats -= full_quantity
+    game_area.disabled_available_seats -= disabled_quantity
 
     area = db.session.query(Area).filter_by(area_id=area_id).first()
     ticket_price = area.price if area else 0
+    disabled_ticket_price = area.disabled_price if area else 0
     new_order = Order(
         buyer_name=current_user.mem_name,
         buyer_email=current_user.mem_email,
         buyer_phone=current_user.mem_phone,
-        total_price=(ticket_price * full_quantity) + (2000 * disabled_quantity),
+        total_price=(ticket_price * full_quantity) + (disabled_ticket_price * disabled_quantity),
         mem_id=current_user.mem_id,
         payment_id=None
     )
     db.session.add(new_order)
     db.session.flush()
 
-    used_seat_nos = db.session.query(Ticket.seat_no)\
-        .filter_by(game_id=game_id, area_id=area_id).all()
+    used_seat_nos = db.session.query(Ticket.seat_no).filter_by(game_id=game_id, area_id=area_id).all()
     used_seat_nos = {seat_no for (seat_no,) in used_seat_nos}
     seat_pool = [f"A{i:03}" for i in range(1, game_area.total_seats + 1)]
     available_seat_nos = [seat for seat in seat_pool if seat not in used_seat_nos]
@@ -292,11 +295,24 @@ def lock_order(game_id, area_id):
     if len(available_seat_nos) < total_quantity:
         return "剩餘座位不足", 400
 
-    for i in range(total_quantity):
+    for i in range(full_quantity):
         seat_no = available_seat_nos[i]
         ticket = Ticket(
             seat_no=seat_no,
             ticket_status='L',
+            is_disabled=False,
+            order_id=new_order.order_id,
+            game_id=game_id,
+            area_id=area_id
+        )
+        db.session.add(ticket)
+
+    for i in range(full_quantity):
+        seat_no = available_seat_nos[full_quantity + i]
+        ticket = Ticket(
+            seat_no=seat_no,
+            ticket_status='L',
+            is_disabled=True,
             order_id=new_order.order_id,
             game_id=game_id,
             area_id=area_id
@@ -311,28 +327,44 @@ def lock_order(game_id, area_id):
 @app.route('/ticket/select-atm/<int:order_id>')
 @login_required
 def select_atm(order_id):
-  # 根據 order_id 取得訂單資訊顯示
+    # 根據 order_id 取得訂單資訊顯示
     order = Order.query.get_or_404(order_id)
+
+    # 取得付款資訊
     payment = Payment.query.filter_by(payment_id=order.payment_id).first()
 
     # 設定繳費期限為當前時間 + 15 分鐘
     due_time = datetime.now() + timedelta(minutes=15)
     formatted_due_time = due_time.strftime('%Y/%m/%d %H:%M')
 
-    return render_template('atm.html', order=order, payment=payment,payment_due_time=formatted_due_time)
+    # 取得訂單中所有票券與區域
+    tickets = db.session.query(Ticket).filter_by(order_id=order_id).all()
+    show = None
+    if tickets:
+        first_game = Game.query.get(tickets[0].game_id)
+        show = Show.query.get(first_game.show_id)
+
+    return render_template(
+        'atm.html',
+        order=order,
+        payment=payment,
+        payment_due_time=formatted_due_time,
+        tickets=tickets,
+        show=show
+    )
 
 # 購票creditcard方式付款
 @app.route('/ticket/select-creditcard/<int:order_id>')
 @login_required
 def select_creditcard(order_id):
-  order = Order.query.get_or_404(order_id)
-  payment = Payment.query.filter_by
-  tickets = Ticket.query.filter_by(order_id=order_id).all()
-  show = None
-  if tickets:
-      game = Game.query.get(tickets[0].game_id)
-      show = Show.query.get(game.show_id)
-  return render_template('creditcard.html', order=order, payment=payment, show=show)
+    order = Order.query.get_or_404(order_id)
+    payment = Payment.query.filter_by
+    tickets = Ticket.query.filter_by(order_id=order_id).all()
+    show = None
+    if tickets:
+        game = Game.query.get(tickets[0].game_id)
+        show = Show.query.get(game.show_id)
+    return render_template('creditcard.html', order=order, payment=payment, show=show, tickets=tickets)
 
 
 
