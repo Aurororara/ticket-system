@@ -18,6 +18,8 @@ from models import Ticket, Order, Game, Show, Area, GameArea
 from models import Ticket, Order, Game, Show, Area, GameArea, Payment
 from datetime import datetime,timedelta
 from markupsafe import Markup
+from models.game import Game
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -36,10 +38,12 @@ with app.app_context():
   print("資料表已建立完成")
 
 # 註冊會員
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     def validate_password(password):
         # 至少8碼，包含至少一個大寫與一個小寫字母
+        # 密碼至少8碼，包含至少一個大寫與一個小寫字母
         pattern = r'^(?=.*[a-z])(?=.*[A-Z]).{8,}$'
         return re.match(pattern, password)
 
@@ -71,11 +75,15 @@ def register():
             flash('密碼不一致，請重新輸入', 'danger')
             return render_template('register.html')
 
+        # 檢查電子郵件是否已註冊
         if Member.query.filter_by(mem_email=email).first():
             flash('此電子郵件已被註冊', 'danger')
             return render_template('register.html')
 
+        # 密碼雜湊
         hashed_pwd = generate_password_hash(password)
+
+        # 建立新會員
         new_member = Member(
             mem_name=name,
             mem_email=email,
@@ -85,12 +93,13 @@ def register():
             createdAt=datetime.now(),
             updatedAt=datetime.now()
         )
+
         db.session.add(new_member)
         db.session.commit()
+
         login_user(new_member)
         flash('註冊成功，歡迎加入！', 'success')
         return redirect(url_for('index'))
-    
     return render_template('register.html')
 
 # =======================
@@ -518,10 +527,6 @@ def my_tickets():
 
     return render_template('my_ticket.html', tickets=tickets, refund_status_map=refund_status_map)
 
-# 節目詳情
-@app.route('/show/test')
-def test_detail():
-    return "這是節目詳情測試頁"
 
 #節目詳情頁
 @app.route('/show/<int:show_id>')
@@ -540,6 +545,17 @@ def show_detail(show_id):
     }
 
     return render_template('show_detail.html', show=show_data)
+#節目詳情跳轉至購票起始頁
+@app.route("/ticket/purchase/<int:show_id>")
+def ticket_start(show_id):
+    show = Show.query.get(show_id)
+    if not show:
+        abort(404)
+    host = Host.query.get(show.host_id)
+    location = Location.query.get(show.location_id)
+    games = Game.query.filter_by(show_id=show.show_id).all()
+    return render_template("ticket_start.html", s=show, host=host, location=location, games=games)
+
 #換行
 @app.template_filter('nl2br')
 def nl2br_filter(s):
