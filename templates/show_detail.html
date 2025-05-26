@@ -363,7 +363,8 @@
     
 
     <div class="buy-button">
-      <a href="{{ url_for('ticket_start', show_id=show.show_id) }}">前往購票</a>
+      <a href="{{ url_for('ticket_start', show_id=show['show_id']) }}">前往購票</a>
+
 
     </div>
   </div>

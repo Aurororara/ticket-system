@@ -536,6 +536,7 @@ def show_detail(show_id):
     location = Location.query.get(show.location_id)
 
     show_data = {
+        'show_id': show.show_id,
         'show_name': show.show_name,
         'show_desc': show.show_desc,
         'show_pic': show.show_pic,
