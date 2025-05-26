@@ -204,8 +204,14 @@ def member_info():
 # =======================
 @app.route('/')
 def index():
-    shows = Show.query.all()  # 撈出所有節目資料
-    return render_template('index.html', shows=shows)
+    # 取出近期節目，依開始日期排序，取前6筆
+    carousel_shows = Show.query.order_by(Show.start_date.asc()).limit(6).all()
+
+    # 取出所有節目（可依需求調整數量）
+    all_shows = Show.query.order_by(Show.start_date.asc()).all()
+
+    return render_template('index.html', carousel_shows=carousel_shows, shows=all_shows)
+
 
 @app.route('/api/buy', methods=['POST'])
 def buy_ticket():
