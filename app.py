@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, get_flashed_messages
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from config import Config
@@ -19,7 +19,7 @@ from datetime import datetime,timedelta
 from markupsafe import Markup
 from models.game import Game
 from flask_migrate import Migrate
-
+import re
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -119,9 +119,21 @@ def load_user(user_id):
 # =======================
 # 登入
 # =======================
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
+
+    # 取得所有 flashed 訊息並翻譯
+    messages = get_flashed_messages()
+    translated_messages = []
+    for msg in messages:
+        if msg == "Please log in to access this page.":
+            translated_messages.append("請先登入以瀏覽此頁面")
+        else:
+            translated_messages.append(msg)
+
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -131,7 +143,9 @@ def login():
             return redirect(url_for('index'))
         else:
             error = '電子郵件或密碼錯誤'
-    return render_template('login.html', error=error)
+
+    return render_template('login.html', error=error, messages=translated_messages)
+
 
 
 @app.route('/logout')
@@ -190,7 +204,14 @@ def member_info():
 # =======================
 @app.route('/')
 def index():
-  return render_template('index.html')
+    # 取出近期節目，依開始日期排序，取前6筆
+    carousel_shows = Show.query.order_by(Show.start_date.asc()).limit(6).all()
+
+    # 取出所有節目（可依需求調整數量）
+    all_shows = Show.query.order_by(Show.start_date.asc()).all()
+
+    return render_template('index.html', carousel_shows=carousel_shows, shows=all_shows)
+
 
 @app.route('/api/buy', methods=['POST'])
 def buy_ticket():
