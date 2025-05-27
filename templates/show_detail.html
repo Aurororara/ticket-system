@@ -134,14 +134,10 @@
 
 
  <!-- 放在 container 外面！ -->
-<div class="header">
-    <div class="logo">NtickeTUB</div>
-    <div class="buttons">
-        <a href="/member" class="button-link">我的會員</a>
-        <a href="{{ url_for('my_tickets') }}" class="button-link">我的票券</a>
+ {% extends "layout.html" %}
+ {% block title %}節目詳情 - {{ show.show_name }}{% endblock %}
+ {% block content %}
 
-    </div>
-</div>
 <div class="container">
     <h1>{{ show.show_name }}</h1>
 
@@ -158,7 +154,7 @@
 <p>
     📍 活動地點：{{ show['location']['loc_name'] }}　
     <a class="highlight" href="https://www.google.com/maps?q={{ show['location']['loc_name'] }}" target="_blank">
-      點我查看交通方式
+      點我查看地圖
     </a>
     </p>    
   <p>📣 主辦單位：{{ show['host']['host_name'] }}</p>  <!-- ✅ -->
@@ -166,7 +162,7 @@
 </div>
 
 <div class="banner">
-  <img src="{{ show['show_pic'] }}" alt="節目圖片">
+  <img src="{{ show['show_pic'] }}" class="img-fluid" alt="Banner Image">
 </div>
 
 
@@ -379,3 +375,5 @@
   </div>
 </body>
 </html>
+
+{% endblock %}
