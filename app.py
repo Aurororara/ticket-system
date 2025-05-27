@@ -459,7 +459,7 @@ def refund_detail(order_id):
                 'amount': order.total_price - 20 if order else 0
             }), 400
 
-    amount = order.total_price - 20  # 扣除20元手續費
+    amount = (order.total_price if order.total_price is not None else 0) - 20  # 扣除20元手續費
 
     if request.method == 'POST':
         name = request.form.get('name')
