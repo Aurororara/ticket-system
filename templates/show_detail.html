@@ -141,14 +141,16 @@
 <div class="container">
     <h1>{{ show.show_name }}</h1>
 
-<div class="info">
+ <div class="info">
   <p>🕒 活動時間：
     {% if show.end_date and show.start_date != show.end_date %}
-      {{ show.start_date.strftime('%Y/%m/%d') }} ～ {{ show.end_date.strftime('%Y/%m/%d') }}
+      {{ show.start_date }} ～ {{ show.end_date }}
     {% else %}
-      {{ show.start_date.strftime('%Y/%m/%d') }}
+      {{ show.start_date }}
     {% endif %}
-  </p>  
+  </p>
+  
+  
 
 
 <p>

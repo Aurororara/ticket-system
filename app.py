@@ -20,6 +20,11 @@ from markupsafe import Markup
 from models.game import Game
 from flask_migrate import Migrate
 
+class Config:
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///your_database.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -39,6 +44,12 @@ login_manager.login_view = 'login'
 with app.app_context():
   db.create_all()
   print("資料表已建立完成")
+with app.app_context():
+    from models.show import Show
+    print("✅ Shows in DB:")
+    for show in Show.query.all():
+        print(show.show_name)
+
 
 # 註冊會員
 
@@ -574,8 +585,9 @@ def show_detail(show_id):
         'show_id': show.show_id,
         'show_name': show.show_name,
         'show_desc': show.show_desc,
-        "start_date": show.start_date,
-        "end_date": show.end_date,
+        "start_date": show.start_date.strftime('%Y/%m/%d') if show.start_date else None,
+
+        "end_date": show.end_date.strftime('%Y/%m/%d') if show.end_date else None,
         'show_pic': show.show_pic,
         'createdAt': show.createdAt,
         'host': {'host_name': host.host_name if host else "未知主辦"},

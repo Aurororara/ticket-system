@@ -14,7 +14,7 @@
   <h2>{{ s.show_name }}</h2>
   <p>
     <span class="d-inline-flex align-items-center">
-      <i class="bi bi-calendar-event me-1"></i> 活動時間：{{ s.createdAt.strftime('%Y/%m/%d') if s.createdAt else '未定' }}
+      <i class="bi bi-calendar-event me-1"></i> 活動時間：{{ s.start_date.strftime('%Y/%m/%d') if s.createdAt else '未定' }}
     </span><br>
 
     <span class="d-inline-flex align-items-center">
