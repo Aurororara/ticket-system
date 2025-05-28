@@ -13,7 +13,6 @@ from datetime import datetime
 from models.location import Location
 from models.refund import Refund
 from datetime import datetime
-from models import Ticket, Order, Game, Show, Area, GameArea
 from models import Ticket, Order, Game, Show, Area, GameArea, Payment
 from datetime import datetime,timedelta
 from markupsafe import Markup
@@ -104,6 +103,15 @@ def register():
         flash('註冊成功，歡迎加入！', 'success')
         return redirect(url_for('index'))
     return render_template('register.html')
+
+#搜尋節目
+@app.route('/search')
+def search():
+    keyword = request.args.get('keyword', '')
+    # 範例：搜尋節目
+    shows = Show.query.filter(Show.show_name.contains(keyword)).all() if keyword else []
+    return render_template('search_result.html', keyword=keyword, shows=shows)
+
 
 # =======================
 # 登入管理初始化
