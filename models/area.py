@@ -1,4 +1,6 @@
 from models.db import db
+from sqlalchemy.orm import relationship
+from sqlalchemy import Date, func
 
 class Area(db.Model):
   __tablename__ = 'area'
@@ -10,5 +12,5 @@ class Area(db.Model):
   disabled_seats = db.Column(db.Integer)    
   loc_id = db.Column(db.Integer, db.ForeignKey('location.loc_id'))
   sect_id = db.Column(db.Integer, db.ForeignKey('section.sect_id'))
-  createdAt = db.Column(db.Date)
-  updatedAt = db.Column(db.Date)
+  createdAt = db.Column(db.DateTime, default=func.now())
+  updatedAt = db.Column(db.DateTime, default=func.now(), onupdate=func.now())

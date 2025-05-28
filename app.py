@@ -309,7 +309,8 @@ def lock_order(game_id, area_id):
         buyer_phone=current_user.mem_phone,
         total_price=(ticket_price * full_quantity) + (disabled_ticket_price * disabled_quantity),
         mem_id=current_user.mem_id,
-        payment_id=None
+        payment_id=None,
+        order_status='N'
     )
     db.session.add(new_order)
     db.session.flush()
@@ -334,7 +335,7 @@ def lock_order(game_id, area_id):
         )
         db.session.add(ticket)
 
-    for i in range(full_quantity):
+    for i in range(disabled_quantity):
         seat_no = available_seat_nos[full_quantity + i]
         ticket = Ticket(
             seat_no=seat_no,
@@ -355,7 +356,9 @@ def lock_order(game_id, area_id):
 @login_required
 def select_atm(order_id):
     # 根據 order_id 取得訂單資訊顯示
-    order = Order.query.get_or_404(order_id)
+    order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+    if not order:
+        return redirect(url_for('index'))
 
     # 取得付款資訊
     payment = Payment.query.filter_by(payment_id=order.payment_id).first()
@@ -384,7 +387,9 @@ def select_atm(order_id):
 @app.route('/ticket/select-creditcard/<int:order_id>')
 @login_required
 def select_creditcard(order_id):
-    order = Order.query.get_or_404(order_id)
+    order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+    if not order:
+        return redirect(url_for('index'))
     payment = Payment.query.filter_by
     tickets = Ticket.query.filter_by(order_id=order_id).all()
     show = None
@@ -399,26 +404,28 @@ def select_creditcard(order_id):
 @app.route('/ticket/order-complete/<int:order_id>')
 @login_required
 def order_complete(order_id):
-  order = Order.query.get_or_404(order_id)
-  tickets = Ticket.query.filter_by(order_id=order_id).all()
+    order = Order.query.filter_by(order_id=order_id, order_status='Y').first()
+    if not order:
+        return redirect(url_for('index'))
+    tickets = Ticket.query.filter_by(order_id=order_id).all()
 
-  # 預設使用第一張票取得相關資訊
-  if tickets:
-    game = Game.query.get(tickets[0].game_id)
-    show = Show.query.get(game.show_id)
-    location = Location.query.get(show.location_id)
-  else:
-    game = show = location = None
+    # 預設使用第一張票取得相關資訊
+    if tickets:
+        game = Game.query.get(tickets[0].game_id)
+        show = Show.query.get(game.show_id)
+        location = Location.query.get(show.location_id)
+    else:
+        game = show = location = None
 
-  return render_template(
-    'order_complete.html',
-    order=order,
-    tickets=tickets,
-    show=show,
-    game=game,
-    location=location
-    )
-  # return render_template('order_complete.html')
+    return render_template(
+        'order_complete.html',
+            order=order,
+            tickets=tickets,
+            show=show,
+            game=game,
+            location=location
+        )
+    # return render_template('order_complete.html')
 
 
 
@@ -639,10 +646,12 @@ def order_detail(order_id):
     refund_status = refund.refund_status if refund else None
     return render_template('order_detail.html', order=order, tickets=tickets, refund_status=refund_status)
 
-# 啟動伺服器
+# 選擇付款
 @app.route('/ticket/select-payment/<int:order_id>')
 def select_payment(order_id):
-    order = Order.query.get_or_404(order_id)
+    order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+    if not order:
+        return redirect(url_for('index'))
     tickets = Ticket.query.filter_by(order_id=order_id).all()
     if not tickets:
         return "找不到此訂單的票券", 404
@@ -652,7 +661,6 @@ def select_payment(order_id):
     host = Host.query.get(show.host_id)
     location = Location.query.get(show.location_id)
 
-    # 暫時用假資料 - 抓第一筆會員
     member = Member.query.get(order.mem_id)
     if not member:
       return "尚未建立會員資料，請先新增會員", 404
@@ -672,7 +680,9 @@ def select_payment_method():
   order_id = request.form.get('order_id')
   pay_method = request.form.get('pay_method')
 
-  order = Order.query.get_or_404(order_id)
+  order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+  if not order:
+    return redirect(url_for('index'))
 
   # 建立 Payment 記錄
   payment = Payment(
@@ -703,7 +713,9 @@ def select_payment_method():
 @app.route('/ticket/confirm-payment', methods=['POST'])
 def confirm_payment():
   order_id = request.form.get('order_id')
-  order = Order.query.get_or_404(order_id)
+  order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+  if not order:
+      return redirect(url_for('index'))
   payment = Payment.query.filter_by(payment_id=order.payment_id).first()
 
   if payment:
