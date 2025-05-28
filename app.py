@@ -140,6 +140,9 @@ def login():
         user = Member.query.filter_by(mem_email=email).first()
         if user and check_password_hash(user.mem_pwd, password):
             login_user(user)
+            next_page = request.args.get('next')
+            if next_page:
+                return redirect(next_page)
             return redirect(url_for('index'))
         else:
             error = '電子郵件或密碼錯誤'
