@@ -146,12 +146,16 @@
 
 <div class="info">
   <p>🕒 活動時間：
-    {% if show.end_date and show.start_date != show.end_date %}
-      {{ show.start_date.strftime('%Y/%m/%d') }} ～ {{ show.end_date.strftime('%Y/%m/%d') }}
+    {% if show.start_date %}
+      {% if show.end_date and show.start_date != show.end_date %}
+        {{ show.start_date.strftime('%Y/%m/%d') }} ～ {{ show.end_date.strftime('%Y/%m/%d') }}
+      {% else %}
+        {{ show.start_date.strftime('%Y/%m/%d') }}
+      {% endif %}
     {% else %}
-      {{ show.start_date.strftime('%Y/%m/%d') }}
+    未定
     {% endif %}
-  </p>  
+  </p>
 
 
 <p>
