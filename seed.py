@@ -3,6 +3,7 @@ from models import (
     Member, Show, Host, Location, Game, Area, Section,
     Order, Payment, Ticket, GameArea
 )
+from models.refund import Refund
 from datetime import datetime, date, time, timedelta
 from werkzeug.security import generate_password_hash
 
@@ -10,11 +11,6 @@ with app.app_context():
     # Clear existing data (for development only, do not use in production)
     db.drop_all()
     db.create_all()
-
-    # Debug prints for date and timedelta
-    print("date.today():", date.today())
-    print("timedelta(days=30):", timedelta(days=30))
-    print("date.today() + timedelta(days=30):", date.today() + timedelta(days=30))
 
     # Add a member
     member = Member(
@@ -60,10 +56,10 @@ with app.app_context():
         updatedAt=datetime.now()
     )
 
-    # Add a game (show date 30 days from now)
     db.session.add(show)
     db.session.commit()  # Commit to get show_id
 
+    # Add a game (show date 30 days from now)
     game = Game(
         game_date=date.today() + timedelta(days=30),
         game_time=time(19, 0),
@@ -100,7 +96,7 @@ with app.app_context():
     )
 
     # Add a payment
-    payment = Payment(
+    payment1 = Payment(
         pay_method="C",
         pay_status="Y",
         amount=5000,
@@ -109,8 +105,17 @@ with app.app_context():
         updatedAt=datetime.now()
     )
 
-    # Add an order
-    order = Order(
+    payment2 = Payment(
+        pay_method="C",
+        pay_status="Y",
+        amount=5000,
+        paid_time=datetime.now(),
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
+    )
+
+    # Add two orders: one refundable, one not refundable (refund sent day before show)
+    order1 = Order(
         order_status="Y",
         buyer_name="Test User",
         buyer_email="testuser@example.com",
@@ -122,8 +127,20 @@ with app.app_context():
         updatedAt=datetime.now()
     )
 
-    # Add a ticket
-    ticket = Ticket(
+    order2 = Order(
+        order_status="Y",
+        buyer_name="Test User",
+        buyer_email="testuser@example.com",
+        buyer_phone="0912345678",
+        total_price=5000,
+        mem_id=1,
+        payment_id=2,
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
+    )
+
+    # Add tickets for both orders
+    ticket1 = Ticket(
         seat_no="A001",
         ticket_status="L",
         order_id=1,
@@ -133,11 +150,44 @@ with app.app_context():
         updatedAt=datetime.now()
     )
 
+    ticket2 = Ticket(
+        seat_no="A002",
+        ticket_status="L",
+        order_id=2,
+        game_id=1,
+        area_id=1,
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
+    )
+
+    # Add a refund request for order1 (refundable)
+    refund1 = Refund(
+        order_id=1,
+        name="Test User",
+        email="testuser@example.com",
+        phone="0912345678",
+        refund_status="pending",
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
+    )
+
+    # Add a refund request for order2 (not refundable, sent day before show)
+    refund2 = Refund(
+        order_id=2,
+        name="Test User",
+        email="testuser@example.com",
+        phone="0912345678",
+        refund_status="rejected",
+        createdAt=datetime.now() - timedelta(days=1),
+        updatedAt=datetime.now() - timedelta(days=1)
+    )
+
     # Add all to session and commit
     db.session.add_all([
         member, host, location, section, show, game,
-        area, game_area, payment, order, ticket
+        area, game_area, payment1, payment2, order1, order2,
+        ticket1, ticket2, refund1, refund2
     ])
     db.session.commit()
 
-    print("Seed data added successfully.")
+    print("Seed data with two orders (one refundable, one not) added successfully.")

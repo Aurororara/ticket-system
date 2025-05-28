@@ -420,7 +420,7 @@ def order_complete(order_id):
 
 
 #退款表單
-@app.route('/ticket/refund/<int:order_id>', methods=['GET', 'POST'])
+@app.route('ticket/refund/<int: order_id>', methods=['GET', 'POST'])
 def refund_detail(order_id):
     order = Order.query.filter_by(order_id=order_id).first()
     if not order:
@@ -564,24 +564,29 @@ def load_user(user_id):
 @app.route('/my-tickets')
 @login_required
 def my_tickets():
-    tickets = (
-        db.session.query(Ticket, Game, Show, Area, Order)
-        .join(Order, Ticket.order_id == Order.order_id)
-        .join(Game, Ticket.game_id == Game.game_id)
-        .join(Show, Game.show_id == Show.show_id)
-        .join(Area, Ticket.area_id == Area.area_id)
-        .filter(Order.mem_id == current_user.mem_id)
-        .all()
-    )
-    # Get refund status for each order
-    order_ids = {ticket.Order.order_id for ticket in tickets}
+    orders = Order.query.filter_by(mem_id=current_user.mem_id).all()
+    order_data = []
+    order_ids = [order.order_id for order in orders]
+
     refunds = Refund.query.filter(Refund.order_id.in_(order_ids)).all()
     refund_status_map = {refund.order_id: refund.refund_status for refund in refunds}
 
-    # Debug print to verify refund_status_map content
-    print("Refund status map:", refund_status_map)
+    for order in orders:
+        tickets = (
+            db.session.query(Ticket, Game, Show, Area)
+            .join(Game, Ticket.game_id == Game.game_id)
+            .join(Show, Game.show_id == Show.show_id)
+            .join(Area, Ticket.area_id == Area.area_id)
+            .filter(Ticket.order_id == order.order_id)
+            .all()
+        )
+        order_data.append({
+            'order': order,
+            'tickets': tickets,
+            'refund_status': refund_status_map.get(order.order_id, None)
+        })
 
-    return render_template('my_ticket.html', tickets=tickets, refund_status_map=refund_status_map)
+    return render_template('my_ticket.html', order_data=order_data)
 
 
 #節目詳情頁
