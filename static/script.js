@@ -59,49 +59,82 @@ document.querySelectorAll('input[name="payment"]').forEach(radio => {
 
 // 信用卡確認付款模擬 跳轉
 document.addEventListener('DOMContentLoaded', function () {
-  const submitButton = document.getElementById('submitPaymentBtn');
-  if (submitButton) {
-    submitButton.addEventListener('click', function () {
+  const form = document.getElementById('creditcardForm');
+  if (form) {
+    const cardNumberInput = document.getElementById('cardNumber');
+    const submitButton = document.getElementById('submitPaymentBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const cardExpiryInput = document.getElementById('cardExpiry');
 
-      const cardNumber = document.getElementById('cardNumber').value.trim();
-      const cardExpiry = document.getElementById('cardExpiry').value.trim();
+    // ➤ 輸入時自動每四位加一個空格
+    if (cardNumberInput) {
+      cardNumberInput.addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, ''); // 只保留數字
+        if (value.length > 16) {
+          value = value.slice(0, 16); // 最多16位數字
+        }
+        e.target.value = value.replace(/(.{4})/g, '$1 ').trim(); // 每4位加空格
+      });
+    }
+
+    // ➤ 到期日輸入自動補 /
+    if (cardExpiryInput) {
+      cardExpiryInput.addEventListener('input', function (e) {
+        let value = e.target.value.replace(/[^\d]/g, ''); // 僅保留數字
+        if (value.length >= 3) {
+          value = value.slice(0, 4);
+          value = value.slice(0, 2) + '/' + value.slice(2);
+        } else if (value.length >= 2) {
+          value = value.slice(0, 2) + '/';
+        }
+        e.target.value = value;
+      });
+
+      // ➤ 按下 Backspace 自動移除 /
+      cardExpiryInput.addEventListener('keydown', function (e) {
+        const value = cardExpiryInput.value;
+        if (e.key === 'Backspace' && value.length === 4 && value.charAt(2) === '/') {
+          e.preventDefault();
+          cardExpiryInput.value = value.slice(0, 2);
+        }
+      });
+    }
+    
+  
+    // ➤ 點擊「確認付款」按鈕事件
+    document.getElementById('creditcardForm').addEventListener('submit', function (e) {
+      e.preventDefault()
+      const cardNumber = cardNumberInput.value.trim();
+      const cardExpiry = cardExpiryInput.value.trim();
       const cardCVC = document.getElementById('cardCVC').value.trim();
-      const errorMsg = document.getElementById('errorMsg');
-      
       const orderIdInput = document.querySelector('input[name="order_id"]');
       const orderId = orderIdInput ? orderIdInput.value : null;
-
-
       let errorMessages = [];
-
-      // 檢查卡號 16 位數字
-      if (!/^\d{16}$/.test(cardNumber)) {
+      // ➤ 去除空格並驗證卡號為 16 位數字
+      const rawCardNumber = cardNumber.replace(/\D/g, ''); // 移除所有非數字
+      if (!/^\d{16}$/.test(rawCardNumber)) {
         errorMessages.push('卡號必須為16位數字');
       }
 
-      // 檢查有效年月 MM/YY 格式
+      // ➤ 檢查有效年月格式 MM/YY
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry)) {
         errorMessages.push('有效年月格式錯誤，請使用MM/YY格式');
       }
-
-      // 檢查 CVC 3 位數字
+  
+      // ➤ 檢查 CVC 為3位數字
       if (!/^\d{3}$/.test(cardCVC)) {
         errorMessages.push('安全碼必須為3位數字');
       }
-
+  
+      // ➤ 顯示錯誤或進行導向
       if (errorMessages.length > 0) {
         errorMsg.textContent = errorMessages.join('\n');
         errorMsg.classList.remove('d-none');
       } else {
         errorMsg.classList.add('d-none');
-        // 驗證成功後，跳轉到帶 order_id 的完成頁
-        if (orderId) {
-          window.location.href = '/ticket/order-complete/' + orderId;
-        } else {
-          console.error('無法取得 order_id');
-        }
+        form.submit();
       }
-    });
+    })
   }
 });
 
@@ -147,6 +180,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // atm資料確認
 if (document.getElementById('paymentForm')) {
+  const phoneInput = document.getElementById('contact_phone');
+  if (phoneInput) {
+    phoneInput.addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, ''); // 只保留數字
+      if (value.length > 10) {
+        value = value.slice(0, 10); // 最多10位
+      }
+      e.target.value = value;
+    });
+  }
+
+
   document.getElementById('paymentForm').addEventListener('submit', function (e) {
     const name = document.getElementById('contact_name').value.trim();
     const email = document.getElementById('contact_email').value.trim();

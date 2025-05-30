@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, get_flashed_messages
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -390,7 +390,7 @@ def select_creditcard(order_id):
     order = Order.query.filter_by(order_id=order_id, order_status='N').first()
     if not order:
         return redirect(url_for('index'))
-    payment = Payment.query.filter_by
+    payment = Payment.query.filter_by(payment_id=order.payment_id).first()
     tickets = Ticket.query.filter_by(order_id=order_id).all()
     show = None
     if tickets:
@@ -623,7 +623,7 @@ def ticket_start(show_id):
     host = Host.query.get(show.host_id)
     location = Location.query.get(show.location_id)
     games = Game.query.filter_by(show_id=show.show_id).all()
-    return render_template("ticket_start.html", s=show, host=host, location=location, games=games)
+    return render_template("ticket_start.html", s=show, host=host, location=location, games=games,now=datetime.now())
 
 #換行
 @app.template_filter('nl2br')
