@@ -431,7 +431,7 @@ def order_complete(order_id):
 
 
 #退款表單
-@app.route('ticket/refund/<int: order_id>', methods=['GET', 'POST'])
+@app.route('/ticket/refund/<int:order_id>', methods=['GET', 'POST'])
 def refund_detail(order_id):
     order = Order.query.filter_by(order_id=order_id).first()
     if not order:
