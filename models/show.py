@@ -1,5 +1,5 @@
 from models.db import db
-from sqlalchemy import Date
+from sqlalchemy import Date, func
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -13,8 +13,8 @@ class Show(db.Model):
     end_date = db.Column(Date)
     host_id = db.Column(db.Integer, db.ForeignKey('host.host_id'))
     location_id = db.Column(db.Integer, db.ForeignKey('location.loc_id'))
-    createdAt = db.Column(db.Date)
-    updatedAt = db.Column(db.Date)
+    createdAt = db.Column(db.DateTime, default=func.now())
+    updatedAt = db.Column(db.DateTime, default=func.now(), onupdate=func.now())
 
     def __repr__(self):
         return f'<Show {self.show_name}>'

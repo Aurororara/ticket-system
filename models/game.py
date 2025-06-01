@@ -1,4 +1,6 @@
 from models.db import db
+from sqlalchemy.orm import relationship
+from sqlalchemy import Date, func
 
 class Game(db.Model):
   __tablename__ = 'game'
@@ -11,5 +13,5 @@ class Game(db.Model):
   total_seats = db.Column(db.Integer)
   available_seats = db.Column(db.Integer)
   show_id = db.Column(db.Integer, db.ForeignKey('show.show_id'))
-  createdAt = db.Column(db.Date)
-  updatedAt = db.Column(db.Date)
+  createdAt = db.Column(db.DateTime, default=func.now())
+  updatedAt = db.Column(db.DateTime, default=func.now(), onupdate=func.now())
