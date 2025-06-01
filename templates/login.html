@@ -39,7 +39,7 @@
             <label for="password" class="form-label">密碼</label>
             <div class="input-group">
               <input type="password" class="form-control" id="password" name="password" placeholder="請輸入密碼" required>
-              <button type="button" class="btn btn-light border" id="togglePassword" aria-label="切換密碼顯示">👁️</button>
+              <button type="button" class="btn btn-light border" id="togglePassword" aria-label="切換密碼顯示">🙈</button>
             </div>
           </div>
           <div class="d-grid">
@@ -58,13 +58,11 @@
   <script>
     document.getElementById('togglePassword').addEventListener('click', function () {
       const passwordInput = document.getElementById('password');
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        this.textContent = '🙈';
-      } else {
-        passwordInput.type = 'password';
-        this.textContent = '👁️';
-      }
+      const isHidden = passwordInput.type === 'password';
+      passwordInput.type = isHidden ? 'text' : 'password';
+      this.textContent = isHidden ? '👁️' : '🙈';
     });
   </script>
+
+
 {% endblock %}

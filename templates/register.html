@@ -47,12 +47,12 @@
         <div class="mb-3">
           <label for="password" class="form-label">設定密碼</label>
           <div class="input-group">
-            <input type="text" class="form-control rounded-3" id="password" name="password"
+            <input type="password" class="form-control rounded-3" id="password" name="password"
                    placeholder="輸入密碼"
                    pattern="(?=.*[a-z])(?=.*[A-Z]).{8,}"
                    title="密碼必須至少8碼，包含大小寫字母"
                    required autocomplete="new-password">
-            <button type="button" class="btn btn-light border" id="togglePasswordReg" aria-label="切換密碼顯示">👁️</button>
+            <button type="button" class="btn btn-light border" id="togglePasswordReg" aria-label="切換密碼顯示">🙈</button>
           </div>
           <small class="form-text text-muted">密碼需包含大小寫英文字母且至少8位數</small>
         </div>
@@ -60,8 +60,8 @@
         <div class="mb-3">
           <label for="confirm_password" class="form-label">確認密碼</label>
           <div class="input-group">
-            <input type="text" class="form-control rounded-3" id="confirm_password" name="confirm_password" placeholder="請再次輸入密碼" required autocomplete="new-password">
-            <button type="button" class="btn btn-light border" id="toggleConfirmPasswordReg" aria-label="切換確認密碼顯示">👁️</button>
+            <input type="password" class="form-control rounded-3" id="confirm_password" name="confirm_password" placeholder="請再次輸入密碼" required autocomplete="new-password">
+            <button type="button" class="btn btn-light border" id="toggleConfirmPasswordReg" aria-label="切換確認密碼顯示">🙈</button>
           </div>
           <small id="passwordMatch" class="form-text text-danger" style="display: none;">密碼不一致</small>
         </div>
@@ -90,34 +90,22 @@ document.addEventListener('DOMContentLoaded', function () {
   const matchMessage = document.getElementById('passwordMatch');
 
   confirmPassword.addEventListener('input', function () {
-    if (password.value !== confirmPassword.value) {
-      matchMessage.style.display = 'block';
-    } else {
-      matchMessage.style.display = 'none';
-    }
+    matchMessage.style.display = (password.value !== confirmPassword.value) ? 'block' : 'none';
   });
 
-  // 密碼顯示切換 - 預設為顯示（🙈）
+  // 密碼顯示切換
   document.getElementById('togglePasswordReg').addEventListener('click', function () {
     const pwdInput = document.getElementById('password');
-    if (pwdInput.type === 'text') {
-      pwdInput.type = 'password';
-      this.textContent = '👁️';
-    } else {
-      pwdInput.type = 'text';
-      this.textContent = '🙈';
-    }
+    const isHidden = pwdInput.type === 'password';
+    pwdInput.type = isHidden ? 'text' : 'password';
+    this.textContent = isHidden ? '👁️' : '🙈';
   });
 
   document.getElementById('toggleConfirmPasswordReg').addEventListener('click', function () {
     const confirmPwdInput = document.getElementById('confirm_password');
-    if (confirmPwdInput.type === 'text') {
-      confirmPwdInput.type = 'password';
-      this.textContent = '👁️';
-    } else {
-      confirmPwdInput.type = 'text';
-      this.textContent = '🙈';
-    }
+    const isHidden = confirmPwdInput.type === 'password';
+    confirmPwdInput.type = isHidden ? 'text' : 'password';
+    this.textContent = isHidden ? '👁️' : '🙈';
   });
 
   // 即時檢查 Email 是否存在
