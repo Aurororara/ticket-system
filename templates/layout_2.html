@@ -8,7 +8,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   <style>
-    /* 圓點右下，水平排列 */
     #carouselExample .carousel-indicators.custom-indicators {
       position: absolute;
       right: 15px;
@@ -22,7 +21,6 @@
       z-index: 10;
     }
 
-    /* 讓圓點跟 Bootstrap 預設差不多 */
     #carouselExample .carousel-indicators.custom-indicators button {
       width: 12px;
       height: 12px;
@@ -33,50 +31,41 @@
     }
 
     #carouselExample .carousel-indicators.custom-indicators button.active {
-      background-color: #0d6efd; /* Bootstrap 主色 */
+      background-color: #0d6efd;
     }
   </style>
 </head>
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{{ url_for('index') }}">NtickeTUB</a>
-
-    <!-- 搜尋框 -->
-    <form method="GET" action="{{ url_for('search') }}" style="width: 50%;">
-      <div class="input-group" style="height: 45px;">
-        <input type="search" name="keyword" class="form-control rounded-0" placeholder="搜尋你想看的節目關鍵字..." aria-label="Search" />
-        <button class="btn btn-outline-primary rounded-0" type="submit" style="min-width: 100px;">搜尋</button>
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{{ url_for('index') }}">NtickeTUB</a>
+      <form method="GET" action="{{ url_for('search') }}" style="width: 50%;">
+        <div class="input-group" style="height: 45px;">
+          <input type="search" name="keyword" class="form-control rounded-0" placeholder="搜尋你想看的節目關鍵字..." aria-label="Search" />
+          <button class="btn btn-outline-primary rounded-0" type="submit" style="min-width: 100px;">搜尋</button>
+        </div>
+      </form>
+      <div class="d-flex align-items-center">
+        {% if current_user.is_authenticated %}
+        <div class="dropdown me-2">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ current_user.mem_name }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="{{ url_for('member_info') }}">會員資料</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">登出</a></li>
+          </ul>
+        </div>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-outline-secondary me-2">我的會員</a>
+        {% endif %}
+        <a href="{{ url_for('my_tickets') }}" class="btn btn-outline-secondary">我的票券</a>
       </div>
-    </form>
-
-
-
-    <!-- 會員 & 我的票券 -->
-    <div class="d-flex align-items-center">
-      {% if current_user.is_authenticated %}
-      <div class="dropdown me-2">
-        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown"
-          data-bs-toggle="dropdown" aria-expanded="false">
-          {{ current_user.mem_name }}
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-          <li><a class="dropdown-item" href="{{ url_for('member_info') }}">會員資料</a></li>
-          <li><hr class="dropdown-divider" /></li>
-          <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">登出</a></li>
-        </ul>
-      </div>
-      {% else %}
-      <a href="{{ url_for('login') }}" class="btn btn-outline-secondary me-2">我的會員</a>
-      {% endif %}
-      <a href="{{ url_for('my_tickets') }}" class="btn btn-outline-secondary">我的票券</a>
     </div>
-  </div>
-</nav>
+  </nav>
 
-
-  <!-- Flash 訊息 -->
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
   <div class="container mt-3">
@@ -93,7 +82,6 @@
     <div class="position-relative mx-auto" style="max-width: 800px;">
       <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
 
-        <!-- 圓點 -->
         <div class="carousel-indicators custom-indicators">
           {% for show in carousel_shows %}
           <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="{{ loop.index0 }}"
@@ -102,7 +90,6 @@
           {% endfor %}
         </div>
 
-        <!-- 幻燈片內容 -->
         <div class="carousel-inner">
           {% for show in carousel_shows %}
           <div class="carousel-item {% if loop.first %}active{% endif %}">
@@ -121,7 +108,6 @@
           {% endfor %}
         </div>
 
-        <!-- 左右按鈕 -->
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Previous</span>
@@ -134,16 +120,43 @@
     </div>
   </div>
 
+  <!-- 篩選區塊 -->
+  <div class="container mt-4 mb-2" id="filter-section">
+    <div class="btn-group mb-3" role="group" aria-label="排序與篩選">
+      <button type="button" id="btn-upcoming" class="btn btn-primary">即將開演</button>
+      <button type="button" id="btn-date-range" class="btn btn-outline-primary">依開演日期篩選</button>
+    </div>
+
+    <div class="container my-4">
+      <form id="date-range-form" method="get" action="{{ url_for('index') }}"
+            class="card p-4 shadow-sm mx-auto"
+            style="max-width: 600px; display: none;">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-md-5">
+            <label for="start_date" class="form-label fw-semibold">開始日期</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
+          </div>
+          <div class="col-12 col-md-5">
+            <label for="end_date" class="form-label fw-semibold">結束日期</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
+          </div>
+          <div class="col-12 col-md-2 text-md-end text-center">
+            <button type="submit" class="btn btn-primary btn-sm w-100 w-md-auto">GO!</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- 所有節目 -->
-  <div class="container extra-margin-top">
+  <div class="container" id="all-shows">
     <h2 class="text-center mb-3">所有節目</h2>
     <div class="row row-cols-1 row-cols-md-3 g-4">
       {% for show in shows %}
       <div class="col">
         <a href="{{ url_for('show_detail', show_id=show.show_id) }}" class="text-decoration-none text-dark">
           <div class="card h-100">
-            <img src="{{ show.show_pic }}" class="card-img-top" alt="{{ show.show_name }}"
-              style="height: 200px; object-fit: cover;" />
+            <img src="{{ show.show_pic }}" class="card-img-top" alt="{{ show.show_name }}" style="height: 200px; object-fit: cover;" />
             <div class="card-body">
               <h5 class="card-title">{{ show.show_name }}</h5>
               <p class="card-text event-date">
@@ -158,13 +171,40 @@
     </div>
   </div>
 
-  <!-- 頁腳 -->
   <footer class="bg-light text-center py-3 mt-5">
     <p>&copy; 2025 NtickeTUB. All Rights Reserved.</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+  <script>
+    const btnUpcoming = document.getElementById('btn-upcoming');
+    const btnDateRange = document.getElementById('btn-date-range');
+    const dateRangeForm = document.getElementById('date-range-form');
+    const filterSection = document.getElementById('filter-section');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('start_date') || urlParams.get('end_date')) {
+      btnDateRange.classList.replace('btn-outline-primary', 'btn-primary');
+      btnUpcoming.classList.replace('btn-primary', 'btn-outline-primary');
+      dateRangeForm.style.display = 'flex';
+    }
+
+    btnUpcoming.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = "{{ url_for('index') }}";
+      filterSection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    btnDateRange.addEventListener('click', (e) => {
+      e.preventDefault();
+      btnDateRange.classList.replace('btn-outline-primary', 'btn-primary');
+      btnUpcoming.classList.replace('btn-primary', 'btn-outline-primary');
+      dateRangeForm.style.display = 'flex';
+      dateRangeForm.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
 </body>
 
 </html>

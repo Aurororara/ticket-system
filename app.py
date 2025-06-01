@@ -13,7 +13,7 @@ from datetime import datetime
 from models.location import Location
 from models.refund import Refund
 from datetime import datetime
-from models import Ticket, Order, Game, Show, Area, GameArea, Payment
+from models import Ticket, Order, Game, Show, Area, GameArea, Payment,Member
 from datetime import datetime,timedelta
 from markupsafe import Markup
 from models.game import Game
@@ -40,12 +40,10 @@ with app.app_context():
   print("資料表已建立完成")
 
 # 註冊會員
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     def validate_password(password):
         # 至少8碼，包含至少一個大寫與一個小寫字母
-        # 密碼至少8碼，包含至少一個大寫與一個小寫字母
         pattern = r'^(?=.*[a-z])(?=.*[A-Z]).{8,}$'
         return re.match(pattern, password)
 
@@ -82,6 +80,11 @@ def register():
             flash('此電子郵件已被註冊', 'danger')
             return render_template('register.html')
 
+        # 檢查電話號碼是否已註冊
+        if Member.query.filter_by(mem_phone=phone).first():
+            flash('此電話號碼已被註冊', 'danger')
+            return render_template('register.html')
+
         # 密碼雜湊
         hashed_pwd = generate_password_hash(password)
 
@@ -102,7 +105,26 @@ def register():
         login_user(new_member)
         flash('註冊成功，歡迎加入！', 'success')
         return redirect(url_for('index'))
+
     return render_template('register.html')
+
+#電話號碼,email確認
+@app.route('/check_exist', methods=['GET'])
+def check_exist():
+    email = request.args.get('email')
+    phone = request.args.get('phone')
+
+    if email:
+        exists = Member.query.filter_by(mem_email=email).first() is not None
+        return jsonify({'exists': exists, 'type': 'email'})
+
+    if phone:
+        exists = Member.query.filter_by(mem_phone=phone).first() is not None
+        return jsonify({'exists': exists, 'type': 'phone'})
+
+    return jsonify({'exists': False})
+
+
 
 #搜尋節目
 @app.route('/search')
@@ -210,15 +232,50 @@ def member_info():
 # =======================
 # 首頁
 # =======================
+
+
 @app.route('/')
 def index():
-    # 取出近期節目，依開始日期排序，取前6筆
+    # 取得前端送出的篩選參數
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    sort_by = request.args.get('sort_by', 'start_date')  # 預設排序依 start_date
+
+    query = Show.query
+
+    # 日期範圍篩選
+    if start_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            query = query.filter(Show.start_date >= start_date)
+        except ValueError:
+            pass
+
+    if end_date_str:
+        try:
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            query = query.filter(Show.start_date <= end_date)
+        except ValueError:
+            pass
+
+    # 排序
+    if sort_by == 'start_date':
+        query = query.order_by(Show.start_date.asc())
+    elif sort_by == 'ticket_start_date':
+        # 假設你有 ticket_start_date 欄位，若無則先不用這段
+        query = query.order_by(Show.ticket_start_date.asc())
+    else:
+        query = query.order_by(Show.start_date.asc())  # 預設
+
+    all_shows = query.all()
+
+    # 近期節目（輪播），不受篩選影響，還是依開始日期取前6筆
     carousel_shows = Show.query.order_by(Show.start_date.asc()).limit(6).all()
 
-    # 取出所有節目（可依需求調整數量）
-    all_shows = Show.query.order_by(Show.start_date.asc()).all()
+    return render_template('index.html',
+                           carousel_shows=carousel_shows,
+                           shows=all_shows)
 
-    return render_template('index.html', carousel_shows=carousel_shows, shows=all_shows)
 
 
 @app.route('/api/buy', methods=['POST'])

@@ -174,3 +174,27 @@ if (document.getElementById('paymentForm')) {
     }
   });
 }
+
+//email是否註冊過
+document.addEventListener('DOMContentLoaded', function () {
+  const emailInput = document.getElementById('email');
+  const emailExistMsg = document.getElementById('emailExist');
+
+  emailInput.addEventListener('blur', function () {
+    const emailVal = emailInput.value.trim();
+    if (!emailVal) {
+      emailExistMsg.style.display = 'none';
+      return;
+    }
+
+    fetch(`/check_email?email=${encodeURIComponent(emailVal)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.exists) {
+          emailExistMsg.style.display = 'block';
+        } else {
+          emailExistMsg.style.display = 'none';
+        }
+      });
+  });
+});

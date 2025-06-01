@@ -30,11 +30,13 @@
         <div class="mb-3">
           <label for="email" class="form-label">電子郵件信箱</label>
           <input type="email" class="form-control rounded-3" id="email" name="email" placeholder="請輸入電子郵件" required autocomplete="email">
+          <small id="emailExist" class="form-text text-danger" style="display: none;">此電子郵件已被註冊</small>
         </div>
-        
+
         <div class="mb-3">
           <label for="phone" class="form-label">電話號碼</label>
           <input type="tel" class="form-control rounded-3" id="phone" name="phone" placeholder="請輸入手機號碼（09xxxxxxxx）" pattern="^09\d{8}$" maxlength="10" title="請輸入有效的台灣手機號碼（09開頭，共10碼）" required autocomplete="tel">
+          <small id="phoneExist" class="form-text text-danger" style="display: none;">此電話號碼已被註冊</small>
         </div>
 
         <div class="mb-3">
@@ -45,7 +47,7 @@
         <div class="mb-3">
           <label for="password" class="form-label">設定密碼</label>
           <div class="input-group">
-            <input type="password" class="form-control rounded-3" id="password" name="password"
+            <input type="text" class="form-control rounded-3" id="password" name="password"
                    placeholder="輸入密碼"
                    pattern="(?=.*[a-z])(?=.*[A-Z]).{8,}"
                    title="密碼必須至少8碼，包含大小寫字母"
@@ -58,7 +60,7 @@
         <div class="mb-3">
           <label for="confirm_password" class="form-label">確認密碼</label>
           <div class="input-group">
-            <input type="password" class="form-control rounded-3" id="confirm_password" name="confirm_password" placeholder="請再次輸入密碼" required autocomplete="new-password">
+            <input type="text" class="form-control rounded-3" id="confirm_password" name="confirm_password" placeholder="請再次輸入密碼" required autocomplete="new-password">
             <button type="button" class="btn btn-light border" id="toggleConfirmPasswordReg" aria-label="切換確認密碼顯示">👁️</button>
           </div>
           <small id="passwordMatch" class="form-text text-danger" style="display: none;">密碼不一致</small>
@@ -77,47 +79,82 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // 限制生日不能選未來
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('birthday').setAttribute('max', today);
+document.addEventListener('DOMContentLoaded', function () {
+  // 限制生日不能選未來
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('birthday').setAttribute('max', today);
 
-    // 密碼一致檢查
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('confirm_password');
-    const matchMessage = document.getElementById('passwordMatch');
+  // 密碼一致檢查
+  const password = document.getElementById('password');
+  const confirmPassword = document.getElementById('confirm_password');
+  const matchMessage = document.getElementById('passwordMatch');
 
-    confirmPassword.addEventListener('input', function () {
-      if (password.value !== confirmPassword.value) {
-        matchMessage.style.display = 'block';
-      } else {
-        matchMessage.style.display = 'none';
-      }
-    });
-
-    // 密碼顯示切換 - 密碼欄
-    document.getElementById('togglePasswordReg').addEventListener('click', function () {
-      const pwdInput = document.getElementById('password');
-      if (pwdInput.type === 'password') {
-        pwdInput.type = 'text';
-        this.textContent = '🙈';
-      } else {
-        pwdInput.type = 'password';
-        this.textContent = '👁️';
-      }
-    });
-
-    // 密碼顯示切換 - 確認密碼欄
-    document.getElementById('toggleConfirmPasswordReg').addEventListener('click', function () {
-      const confirmPwdInput = document.getElementById('confirm_password');
-      if (confirmPwdInput.type === 'password') {
-        confirmPwdInput.type = 'text';
-        this.textContent = '🙈';
-      } else {
-        confirmPwdInput.type = 'password';
-        this.textContent = '👁️';
-      }
-    });
+  confirmPassword.addEventListener('input', function () {
+    if (password.value !== confirmPassword.value) {
+      matchMessage.style.display = 'block';
+    } else {
+      matchMessage.style.display = 'none';
+    }
   });
+
+  // 密碼顯示切換 - 預設為顯示（🙈）
+  document.getElementById('togglePasswordReg').addEventListener('click', function () {
+    const pwdInput = document.getElementById('password');
+    if (pwdInput.type === 'text') {
+      pwdInput.type = 'password';
+      this.textContent = '👁️';
+    } else {
+      pwdInput.type = 'text';
+      this.textContent = '🙈';
+    }
+  });
+
+  document.getElementById('toggleConfirmPasswordReg').addEventListener('click', function () {
+    const confirmPwdInput = document.getElementById('confirm_password');
+    if (confirmPwdInput.type === 'text') {
+      confirmPwdInput.type = 'password';
+      this.textContent = '👁️';
+    } else {
+      confirmPwdInput.type = 'text';
+      this.textContent = '🙈';
+    }
+  });
+
+  // 即時檢查 Email 是否存在
+  const emailInput = document.getElementById('email');
+  const emailExistMsg = document.getElementById('emailExist');
+
+  emailInput.addEventListener('blur', function () {
+    const emailVal = emailInput.value.trim();
+    if (!emailVal) {
+      emailExistMsg.style.display = 'none';
+      return;
+    }
+
+    fetch(`/check_exist?email=${encodeURIComponent(emailVal)}`)
+      .then(response => response.json())
+      .then(data => {
+        emailExistMsg.style.display = data.exists ? 'block' : 'none';
+      });
+  });
+
+  // 即時檢查電話是否存在
+  const phoneInput = document.getElementById('phone');
+  const phoneExistMsg = document.getElementById('phoneExist');
+
+  phoneInput.addEventListener('blur', function () {
+    const phoneVal = phoneInput.value.trim();
+    if (!phoneVal) {
+      phoneExistMsg.style.display = 'none';
+      return;
+    }
+
+    fetch(`/check_exist?phone=${encodeURIComponent(phoneVal)}`)
+      .then(response => response.json())
+      .then(data => {
+        phoneExistMsg.style.display = data.exists ? 'block' : 'none';
+      });
+  });
+});
 </script>
 {% endblock %}
