@@ -15,6 +15,8 @@ class Show(db.Model):
     location_id = db.Column(db.Integer, db.ForeignKey('location.loc_id'))
     createdAt = db.Column(db.Date)
     updatedAt = db.Column(db.Date)
+    host = db.relationship('Host')
+
 
     def __repr__(self):
         return f'<Show {self.show_name}>'

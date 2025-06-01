@@ -13,7 +13,7 @@ from datetime import datetime
 from models.location import Location
 from models.refund import Refund
 from datetime import datetime
-from models import Ticket, Order, Game, Show, Area, GameArea, Payment,Member
+from models import Ticket, Order, Game, Show, Area, GameArea, Payment,Member,Host
 from datetime import datetime,timedelta
 from markupsafe import Markup
 from models.game import Game
@@ -125,14 +125,24 @@ def check_exist():
     return jsonify({'exists': False})
 
 
-
 #搜尋節目
 @app.route('/search')
 def search():
-    keyword = request.args.get('keyword', '')
-    # 範例：搜尋節目
-    shows = Show.query.filter(Show.show_name.contains(keyword)).all() if keyword else []
+    keyword = request.args.get('keyword', '').strip()
+
+    if keyword:
+        shows = Show.query.join(Host).filter(
+            db.or_(
+                Show.show_name.contains(keyword),
+                Host.host_name.contains(keyword)
+            )
+        ).all()
+    else:
+        shows = []
+
     return render_template('search_result.html', keyword=keyword, shows=shows)
+
+
 
 
 # =======================
@@ -229,6 +239,25 @@ def change_password():
 def member_info():
     return render_template('member_info.html', user=current_user)
 
+#收藏功能
+@app.route('/favorite/<int:show_id>', methods=['POST'])
+@login_required
+def favorite_show(show_id):
+    show = Show.query.get_or_404(show_id)
+    if show not in current_user.favorite_shows:
+        current_user.favorite_shows.append(show)
+        db.session.commit()
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/unfavorite/<int:show_id>', methods=['POST'])
+@login_required
+def unfavorite_show(show_id):
+    show = Show.query.get_or_404(show_id)
+    if show in current_user.favorite_shows:
+        current_user.favorite_shows.remove(show)
+        db.session.commit()
+    return redirect(request.referrer or url_for('index'))
+
 # =======================
 # 首頁
 # =======================
@@ -275,6 +304,9 @@ def index():
     return render_template('index.html',
                            carousel_shows=carousel_shows,
                            shows=all_shows)
+
+
+
 
 
 

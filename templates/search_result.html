@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
-    <!-- 搜尋框 -->
-    <form class="d-flex me-3" method="GET" action="{{ url_for('search') }}" style="width: 50%;">
-      <input class="form-control rounded-0 me-2" type="search" name="keyword" placeholder="請輸入節目名稱..." aria-label="Search" style="height: 45px;" />
-      <button class="btn btn-outline-primary" type="submit">搜尋</button>
-    </form>
+
 {% block title %}搜尋結果 - NtickeTUB{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-  <h2>{{ keyword }} 的搜尋結果：</h2>
+
+
+  <h2>
+    關於「{{ keyword }}」的搜尋結果：
+  </h2>
 
   {% if shows %}
   <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
@@ -16,9 +16,17 @@
     <div class="col">
       <a href="{{ url_for('show_detail', show_id=show.show_id) }}" class="text-decoration-none text-dark">
         <div class="card h-100">
-          <img src="{{ show.show_pic }}" class="card-img-top" alt="{{ show.show_name }}" style="height: 200px; object-fit: cover;" />
+          <img
+            src="{{ show.show_pic }}"
+            class="card-img-top"
+            alt="{{ show.show_name }}"
+            style="height: 200px; object-fit: cover;"
+          />
           <div class="card-body">
             <h5 class="card-title">{{ show.show_name }}</h5>
+            <p class="card-text">
+              主辦方：{{ show.host.host_name }}
+            </p>
             <p class="card-text">
               {{ show.start_date.strftime('%Y/%m/%d') if show.start_date else '未知' }}
               {% if show.end_date %} ~ {{ show.end_date.strftime('%Y/%m/%d') }} {% endif %}
