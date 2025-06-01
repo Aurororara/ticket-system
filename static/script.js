@@ -74,6 +74,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
       let errorMessages = [];
 
+      phoneInput.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, ''); // 移除非數字字元
+      });
+
       // 檢查卡號 16 位數字
       if (!/^\d{16}$/.test(cardNumber)) {
         errorMessages.push('卡號必須為16位數字');
@@ -197,4 +201,27 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
   });
+});
+
+// 即時檢查電話是否存在
+const phoneInput = document.getElementById('phone');
+const phoneExistMsg = document.getElementById('phoneExist');
+
+phoneInput.addEventListener('blur', function () {
+  const phoneVal = phoneInput.value.trim();
+  if (!phoneVal) {
+    phoneExistMsg.style.display = 'none';
+    return;
+  }
+
+  fetch(`/check_exist?phone=${encodeURIComponent(phoneVal)}`)
+    .then(response => response.json())
+    .then(data => {
+      phoneExistMsg.style.display = data.exists ? 'block' : 'none';
+    });
+});
+
+// 限制只能輸入數字
+phoneInput.addEventListener('input', function () {
+  this.value = this.value.replace(/\D/g, '');
 });
