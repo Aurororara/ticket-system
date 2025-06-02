@@ -116,12 +116,27 @@
 </head>
 <body>
 
- <!-- 放在 container 外面！ -->
+ 
+ 
+
+  <!-- 放在 container 外面！ -->
  {% extends "layout.html" %}
  {% block title %}節目詳情 - {{ show.show_name }}{% endblock %}
  {% block content %}
 
+ <!-- 頁首結束後，放在 container 前面！ -->
+ <div class="banner-wrapper">
+  <!-- 黑色漸層遮罩 -->
+  <div class="banner-overlay"></div>
 
+  <!-- 背景圖 -->
+  <img src="{{ show['show_bg'] }}" class="bg-image" alt="背景圖">
+
+  <!-- 主圖 -->
+  <div class="main-pic">
+    <img src="{{ show['show_pic'] }}" alt="節目圖片">
+  </div>
+</div>
 <!-- 頁首 -->
 
 <!-- 主要內容 -->
@@ -143,9 +158,7 @@
     <p><i class="bi bi-envelope me-2"></i> 主辦信箱：<a href="mailto:{{ show['host']['host_email'] }}">{{ show['host']['host_email'] }}</a></p>
   </div>
 
-  <div class="banner">
-    <img src="{{ show['show_pic'] }}" class="img-fluid" alt="節目圖片">
-  </div>
+  
 
 
             <!-- 按鈕區 -->

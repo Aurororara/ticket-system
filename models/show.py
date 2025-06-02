@@ -9,6 +9,7 @@ class Show(db.Model):
     show_name = db.Column(db.String(255))
     show_desc = db.Column(db.Text)
     show_pic = db.Column(db.Text)
+    show_bg = db.Column(db.String(255))
     start_date = db.Column(Date)
     end_date = db.Column(Date)
     host_id = db.Column(db.Integer, db.ForeignKey('host.host_id'))

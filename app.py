@@ -49,8 +49,8 @@ with app.app_context():
 with app.app_context():
     from models.show import Show
     print("✅ Shows in DB:")
-    for show in Show.query.all():
-        print(show.show_name)
+    #for show in Show.query.all():
+        #print(show.show_name)
 
 
 # 註冊會員
@@ -635,6 +635,7 @@ def show_detail(show_id):
         "start_date": show.start_date.strftime('%Y/%m/%d') if show.start_date else None,
         "end_date": show.end_date.strftime('%Y/%m/%d') if show.end_date else None,
         'show_pic': show.show_pic,
+        'show_bg': show.show_bg,  
         'createdAt': show.createdAt,
         'host': {
             'host_name': host.host_name if host else "未知主辦",
