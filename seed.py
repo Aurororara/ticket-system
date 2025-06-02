@@ -3,142 +3,191 @@ from models import (
     Member, Show, Host, Location, Game, Area, Section,
     Order, Payment, Ticket, GameArea
 )
-from datetime import datetime, date, time
+from models.refund import Refund
+from datetime import datetime, date, time, timedelta
+from werkzeug.security import generate_password_hash
 
 with app.app_context():
-    # ❗清空資料表（開發時用，正式環境不要加）
+    # Clear existing data (for development only, do not use in production)
     db.drop_all()
     db.create_all()
 
-    # 🧑 新增一位會員（用來登入）
+    # Add a member
     member = Member(
-        mem_id=1,
-        mem_name="玟潔",
-        mem_acc="aurora",
-        mem_email="aurora@test.com",
-        mem_pwd="yeah123456",  # 若有加密請自行加密
-        birthday=date(2000, 1, 1),
-        mem_phone="0912345678"
+        mem_name="Test User",
+        mem_email="testuser@example.com",
+        mem_pwd=generate_password_hash("TestPass123"),
+        mem_phone="0912345678",
+        birthday=date(2006, 10, 11),
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 🏢 新增主辦單位
+    # Add a host
     host = Host(
-        host_id=1,
-        host_name="BELIFT LAB",
-        host_email="host@test.com",
-        createdAt=date.today(),
-        updatedAt=date.today()
+        host_name="Sample Host",
+        host_email="host@example.com",
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 🏟️ 新增地點
+    # Add a location
     location = Location(
-        loc_id=1,
-        loc_name="KSPO DOME",
-        createdAt=date.today(),
-        updatedAt=date.today()
+        loc_name="Sample Venue",
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 📐 新增區段
+    # Add a section
     section = Section(
-        sect_id=1,
-        sect_name="搖滾區",
-        createdAt=date.today(),
-        updatedAt=date.today()
+        sect_name="General Admission",
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 🎤 新增節目
+    # Add a show with existing project image
     show = Show(
-        show_id=1,
-        show_name="ENHYPEN Fate+ in Seoul",
-        show_desc="我好想看",
-        show_pic="enhypen.jpg",
+        show_name="Fate+ in Seoul",
+        show_desc="This is a sample show.",
+        show_pic="show1.jpg",  # Using existing image from static/img/
         host_id=1,
         location_id=1,
-        createdAt=date.today(),
-        updatedAt=date.today()
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 📅 新增一場場次（關鍵：game_status 要是 'A' 開賣中）
+    db.session.add(show)
+    db.session.commit()  # Commit to get show_id
+
+    # Add a game (show date 30 days from now)
     game = Game(
-        game_id=1,
-        game_date=date(2025, 5, 31),
+        game_date=date.today() + timedelta(days=30),
         game_time=time(19, 0),
-        sale_start_time=datetime(2025, 5, 1, 10, 0),
-        sale_end_time=datetime(2025, 5, 30, 23, 59),
+        sale_start_time=datetime.combine(date.today(), time(0, 0)),
+        sale_end_time=datetime.combine(date.today() + timedelta(days=29), time(23, 59, 59)),
         game_status="A",
         total_seats=1000,
-        available_seats=998,
-        show_id=1,
-        createdAt=date.today(),
-        updatedAt=date.today()
+        available_seats=1000,
+        show_id=show.show_id,
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 🪑 新增一個場區
+    # Add an area
     area = Area(
-        area_id=1,
-        area_name="A區 VIP",
+        area_name="VIP Area",
         seat_count=500,
-        price=7880,
+        price=5000,
         loc_id=1,
         sect_id=1,
-        createdAt=date.today(),
-        updatedAt=date.today()
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 🔁 將場次與場區連結（GameArea）
+    # Add a game area
     game_area = GameArea(
-        game_area_id=1,
         total_seats=500,
-        available_seats=499,
+        available_seats=500,
+        disabled_available_seats=500,
         game_id=1,
         area_id=1,
-        createdAt=date.today(),
-        updatedAt=date.today()
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 💳 新增付款資料
-    payment = Payment(
-        payment_id=1,
-        pay_method="1",
-        pay_status="1",
-        amount=7880,
+    # Add a payment
+    payment1 = Payment(
+        pay_method="C",
+        pay_status="Y",
+        amount=5000,
         paid_time=datetime.now(),
-        order_id=1,  # ⚠️ 須與訂單對應
-        createdAt=date.today(),
-        updatedAt=date.today()
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 🧾 新增訂單
-    order = Order(
-        order_id=1,
-        order_status="1",
-        buyer_name="玟潔",
-        buyer_email="aurora@test.com",
+    payment2 = Payment(
+        pay_method="C",
+        pay_status="Y",
+        amount=5000,
+        paid_time=datetime.now(),
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
+    )
+
+    # Add two orders: one refundable, one not refundable (refund sent day before show)
+    order1 = Order(
+        order_status="Y",
+        buyer_name="Test User",
+        buyer_email="testuser@example.com",
         buyer_phone="0912345678",
-        total_price=7880,
+        total_price=5000,
         mem_id=1,
         payment_id=1,
-        createdAt=date.today(),
-        updatedAt=date.today()
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # 🎟️ 新增票券（指定給該場次＋場區）
-    ticket = Ticket(
-        ticket_id=1,
-        seat_no="A01",
-        ticket_status="1",
+    order2 = Order(
+        order_status="Y",
+        buyer_name="Test User",
+        buyer_email="testuser@example.com",
+        buyer_phone="0912345678",
+        total_price=5000,
+        mem_id=1,
+        payment_id=2,
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
+    )
+
+    # Add tickets for both orders
+    ticket1 = Ticket(
+        seat_no="A001",
+        ticket_status="L",
         order_id=1,
         game_id=1,
         area_id=1,
-        createdAt=date.today(),
-        updatedAt=date.today()
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
     )
 
-    # ✅ 一次加入所有資料
+    ticket2 = Ticket(
+        seat_no="A002",
+        ticket_status="L",
+        order_id=2,
+        game_id=1,
+        area_id=1,
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
+    )
+
+    # Add a refund request for order1 (refundable)
+    refund1 = Refund(
+        order_id=1,
+        name="Test User",
+        email="testuser@example.com",
+        phone="0912345678",
+        refund_status="pending",
+        createdAt=datetime.now(),
+        updatedAt=datetime.now()
+    )
+
+    # Add a refund request for order2 (not refundable, sent day before show)
+    refund2 = Refund(
+        order_id=2,
+        name="Test User",
+        email="testuser@example.com",
+        phone="0912345678",
+        refund_status="rejected",
+        createdAt=datetime.now() - timedelta(days=1),
+        updatedAt=datetime.now() - timedelta(days=1)
+    )
+
+    # Add all to session and commit
     db.session.add_all([
         member, host, location, section, show, game,
-        area, game_area, payment, order, ticket
+        area, game_area, payment1, payment2, order1, order2,
+        ticket1, ticket2, refund1, refund2
     ])
     db.session.commit()
 
-    print("✅ 模擬資料新增完成")
+    print("Seed data with two orders (one refundable, one not) added successfully.")

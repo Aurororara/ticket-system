@@ -11,10 +11,17 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
+              {% if message == 'Please log in to access this page.' %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                  請先登入以瀏覽此頁面
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% else %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endif %}
             {% endfor %}
           {% endif %}
         {% endwith %}
@@ -23,7 +30,7 @@
           <div class="alert alert-danger">{{ error }}</div>
         {% endif %}
 
-        <form method="POST" action="{{ url_for('login') }}">
+        <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
           <div class="mb-3">
             <label for="email" class="form-label">電子郵件信箱</label>
             <input type="email" class="form-control" id="email" name="email" placeholder="請輸入電子郵件" required>

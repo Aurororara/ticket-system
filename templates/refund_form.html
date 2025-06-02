@@ -19,7 +19,13 @@
   <p>訂單編號：<span class="highlight">{{ '%05d'|format(order.order_id) }}</span></p>
   <p>節目名稱：{{ order.show.show_name if order.show else '未知' }}</p>
   <p>活動地點：{{ order.show.location.loc_name if order.show and order.show.location else '未知' }}</p>
-  <p>活動時間：{{ order.show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') if order.show and order.show.createdAt else '未知' }}</p>
+  <p>活動時間：
+    {% if order.show and order.show.createdAt %}
+      {{ order.show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') }}
+    {% else %}
+      未知
+    {% endif %}
+  </p>
   <p>退款金額：TWD${{ order.total_price }}</p>
   <p class="note">**退款需自行支付20(元)手續費，詳情請見 退票說明**</p>
 </div>

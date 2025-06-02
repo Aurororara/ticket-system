@@ -1,5 +1,7 @@
 from models.db import db
 from sqlalchemy.orm import relationship
+from sqlalchemy import Date, func
+
 
 class Payment(db.Model):
   __tablename__ = 'payment'
@@ -8,7 +10,7 @@ class Payment(db.Model):
   pay_status = db.Column(db.String(1))
   amount = db.Column(db.Integer)
   paid_time = db.Column(db.DateTime)
-  createdAt = db.Column(db.Date)
-  updatedAt = db.Column(db.Date)
+  createdAt = db.Column(db.DateTime, default=func.now())
+  updatedAt = db.Column(db.DateTime, default=func.now(), onupdate=func.now())
 
   order = relationship('Order', back_populates='payment', uselist=False)

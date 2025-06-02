@@ -57,33 +57,45 @@
   </div> -->
 
   <!-- 隱藏訂單編號 -->
-  <input type="hidden" name="order_id" value="{{ order.order_id }}">
-
-  <!-- 信用卡付款表單 -->
-  <div class="border p-3 ">
-    <div class="mb-3">
-      <label class="form-label">信用卡卡號</label>
-      <input type="text" id="cardNumber" class="form-control" placeholder="請輸入卡號">
-    </div>
-    <div class="row g-2 mb-3">
-      <div class="col">
-        <label class="form-label">卡片到期日</label>
-        <input type="text" id="cardExpiry" class="form-control" placeholder="MM/YY有效年月">
-      </div>
-      <div class="col">
-        <label class="form-label">安全碼</label>
-        <input type="text" id="cardCVC" class="form-control" placeholder="卡片背面末三碼">
-      </div>
-    </div>
+  <form id="creditcardForm" method="post" action="{{ url_for('confirm_payment') }}">
+    <input type="hidden" name="order_id" value="{{ order.order_id }}">
   
-
-  <!-- 錯誤提示區塊（預設隱藏） -->
-  <div id="errorMsg" class="alert alert-danger d-none text-center mb-3"></div>
-
-    <!-- 置中按鈕 -->
-    <div class="d-flex justify-content-center">
-      <button class="btn btn-dark w-50" id="submitPaymentBtn">確定</button>
+    <!-- 信用卡付款表單 -->
+    <div class="border rounded-3 p-4 shadow-sm bg-white">
+      <h5 class="mb-3">信用卡付款資訊</h5>
+  
+      <!-- 卡號 -->
+      <div class="mb-3">
+        <label for="cardNumber" class="form-label">卡號</label>
+        <input type="text" id="cardNumber" name="cardNumber" class="form-control" placeholder="0000 0000 0000 0000"
+          inputmode="numeric" maxlength="19" autocomplete="cc-number">
+      </div>
+  
+      <!-- 到期日 + 安全碼 -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="cardExpiry" class="form-label">有效年月</label>
+          <input type="text" id="cardExpiry" name="cardExpiry" class="form-control" placeholder="MM/YY" inputmode="numeric"
+            maxlength="5" autocomplete="cc-exp">
+        </div>
+  
+        <div class="col-md-6">
+          <label for="cardCVC" class="form-label">安全碼（CVC）</label>
+          <input type="text" id="cardCVC" name="cardCVC" class="form-control" placeholder="卡片背面末三碼" inputmode="numeric"
+            maxlength="3" autocomplete="cc-csc">
+        </div>
+      </div>
+  
+      
+  
+      <!-- 錯誤提示區塊（預設隱藏） -->
+      <div id="errorMsg" class="alert alert-danger d-none text-center mb-3"></div>
+  
+        <!-- 置中按鈕 -->
+        <div class="d-flex justify-content-center">
+          <button class="btn btn-dark w-50" id="submitPaymentBtn" type="submit">確定</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  </form>
 {% endblock %}

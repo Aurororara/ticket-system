@@ -3,12 +3,11 @@
 {% block title %}購票起始頁 - NtickeTUB{% endblock %}
 
 {% block content %}
-<div class="text-center my-4">
-  <!-- 改為固定顯示 show1.jpg -->
-  <img src="{{ url_for('static', filename='img/show1.jpg') }}" class="img-fluid" alt="Banner Image">
 
-
-</div>
+  <div style="max-width: 1000px; height: 400px; margin: 20px auto; overflow: hidden; border-radius: 12px;">
+    <img src="{{ url_for('static', filename='img/' ~ s.show_pic) }}" alt="Banner Image"
+      style="width: 100%; height: 100%; object-fit: cover;">
+  </div>
 
 <div class="container">
   <h2>{{ s.show_name }}</h2>
@@ -18,7 +17,10 @@
     </span><br>
 
     <span class="d-inline-flex align-items-center">
-      <i class="bi bi-geo-alt me-1"></i> 活動地點：{{ location.loc_name }}
+      <i class="bi bi-geo-alt me-1"></i> 活動地點：{{ location.loc_name }}　
+      <a class="highlight" href="https://www.google.com/maps?q={{ location.loc_name }}" target="_blank">
+        點我查看地圖
+      </a>
     </span><br>
 
     <span class="d-inline-flex align-items-center">
@@ -36,10 +38,9 @@
   <table class="table table-bordered text-center">
     <thead class="table-light">
       <tr>
-        <th>演出時間</th>
-        <th>場次名稱</th>
-        <th>場地</th>
-        <th>購票狀態</th>
+        <th>演出日期</th>
+        <th>售票期間</th>
+        <th>地點</th>
       </tr>
     </thead>
     <tbody>
@@ -47,15 +48,15 @@
       {% for game in games %}
       <tr>
         <td>{{ game.game_date }}</td>
-        <td>{{ game.game_time }}</td>
-        <td>{{ s.show_name }}</td>
+        <td>{{ game.sale_start_time}} ～ {{ game.sale_end_time}}</td>
         <td>{{ location.loc_name }}</td>
+
         <td>
-          {% if game.game_status == 'A' %}
-          <a href="{{ url_for('select_area', game_id=game.game_id) }}" class="btn btn-secondary">立即訂購</a>
-          {% else %}
-          <button class="btn btn-secondary" disabled>暫停販售</button>
-          {% endif %}
+          {% if game.game_status == 'A' and game.sale_start_time <= now <=game.sale_end_time %} <a
+            href="{{ url_for('select_area', game_id=game.game_id) }}" class="btn btn-secondary">立即訂購</a>
+            {% else %}
+            <button class="btn btn-secondary" disabled>暫停販售</button>
+            {% endif %}
         </td>
       </tr>
       {% else %}

@@ -3,26 +3,38 @@
 {% block title %}我的票券 - NtickeTUB{% endblock %}
 
 {% block content %}
-<h2>個人帳務清單</h2>
+<h2 style="margin-top: 20px;">個人帳務清單</h2>
 
-{% if tickets %}
+{% if order_data %}
   <div class="ticket-list">
-    {% for ticket, game, show, area, order in tickets %}
-      <a href="{{ url_for('order_detail', order_id=ticket.order_id) }}" class="ticket-card-link" style="text-decoration:none; color: inherit;">
+    {% for item in order_data %}
+      <a href="{{ url_for('order_detail', order_id=item.order.order_id) }}" class="ticket-card-link" style="text-decoration:none; color: inherit;">
         <div class="ticket-card">
           <div class="ticket-card-left">
             <img src="{{ url_for('static', filename='img/show1.jpg') }}" alt="活動圖片" class="ticket-image" />
           </div>
           <div class="ticket-card-right">
-            <h3 style="color: #e74c3c;">{{ show.show_name }}</h3>
-            <p>訂單編號：{{ '%05d'|format(ticket.order_id) }}</p>
-            <p>購買日期：{{ ticket.createdAt.strftime('%Y/%m/%d') if ticket.createdAt else '未知' }}</p>
-            <p>活動日期：{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }}</p>
-            <p>活動地點：{{ area.area_name }}</p>
+            {% if item.tickets %}
+              {% set ticket = item.tickets[0][0] %}
+              {% set game = item.tickets[0][1] %}
+              {% set show = item.tickets[0][2] %}
+              {% set area = item.tickets[0][3] %}
+              <h3 style="color: #e74c3c;">{{ show.show_name }}</h3>
+              <p>訂單編號：{{ '%05d'|format(ticket.order_id) }}</p>
+              <p>購買日期：{{ ticket.createdAt.strftime('%Y/%m/%d') if ticket.createdAt else '未知' }}</p>
+              <p>活動日期：{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }}</p>
+              <p>活動地點：{{ area.area_name }}</p>
+            {% else %}
+              <h3 style="color: #e74c3c;">無票券資料</h3>
+              <p>訂單編號：{{ '%05d'|format(item.order.order_id) }}</p>
+              <p>購買日期：{{ item.order.createdAt.strftime('%Y/%m/%d') if item.order.createdAt else '未知' }}</p>
+              <p>活動日期：未知</p>
+              <p>活動地點：未知</p>
+            {% endif %}
             <p>
               退款狀態：
-              {% if refund_status_map[ticket.order_id] is defined %}
-                {{ refund_status_map[ticket.order_id] }}
+              {% if item.refund_status %}
+                {{ item.refund_status }}
               {% else %}
                 無退款申請
               {% endif %}

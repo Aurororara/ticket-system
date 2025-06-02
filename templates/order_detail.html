@@ -7,7 +7,13 @@
 
 <div>
   <p>訂單編號：{{ '%05d'|format(order.order_id) }}</p>
-  <p>訂購時間：{{ order.createdAt.strftime('%Y/%m/%d %H:%M') if order.createdAt else '未知' }}</p>
+  <p>訂購時間：
+    {% if order.createdAt %}
+      {{ order.createdAt.strftime('%Y/%m/%d %H:%M') }}
+    {% else %}
+      未知
+    {% endif %}
+  </p>
   <p>訂單狀態：{{ order.order_status }}</p>
   <p>退款狀態：
     {% if refund_status %}

@@ -2,88 +2,131 @@
 <html lang="zh-Hant">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}NtickeTUB{% endblock %}</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    /* 圓點右下，水平排列 */
+    #carouselExample .carousel-indicators.custom-indicators {
+      position: absolute;
+      right: 15px;
+      bottom: 10px;
+      display: flex !important;
+      justify-content: flex-end;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      z-index: 10;
+    }
+
+    /* 讓圓點跟 Bootstrap 預設差不多 */
+    #carouselExample .carousel-indicators.custom-indicators button {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.7);
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+
+    #carouselExample .carousel-indicators.custom-indicators button.active {
+      background-color: #0d6efd; /* Bootstrap 主色 */
+    }
+  </style>
 </head>
 
 <body>
-  <!-- 導航列 -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">NtickeTUB</a>
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ url_for('index') }}">NtickeTUB</a>
 
-      <!-- 搜尋框 -->
-      <form class="d-flex ms-auto" style="width: 60%;">
-        <input class="form-control me-2 rounded-0" type="search" placeholder="請輸入節目名稱..." aria-label="Search" style="height: 45px;">
-      </form>
-       <div class="d-flex">
-        {% if current_user.is_authenticated %}
-        <div class="dropdown">
-          <button class="btn btn-outline-secondary dropdown-toggle me-2" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            {{ current_user.mem_name }}
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" href="{{ url_for('member_info') }}">會員資料</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">登出</a></li>
-          </ul>
-        </div>
-        {% else %}
-        <a href="{{ url_for('login') }}" class="btn btn-outline-secondary me-2">我的會員</a>
-        {% endif %}
-        <a href="{{ url_for('my_tickets') }}" class="btn btn-outline-secondary">我的票券</a>
+    <!-- 搜尋框 -->
+    <form method="GET" action="{{ url_for('search') }}" style="width: 50%;">
+      <div class="input-group" style="height: 45px;">
+        <input type="search" name="keyword" class="form-control rounded-0" placeholder="搜尋你想看的節目關鍵字..." aria-label="Search" />
+        <button class="btn btn-outline-primary rounded-0" type="submit" style="min-width: 100px;">搜尋</button>
       </div>
-  </nav>
+    </form>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="container mt-3">
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
+
+
+    <!-- 會員 & 我的票券 -->
+    <div class="d-flex align-items-center">
+      {% if current_user.is_authenticated %}
+      <div class="dropdown me-2">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          {{ current_user.mem_name }}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li><a class="dropdown-item" href="{{ url_for('member_info') }}">會員資料</a></li>
+          <li><hr class="dropdown-divider" /></li>
+          <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">登出</a></li>
+        </ul>
       </div>
-    {% endif %}
+      {% else %}
+      <a href="{{ url_for('login') }}" class="btn btn-outline-secondary me-2">我的會員</a>
+      {% endif %}
+      <a href="{{ url_for('my_tickets') }}" class="btn btn-outline-secondary">我的票券</a>
+    </div>
+  </div>
+</nav>
+
+
+  <!-- Flash 訊息 -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="container mt-3">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
   {% endwith %}
 
   <!-- 幻燈片 -->
   <div class="container mt-5">
     <h2 class="text-center mb-3">近期節目</h2>
-
     <div class="position-relative mx-auto" style="max-width: 800px;">
       <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+
         <!-- 圓點 -->
-        <div class="carousel-indicators">
-          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="1" aria-label="Slide 2"></button>
-          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="2" aria-label="Slide 3"></button>
-          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="3" aria-label="Slide 4"></button>
+        <div class="carousel-indicators custom-indicators">
+          {% for show in carousel_shows %}
+          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="{{ loop.index0 }}"
+            {% if loop.first %}class="active" aria-current="true"{% endif %}
+            aria-label="Slide {{ loop.index }}"></button>
+          {% endfor %}
         </div>
 
         <!-- 幻燈片內容 -->
         <div class="carousel-inner">
-          <div class="carousel-item active">
-            <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="d-block w-100" alt="節目1" style="max-height: 400px; object-fit: cover;">
+          {% for show in carousel_shows %}
+          <div class="carousel-item {% if loop.first %}active{% endif %}">
+            <a href="{{ url_for('show_detail', show_id=show.show_id) }}">
+              <img src="{{ show.show_pic }}" class="d-block w-100" alt="{{ show.show_name }}"
+                style="width: 100%; height: 400px; object-fit: cover;" />
+            </a>
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+              <h5>{{ show.show_name }}</h5>
+              <p>
+                {{ show.start_date.strftime('%Y/%m/%d') if show.start_date else '未知' }}
+                {% if show.end_date %} ~ {{ show.end_date.strftime('%Y/%m/%d') }} {% endif %}
+              </p>
+            </div>
           </div>
-          <div class="carousel-item">
-            <img src="{{ url_for('static', filename='images/jak.jpeg') }}" class="d-block w-100" alt="節目2" style="max-height: 400px; object-fit: cover;">
-          </div>
-          <div class="carousel-item">
-            <img src="{{ url_for('static', filename='images/chiq.webp') }}" class="d-block w-100" alt="節目3" style="max-height: 400px; object-fit: cover;">
-          </div>
-          <div class="carousel-item">
-            <img src="{{ url_for('static', filename='images/yaju.jpg') }}" class="d-block w-100" alt="節目4" style="max-height: 400px; object-fit: cover;">
-          </div>
+          {% endfor %}
         </div>
 
         <!-- 左右按鈕 -->
-        <button class="carousel-control-prev custom-carousel-btn" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Previous</span>
         </button>
-        <button class="carousel-control-next custom-carousel-btn" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Next</span>
         </button>
@@ -95,64 +138,23 @@
   <div class="container extra-margin-top">
     <h2 class="text-center mb-3">所有節目</h2>
     <div class="row row-cols-1 row-cols-md-3 g-4">
-      <!-- 節目卡片 1 -->
+      {% for show in shows %}
       <div class="col">
-        <a href="/show/test" class="text-decoration-none text-dark">
+        <a href="{{ url_for('show_detail', show_id=show.show_id) }}" class="text-decoration-none text-dark">
           <div class="card h-100">
-            <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="card-img-top" alt="KESHI">
+            <img src="{{ show.show_pic }}" class="card-img-top" alt="{{ show.show_name }}"
+              style="height: 200px; object-fit: cover;" />
             <div class="card-body">
-              <h5 class="card-title">KESHI : Keshi Tour in Taipei</h5>
-              <p class="card-text event-date">2025/4/10(四) ~ 2025/4/11(五)</p>
+              <h5 class="card-title">{{ show.show_name }}</h5>
+              <p class="card-text event-date">
+                {{ show.start_date.strftime('%Y/%m/%d') if show.start_date else '未知' }}
+                {% if show.end_date %} ~ {{ show.end_date.strftime('%Y/%m/%d') }} {% endif %}
+              </p>
             </div>
           </div>
         </a>
       </div>
-
-      <!-- 節目卡片 2 -->
-      <div class="col">
-        <a href="/show/test" class="text-decoration-none text-dark">
-          <div class="card h-100">
-            <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="card-img-top" alt="TAIL">
-            <div class="card-body">
-              <h5 class="card-title">TAIL : Tail Asia Tour 2025</h5>
-              <p class="card-text event-date">2025/6/10(四) ~ 2025/6/11(五)</p>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <!-- 節目卡片 3 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="card-img-top" alt="JAY B">
-          <div class="card-body">
-            <h5 class="card-title">JAY B : Concert [TAPE:RE LOAD]</h5>
-            <p class="card-text event-date">2025/4/30(三)</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 節目卡片 4 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="card-img-top" alt="JAY B">
-          <div class="card-body">
-            <h5 class="card-title">NANA Fang : Concert [UCLA]</h5>
-            <p class="card-text event-date">2025/2/8(三)</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 節目卡片 5 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="{{ url_for('static', filename='images/jae.jpg') }}" class="card-img-top" alt="平野綾">
-          <div class="card-body">
-            <h5 class="card-title">平野綾 AYA HIRANO : Fanmeeting in Taiwan</h5>
-            <p class="card-text">2025/5/2(五) ~ 2025/5/3(六)</p>
-          </div>
-        </div>
-      </div>
+      {% endfor %}
     </div>
   </div>
 
@@ -164,4 +166,5 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
+
 </html>

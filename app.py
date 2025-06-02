@@ -1,5 +1,5 @@
-
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+# -*- coding: utf-8 -*-
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, get_flashed_messages
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from config import Config
@@ -13,7 +13,6 @@ from datetime import datetime
 from models.location import Location
 from models.refund import Refund
 from datetime import datetime
-from models import Ticket, Order, Game, Show, Area, GameArea
 from models import Ticket, Order, Game, Show, Area, GameArea, Payment
 from datetime import datetime,timedelta
 from markupsafe import Markup
@@ -24,6 +23,9 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///your_database.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+
+
+import re
 
 
 app = Flask(__name__)
@@ -116,6 +118,15 @@ def register():
         return redirect(url_for('index'))
     return render_template('register.html')
 
+#搜尋節目
+@app.route('/search')
+def search():
+    keyword = request.args.get('keyword', '')
+    # 範例：搜尋節目
+    shows = Show.query.filter(Show.show_name.contains(keyword)).all() if keyword else []
+    return render_template('search_result.html', keyword=keyword, shows=shows)
+
+
 # =======================
 # 登入管理初始化
 # =======================
@@ -130,19 +141,36 @@ def load_user(user_id):
 # =======================
 # 登入
 # =======================
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
+
+    # 取得所有 flashed 訊息並翻譯
+    messages = get_flashed_messages()
+    translated_messages = []
+    for msg in messages:
+        if msg == "Please log in to access this page.":
+            translated_messages.append("請先登入以瀏覽此頁面")
+        else:
+            translated_messages.append(msg)
+
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
         user = Member.query.filter_by(mem_email=email).first()
         if user and check_password_hash(user.mem_pwd, password):
             login_user(user)
+            next_page = request.args.get('next')
+            if next_page:
+                return redirect(next_page)
             return redirect(url_for('index'))
         else:
             error = '電子郵件或密碼錯誤'
-    return render_template('login.html', error=error)
+
+    return render_template('login.html', error=error, messages=translated_messages)
+
 
 
 @app.route('/logout')
@@ -201,7 +229,14 @@ def member_info():
 # =======================
 @app.route('/')
 def index():
-  return render_template('index.html')
+    # 取出近期節目，依開始日期排序，取前6筆
+    carousel_shows = Show.query.order_by(Show.start_date.asc()).limit(6).all()
+
+    # 取出所有節目（可依需求調整數量）
+    all_shows = Show.query.order_by(Show.start_date.asc()).all()
+
+    return render_template('index.html', carousel_shows=carousel_shows, shows=all_shows)
+
 
 @app.route('/api/buy', methods=['POST'])
 def buy_ticket():
@@ -296,7 +331,8 @@ def lock_order(game_id, area_id):
         buyer_phone=current_user.mem_phone,
         total_price=(ticket_price * full_quantity) + (disabled_ticket_price * disabled_quantity),
         mem_id=current_user.mem_id,
-        payment_id=None
+        payment_id=None,
+        order_status='N'
     )
     db.session.add(new_order)
     db.session.flush()
@@ -321,7 +357,7 @@ def lock_order(game_id, area_id):
         )
         db.session.add(ticket)
 
-    for i in range(full_quantity):
+    for i in range(disabled_quantity):
         seat_no = available_seat_nos[full_quantity + i]
         ticket = Ticket(
             seat_no=seat_no,
@@ -342,7 +378,9 @@ def lock_order(game_id, area_id):
 @login_required
 def select_atm(order_id):
     # 根據 order_id 取得訂單資訊顯示
-    order = Order.query.get_or_404(order_id)
+    order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+    if not order:
+        return redirect(url_for('index'))
 
     # 取得付款資訊
     payment = Payment.query.filter_by(payment_id=order.payment_id).first()
@@ -371,8 +409,10 @@ def select_atm(order_id):
 @app.route('/ticket/select-creditcard/<int:order_id>')
 @login_required
 def select_creditcard(order_id):
-    order = Order.query.get_or_404(order_id)
-    payment = Payment.query.filter_by
+    order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+    if not order:
+        return redirect(url_for('index'))
+    payment = Payment.query.filter_by(payment_id=order.payment_id).first()
     tickets = Ticket.query.filter_by(order_id=order_id).all()
     show = None
     if tickets:
@@ -386,26 +426,28 @@ def select_creditcard(order_id):
 @app.route('/ticket/order-complete/<int:order_id>')
 @login_required
 def order_complete(order_id):
-  order = Order.query.get_or_404(order_id)
-  tickets = Ticket.query.filter_by(order_id=order_id).all()
+    order = Order.query.filter_by(order_id=order_id, order_status='Y').first()
+    if not order:
+        return redirect(url_for('index'))
+    tickets = Ticket.query.filter_by(order_id=order_id).all()
 
-  # 預設使用第一張票取得相關資訊
-  if tickets:
-    game = Game.query.get(tickets[0].game_id)
-    show = Show.query.get(game.show_id)
-    location = Location.query.get(show.location_id)
-  else:
-    game = show = location = None
+    # 預設使用第一張票取得相關資訊
+    if tickets:
+        game = Game.query.get(tickets[0].game_id)
+        show = Show.query.get(game.show_id)
+        location = Location.query.get(show.location_id)
+    else:
+        game = show = location = None
 
-  return render_template(
-    'order_complete.html',
-    order=order,
-    tickets=tickets,
-    show=show,
-    game=game,
-    location=location
-    )
-  # return render_template('order_complete.html')
+    return render_template(
+        'order_complete.html',
+            order=order,
+            tickets=tickets,
+            show=show,
+            game=game,
+            location=location
+        )
+    # return render_template('order_complete.html')
 
 
 
@@ -470,7 +512,7 @@ def refund_detail(order_id):
                 'amount': order.total_price - 20 if order else 0
             }), 400
 
-    amount = order.total_price - 20  # 扣除20元手續費
+    amount = (order.total_price if order.total_price is not None else 0) - 20  # 扣除20元手續費
 
     if request.method == 'POST':
         name = request.form.get('name')
@@ -554,24 +596,29 @@ def load_user(user_id):
 @app.route('/my-tickets')
 @login_required
 def my_tickets():
-    tickets = (
-        db.session.query(Ticket, Game, Show, Area, Order)
-        .join(Order, Ticket.order_id == Order.order_id)
-        .join(Game, Ticket.game_id == Game.game_id)
-        .join(Show, Game.show_id == Show.show_id)
-        .join(Area, Ticket.area_id == Area.area_id)
-        .filter(Order.mem_id == current_user.mem_id)
-        .all()
-    )
-    # Get refund status for each order
-    order_ids = {ticket.Order.order_id for ticket in tickets}
+    orders = Order.query.filter_by(mem_id=current_user.mem_id).all()
+    order_data = []
+    order_ids = [order.order_id for order in orders]
+
     refunds = Refund.query.filter(Refund.order_id.in_(order_ids)).all()
     refund_status_map = {refund.order_id: refund.refund_status for refund in refunds}
 
-    # Debug print to verify refund_status_map content
-    print("Refund status map:", refund_status_map)
+    for order in orders:
+        tickets = (
+            db.session.query(Ticket, Game, Show, Area)
+            .join(Game, Ticket.game_id == Game.game_id)
+            .join(Show, Game.show_id == Show.show_id)
+            .join(Area, Ticket.area_id == Area.area_id)
+            .filter(Ticket.order_id == order.order_id)
+            .all()
+        )
+        order_data.append({
+            'order': order,
+            'tickets': tickets,
+            'refund_status': refund_status_map.get(order.order_id, None)
+        })
 
-    return render_template('my_ticket.html', tickets=tickets, refund_status_map=refund_status_map)
+    return render_template('my_ticket.html', order_data=order_data)
 
 
 #節目詳情頁
@@ -586,12 +633,16 @@ def show_detail(show_id):
         'show_name': show.show_name,
         'show_desc': show.show_desc,
         "start_date": show.start_date.strftime('%Y/%m/%d') if show.start_date else None,
-
         "end_date": show.end_date.strftime('%Y/%m/%d') if show.end_date else None,
         'show_pic': show.show_pic,
         'createdAt': show.createdAt,
-        'host': {'host_name': host.host_name if host else "未知主辦"},
-        'location': {'loc_name': location.loc_name if location else "未知地點"}
+        'host': {
+            'host_name': host.host_name if host else "未知主辦",
+            'host_email': host.host_email if host else "未知信箱"
+        },
+        'location': {
+            'loc_name': location.loc_name if location else "未知地點"
+        }
     }
 
     return render_template('show_detail.html', show=show_data)
@@ -604,7 +655,7 @@ def ticket_start(show_id):
     host = Host.query.get(show.host_id)
     location = Location.query.get(show.location_id)
     games = Game.query.filter_by(show_id=show.show_id).all()
-    return render_template("ticket_start.html", s=show, host=host, location=location, games=games)
+    return render_template("ticket_start.html", s=show, host=host, location=location, games=games,now=datetime.now())
 
 #換行
 @app.template_filter('nl2br')
@@ -627,10 +678,12 @@ def order_detail(order_id):
     refund_status = refund.refund_status if refund else None
     return render_template('order_detail.html', order=order, tickets=tickets, refund_status=refund_status)
 
-# 啟動伺服器
+# 選擇付款
 @app.route('/ticket/select-payment/<int:order_id>')
 def select_payment(order_id):
-    order = Order.query.get_or_404(order_id)
+    order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+    if not order:
+        return redirect(url_for('index'))
     tickets = Ticket.query.filter_by(order_id=order_id).all()
     if not tickets:
         return "找不到此訂單的票券", 404
@@ -640,7 +693,6 @@ def select_payment(order_id):
     host = Host.query.get(show.host_id)
     location = Location.query.get(show.location_id)
 
-    # 暫時用假資料 - 抓第一筆會員
     member = Member.query.get(order.mem_id)
     if not member:
       return "尚未建立會員資料，請先新增會員", 404
@@ -660,7 +712,9 @@ def select_payment_method():
   order_id = request.form.get('order_id')
   pay_method = request.form.get('pay_method')
 
-  order = Order.query.get_or_404(order_id)
+  order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+  if not order:
+    return redirect(url_for('index'))
 
   # 建立 Payment 記錄
   payment = Payment(
@@ -691,7 +745,9 @@ def select_payment_method():
 @app.route('/ticket/confirm-payment', methods=['POST'])
 def confirm_payment():
   order_id = request.form.get('order_id')
-  order = Order.query.get_or_404(order_id)
+  order = Order.query.filter_by(order_id=order_id, order_status='N').first()
+  if not order:
+      return redirect(url_for('index'))
   payment = Payment.query.filter_by(payment_id=order.payment_id).first()
 
   if payment:
@@ -707,4 +763,19 @@ def confirm_payment():
   return redirect(url_for('order_complete', order_id=order_id))
 
 if __name__ == '__main__':
+    app.run(debug=True)
+if __name__ == '__main__':
+    with app.app_context():
+        from models import Show
+        from datetime import datetime
+
+        shows = Show.query.all()
+        for s in shows:
+            if isinstance(s.start_date, str):
+                s.start_date = datetime.strptime(s.start_date, '%Y-%m-%d').date()
+            if isinstance(s.end_date, str):
+                s.end_date = datetime.strptime(s.end_date, '%Y-%m-%d').date()
+        db.session.commit()
+        print("✔ 已修正所有 start_date 和 end_date 格式")
+
     app.run(debug=True)
