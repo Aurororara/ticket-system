@@ -5,9 +5,9 @@ from sqlalchemy import Date, func
 
 
 class Refund(db.Model):
-    __tablename__ = 'refund'
+    __tablename__ = 'Refund'
     refund_id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.order_id'), nullable=False)
+    order_id = db.Column(db.Integer, db.ForeignKey('Orders.order_id'), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
