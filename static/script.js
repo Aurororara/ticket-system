@@ -117,9 +117,25 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       // ➤ 檢查有效年月格式 MM/YY
+      // ➤ 檢查有效年月格式 MM/YY
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry)) {
         errorMessages.push('有效年月格式錯誤，請使用MM/YY格式');
+      } else {
+        // ➤ 檢查是否過期
+        const [expMonth, expYear] = cardExpiry.split('/').map(str => parseInt(str, 10));
+
+        // ➤ 轉換成完整西元年
+        const fullExpYear = expYear + 2000;
+
+        const now = new Date();
+        const thisMonth = now.getMonth() + 1; // getMonth() 是 0~11
+        const thisYear = now.getFullYear();
+
+        if (fullExpYear < thisYear || (fullExpYear === thisYear && expMonth < thisMonth)) {
+          errorMessages.push('信用卡已過期，請輸入有效年月');
+        }
       }
+
   
       // ➤ 檢查 CVC 為3位數字
       if (!/^\d{3}$/.test(cardCVC)) {
@@ -143,8 +159,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const nextBtn = document.getElementById('typenextBtn');
 
   function updateButtonState() {
-    const fullQtyEl = document.getElementById('fullTicketQty');
-    const disabledQtyEl = document.getElementById('disabledTicketQty');
+    const fullQtyEl = document.getElementById('hiddenFullTicketQty');
+    const disabledQtyEl = document.getElementById('hiddenDisabledTicketQty');
 
     if (!fullQtyEl || !disabledQtyEl) return;
 
@@ -161,9 +177,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const qtyInput = document.getElementById(targetId);
       const hiddenInput = document.getElementById(hiddenId);
 
+      const max = parseInt(qtyInput.dataset.max || "0");
       let qty = parseInt(qtyInput.value);
 
-      if (action === 'increase') {
+      if (action === "increase" && qty < max) {
         qty += 1;
       } else if (action === 'decrease' && qty > 0) {
         qty -= 1;
@@ -190,7 +207,6 @@ if (document.getElementById('paymentForm')) {
       e.target.value = value;
     });
   }
-
 
   document.getElementById('paymentForm').addEventListener('submit', function (e) {
     const name = document.getElementById('contact_name').value.trim();

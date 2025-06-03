@@ -154,3 +154,7 @@ input[type="radio"]:checked+.selectable-option {
   width: 60%;
 }
 
+.text-disabled {
+  color: #c0c0c0 !important;
+  cursor: not-allowed;
+}

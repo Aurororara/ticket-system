@@ -51,27 +51,38 @@
           <td>全票</td>
           <td>TWD${{ area.price }}</td>
           <td>
+            {% if available_seats > 0 %}
             <div class="input-group justify-content-center">
               <button type="button" class="btn btn-secondary btn-sm quantity-btn" data-target="fullTicketQty"
                 data-hidden="hiddenFullTicketQty" data-action="decrease">-</button>
-              <input type="text" id="fullTicketQty" class="form-control text-center" value="0" readonly style="max-width: 50px;">
+              <input type="text" id="fullTicketQty" class="form-control text-center" value="0" readonly style="max-width: 50px;"
+                data-max="{{ available_seats }}">
               <button type="button" class="btn btn-secondary btn-sm quantity-btn" data-target="fullTicketQty"
                 data-hidden="hiddenFullTicketQty" data-action="increase">+</button>
             </div>
+            {% else %}
+            <span class="text-danger fw-bold">已售完</span>
+            <input type="hidden" name="full_ticket_quantity" value="0">
+            {% endif %}
           </td>
         </tr>
         <tr>
           <td>身障票</td>
           <td>TWD${{ area.disabled_price }}</td>
           <td>
+            {% if disabled_available_seats > 0 %}
             <div class="input-group justify-content-center">
               <button type="button" class="btn btn-secondary btn-sm quantity-btn" data-target="disabledTicketQty"
                 data-hidden="hiddenDisabledTicketQty" data-action="decrease">-</button>
               <input type="text" id="disabledTicketQty" class="form-control text-center" value="0" readonly
-                style="max-width: 50px;">
+                style="max-width: 50px;" data-max="{{ disabled_available_seats }}">
               <button type="button" class="btn btn-secondary btn-sm quantity-btn" data-target="disabledTicketQty"
                 data-hidden="hiddenDisabledTicketQty" data-action="increase">+</button>
             </div>
+            {% else %}
+            <span class="text-danger fw-bold">已售完</span>
+            <input type="hidden" name="disabled_ticket_quantity" value="0">
+            {% endif %}
           </td>
         </tr>
       </tbody>

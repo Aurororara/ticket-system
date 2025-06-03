@@ -51,9 +51,11 @@
       <h6 class="bg-secondary text-white p-2">{{ sect_name }}</h6>
       <div class="list-group">
         {% for area in areas %}
-        <label class="list-group-item">
-          <input class="form-check-input me-1" type="radio" name="selected_area" value="{{ area.area_id }}">
-{{ area.area_name }}（共 {{ (area.seat_count or 0) + (area.disabled_seats or 0) }} 席，票價 {{ area.price }} 元）
+        {% set total_seats = (area.available or 0) + (area.disabled or 0) %}
+        <label class="list-group-item {% if total_seats == 0 %}text-disabled{% endif %}">
+          <input class="form-check-input me-1" type="radio" name="selected_area" value="{{ area.area.area_id }}" {% if
+            total_seats==0 %}disabled{% endif %}>
+          {{ area.area.area_name }}（剩餘：{{ total_seats }} 席，票價 {{ area.area.price }} 元）
         </label>
         {% endfor %}
       </div>

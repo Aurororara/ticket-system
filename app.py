@@ -235,23 +235,23 @@ def buy_ticket():
       return jsonify({"message": "搶票成功！剩餘：" + str(ticket['stock'])})
   return jsonify({"message": "搶票失敗，可能已售完"}), 400
 
-# 購票起始頁
-@app.route('/ticket/<int:show_id>/start')
-def view_ticket_start(show_id):
-  show_result = db.session.query(Show, Host, Location)\
-    .join(Host, Show.host_id == Host.host_id)\
-    .join(Location, Show.location_id == Location.loc_id)\
-    .filter(Show.show_id == show_id)\
-    .first()
-  if not show_result:
-    return "節目不存在", 404
-  # 取得 show 下的所有 game 資訊 (一對多)
-  games = db.session.query(Game).filter(Game.show_id == show_id).all()
+# # 購票起始頁
+# @app.route('/ticket/<int:show_id>/start')
+# def view_ticket_start(show_id):
+#   show_result = db.session.query(Show, Host, Location)\
+#     .join(Host, Show.host_id == Host.host_id)\
+#     .join(Location, Show.location_id == Location.loc_id)\
+#     .filter(Show.show_id == show_id)\
+#     .first()
+#   if not show_result:
+#     return "節目不存在", 404
+#   # 取得 show 下的所有 game 資訊 (一對多)
+#   games = db.session.query(Game).filter(Game.show_id == show_id).all()
 
-  # 拆解 tuple (show, host, location)
-  s, host, location = show_result
+#   # 拆解 tuple (show, host, location)
+#   s, host, location = show_result
 
-  return render_template('ticket_start.html', s=s, host=host, location=location, games=games)
+#   return render_template('ticket_start.html', s=s, host=host, location=location, games=games,now=datetime.now())
 
 # 購票選擇區域
 @app.route('/ticket/<int:game_id>/select-area')
@@ -264,13 +264,28 @@ def select_area(game_id):
         .filter(Game.game_id == game_id).first()
     if not game_result:
         return "場次不存在", 404
+    
+    # 解構查詢結果
     game, show, host, location = game_result
+    # 查詢所有該場地的區域與其區段
     area_results = db.session.query(Area, Section)\
         .join(Section, Area.sect_id == Section.sect_id)\
         .filter(Area.loc_id == show.location_id).all()
+    
+    # 查詢此場次的所有 GameArea（含剩餘票數）
+    game_areas = db.session.query(GameArea)\
+        .filter(GameArea.game_id == game_id).all()
+
+    # 對應 area_id → GameArea
+    game_area_map = {ga.area_id: ga for ga in game_areas}
     grouped_areas = defaultdict(list)
     for area, section in area_results:
-        grouped_areas[section.sect_name].append(area)
+        ga = game_area_map.get(area.area_id)
+        grouped_areas[section.sect_name].append({
+            'area': area,
+            'available': ga.available_seats if ga else 0,
+            'disabled': ga.disabled_available_seats if ga else 0
+        })
     return render_template('select_area.html', show=show, host=host, location=location, game=game, grouped_areas=grouped_areas)
 
 # 購票選擇票種
@@ -287,9 +302,9 @@ def select_type(game_id, area_id):
     if not game_area:
         return "查無此場次或區域", 404
     game_area_data, game, show, host, location, area = game_area
-    if game_area_data.available_seats <= 0:
+    if game_area_data.available_seats <= 0 and game_area_data.disabled_available_seats <= 0:
         return "此區已售完", 400
-    return render_template('select_type.html', game=game, show=show, host=host, location=location, area=area, available_seats=game_area_data.available_seats)
+    return render_template('select_type.html', game=game, show=show, host=host, location=location, area=area, available_seats=game_area_data.available_seats,disabled_available_seats=game_area_data.disabled_available_seats)
 
 # 鎖定訂單
 @app.route('/ticket/<int:game_id>/<int:area_id>/lock-order', methods=['POST'])
@@ -317,7 +332,6 @@ def lock_order(game_id, area_id):
         buyer_phone=current_user.mem_phone,
         total_price=(ticket_price * full_quantity) + (disabled_ticket_price * disabled_quantity),
         mem_id=current_user.mem_id,
-        payment_id=None,
         order_status='N'
     )
     db.session.add(new_order)
@@ -325,7 +339,7 @@ def lock_order(game_id, area_id):
 
     used_seat_nos = db.session.query(Ticket.seat_no).filter_by(game_id=game_id, area_id=area_id).all()
     used_seat_nos = {seat_no for (seat_no,) in used_seat_nos}
-    seat_pool = [f"A{i:03}" for i in range(1, game_area.total_seats + 1)]
+    seat_pool = [f"A{i:03}" for i in range(1, area.seat_count + area.disabled_seats + 1)]
     available_seat_nos = [seat for seat in seat_pool if seat not in used_seat_nos]
 
     if len(available_seat_nos) < total_quantity:
@@ -369,7 +383,7 @@ def select_atm(order_id):
         return redirect(url_for('index'))
 
     # 取得付款資訊
-    payment = Payment.query.filter_by(payment_id=order.payment_id).first()
+    payment = Payment.query.filter_by(order_id=order_id).first()
 
     # 設定繳費期限為當前時間 + 15 分鐘
     due_time = datetime.now() + timedelta(minutes=15)
@@ -398,7 +412,8 @@ def select_creditcard(order_id):
     order = Order.query.filter_by(order_id=order_id, order_status='N').first()
     if not order:
         return redirect(url_for('index'))
-    payment = Payment.query.filter_by(payment_id=order.payment_id).first()
+    print(order.payment)
+    payment = Payment.query.filter_by(order_id=order_id).first()
     tickets = Ticket.query.filter_by(order_id=order_id).all()
     show = None
     if tickets:
@@ -729,7 +744,7 @@ def confirm_payment():
   order = Order.query.filter_by(order_id=order_id, order_status='N').first()
   if not order:
       return redirect(url_for('index'))
-  payment = Payment.query.filter_by(payment_id=order.payment_id).first()
+  payment = Payment.query.filter_by(order_id=order_id).first()
 
   if payment:
     payment.pay_status = 'Y'
