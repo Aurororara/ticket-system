@@ -18,7 +18,15 @@ from datetime import datetime,timedelta
 from markupsafe import Markup
 from models.game import Game
 from flask_migrate import Migrate
+
+class Config:
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///your_database.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+
 import re
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -38,6 +46,12 @@ login_manager.login_view = 'login'
 with app.app_context():
   db.create_all()
   print("資料表已建立完成")
+with app.app_context():
+    from models.show import Show
+    print("✅ Shows in DB:")
+    #for show in Show.query.all():
+        #print(show.show_name)
+
 
 # 註冊會員
 
@@ -636,12 +650,18 @@ def show_detail(show_id):
         'show_id': show.show_id,
         'show_name': show.show_name,
         'show_desc': show.show_desc,
-        "start_date": show.start_date,
-        "end_date": show.end_date,
+        "start_date": show.start_date.strftime('%Y/%m/%d') if show.start_date else None,
+        "end_date": show.end_date.strftime('%Y/%m/%d') if show.end_date else None,
         'show_pic': show.show_pic,
+        'show_bg': show.show_bg,  
         'createdAt': show.createdAt,
-        'host': {'host_name': host.host_name if host else "未知主辦"},
-        'location': {'loc_name': location.loc_name if location else "未知地點"}
+        'host': {
+            'host_name': host.host_name if host else "未知主辦",
+            'host_email': host.host_email if host else "未知信箱"
+        },
+        'location': {
+            'loc_name': location.loc_name if location else "未知地點"
+        }
     }
 
     return render_template('show_detail.html', show=show_data)
@@ -762,4 +782,19 @@ def confirm_payment():
   return redirect(url_for('order_complete', order_id=order_id))
 
 if __name__ == '__main__':
+    app.run(debug=True)
+if __name__ == '__main__':
+    with app.app_context():
+        from models import Show
+        from datetime import datetime
+
+        shows = Show.query.all()
+        for s in shows:
+            if isinstance(s.start_date, str):
+                s.start_date = datetime.strptime(s.start_date, '%Y-%m-%d').date()
+            if isinstance(s.end_date, str):
+                s.end_date = datetime.strptime(s.end_date, '%Y-%m-%d').date()
+        db.session.commit()
+        print("✔ 已修正所有 start_date 和 end_date 格式")
+
     app.run(debug=True)

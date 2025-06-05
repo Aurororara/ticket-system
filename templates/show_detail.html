@@ -116,43 +116,57 @@
 </head>
 <body>
 
-<!-- 頁首 -->
-<div class="header">
-  <div class="logo">NtickeTUB</div>
-  <div class="buttons">
-    <a href="/member" class="button-link">我的會員</a>
-    <a href="/ticket" class="button-link">我的票券</a>
+ 
+ 
+
+  <!-- 放在 container 外面！ -->
+ {% extends "layout.html" %}
+ {% block title %}節目詳情 - {{ show.show_name }}{% endblock %}
+ {% block content %}
+
+ <!-- 頁首結束後，放在 container 前面！ -->
+ <div class="banner-wrapper">
+  <!-- 黑色漸層遮罩 -->
+  <div class="banner-overlay"></div>
+
+  <!-- 背景圖 -->
+  <img src="{{ show['show_bg'] }}" class="bg-image" alt="背景圖">
+
+  <!-- 主圖 -->
+  <div class="main-pic">
+    <img src="{{ show['show_pic'] }}" alt="節目圖片">
   </div>
 </div>
+<!-- 頁首 -->
 
 <!-- 主要內容 -->
 <div class="container">
   <h1>{{ show.show_name }}</h1>
+
   <div class="info">
-    <p class="d-inline-flex align-items-center">
-      <i class="bi bi-calendar-event me-2"></i> 活動時間：
+    <p><i class="bi bi-calendar-event me-2"></i> 活動時間：
       {% if show.end_date and show.start_date != show.end_date %}
-        {{ show.start_date.strftime('%Y/%m/%d') }} ～ {{ show.end_date.strftime('%Y/%m/%d') }}
+        {{ show.start_date }} ～ {{ show.end_date }}
       {% else %}
-        {{ show.start_date.strftime('%Y/%m/%d') }}
+        {{ show.start_date }}
       {% endif %}
     </p>
-    <p class="d-inline-flex align-items-center">
-      <i class="bi bi-geo-alt me-2"></i> 活動地點：{{ show['location']['loc_name'] }}　
+    <p><i class="bi bi-geo-alt me-2"></i> 活動地點：{{ show['location']['loc_name'] }}　
       <a class="highlight" href="https://www.google.com/maps?q={{ show['location']['loc_name'] }}" target="_blank">點我查看地圖</a>
     </p>
-
-    <p class="d-inline-flex align-items-center">
-      <i class="bi bi-briefcase me-2"></i> 主辦單位：{{ show['host']['host_name'] }}
-    </p>
+    <p><i class="bi bi-briefcase me-2"></i> 主辦單位：{{ show['host']['host_name'] }}</p>
+    <p><i class="bi bi-envelope me-2"></i> 主辦信箱：<a href="mailto:{{ show['host']['host_email'] }}">{{ show['host']['host_email'] }}</a></p>
   </div>
 
-  <div class="banner">
-    <img src="{{ show['show_pic'] }}" alt="節目圖片">
-  </div>
+  
+
+
+            <!-- 按鈕區 -->
+<div class="tab-buttons">
 
   <!-- 分頁按鈕區 -->
   <div class="tab-buttons">
+
     <button class="tab-btn active" data-tab="tab-intro">節目介紹</button>
     <button class="tab-btn" data-tab="tab-rules">注意事項</button>
     <button class="tab-btn" data-tab="tab-reminder">購票提醒</button>
@@ -234,6 +248,31 @@
   <!-- 樣式區（可放 head 裡） -->
   <style>
 
+  :root {
+    --main-blue: #99C2EC;
+    --blue-hover: #79AEE5;
+    --blue-active: #3385D9;
+  }
+  .button-link,
+.header-right button,
+.buy-button a {
+  background-color: var(--main-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button-link:hover,
+.header-right button:hover,
+
+
+.buy-button a:hover {
+  background-color: var(--blue-hover);
+}
+
+
     html, body {
     margin: 0;
     padding: 0;
@@ -247,18 +286,27 @@
     }
   
     .tab-btn {
-      padding: 12px 20px;
-      background-color: #ccc;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+  padding: 12px 20px;
+  background-color: var(--main-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.tab-btn:hover {
+  background-color: var(--blue-hover);
+}
+
+.tab-btn.active {
+  background-color: var(--blue-active);
+  font-weight: bold;
+}
+
+
   
-    .tab-btn.active {
-      background-color: #333;
-      color: white;
-    }
-  
+
     .tab-content {
       padding: 20px;
       border: 1px solid #eee;
@@ -292,15 +340,20 @@
     font-weight: bold;
     }
 
-    .header-right button {
-    margin-left: 10px;
-    padding: 10px 18px;
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    }
+    .header-right button,
+.buy-button a {
+  background-color: var(--main-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.header-right button:hover,
+.buy-button a:hover {
+  background-color: var(--blue-hover);
+}
 
 
     .container {
@@ -364,3 +417,5 @@
   </div>
 </body>
 </html>
+
+{% endblock %}
