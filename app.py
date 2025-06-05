@@ -556,7 +556,10 @@ def refund_detail(order_id):
         for ticket in tickets:
             game_area = db.session.query(GameArea).filter_by(game_id=ticket.game_id, area_id=ticket.area_id).first()
             if game_area:
-                game_area.available_seats += 1
+                if ticket.is_disabled:
+                    game_area.disabled_available_seats += 1
+                else:
+                    game_area.available_seats += 1
         db.session.commit()
 
         message = "退款申請送出成功，請留意您的信箱通知。"
