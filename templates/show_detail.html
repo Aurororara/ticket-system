@@ -248,6 +248,31 @@
   <!-- 樣式區（可放 head 裡） -->
   <style>
 
+  :root {
+    --main-blue: #99C2EC;
+    --blue-hover: #79AEE5;
+    --blue-active: #3385D9;
+  }
+  .button-link,
+.header-right button,
+.buy-button a {
+  background-color: var(--main-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button-link:hover,
+.header-right button:hover,
+
+
+.buy-button a:hover {
+  background-color: var(--blue-hover);
+}
+
+
     html, body {
     margin: 0;
     padding: 0;
@@ -261,18 +286,27 @@
     }
   
     .tab-btn {
-      padding: 12px 20px;
-      background-color: #ccc;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+  padding: 12px 20px;
+  background-color: var(--main-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.tab-btn:hover {
+  background-color: var(--blue-hover);
+}
+
+.tab-btn.active {
+  background-color: var(--blue-active);
+  font-weight: bold;
+}
+
+
   
-    .tab-btn.active {
-      background-color: #333;
-      color: white;
-    }
-  
+
     .tab-content {
       padding: 20px;
       border: 1px solid #eee;
@@ -306,15 +340,20 @@
     font-weight: bold;
     }
 
-    .header-right button {
-    margin-left: 10px;
-    padding: 10px 18px;
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    }
+    .header-right button,
+.buy-button a {
+  background-color: var(--main-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.header-right button:hover,
+.buy-button a:hover {
+  background-color: var(--blue-hover);
+}
 
 
     .container {

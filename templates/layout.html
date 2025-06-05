@@ -36,9 +36,9 @@
           </ul>
         </div>
       {% else %}
-        <a href="{{ url_for('login') }}" class="btn btn-outline-secondary me-2">我的會員</a>
+      <a href="{{ url_for('login') }}" class="button-blue me-2">我的會員</a>
       {% endif %}
-      <a href="{{ url_for('my_tickets') }}" class="btn btn-outline-secondary">我的票券</a>
+      <a href="{{ url_for('my_tickets') }}" class="button-blue">我的票券</a>
     </div>
   </nav>
   
@@ -52,6 +52,33 @@
   <footer class="bg-light text-center py-3">
     <p>&copy; 2025 NtickeTUB. All Rights Reserved.</p>
   </footer>
+
+<style>
+  :root {
+    --main-blue: #99C2EC;
+    --blue-hover: #79AEE5;
+    --blue-active: #3385D9;
+  }
+  
+  .button-blue {
+    background-color: var(--main-blue);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  
+  .button-blue:hover {
+    background-color: var(--blue-hover);
+  }
+  
+  .button-blue:active {
+    background-color: var(--blue-active);
+  }
+</style>  
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
