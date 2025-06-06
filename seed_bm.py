@@ -46,7 +46,6 @@ with app.app_context():
 
 SPONSORED BY：北商四人辣妹組""",
             show_pic="/static/Showdetail/bm.jpg",
-            show_bg="/static/Showdetail/dark_bm.jpg",
             host_id=host.host_id,
             location_id=location.loc_id,
             start_date=date(2025, 8, 20),  # ✅ 補上這兩個超關鍵的欄位
