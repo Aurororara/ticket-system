@@ -18,15 +18,7 @@ from datetime import datetime,timedelta
 from markupsafe import Markup
 from models.game import Game
 from flask_migrate import Migrate
-
-class Config:
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///your_database.db'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-
-
 import re
-
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -282,23 +274,18 @@ def select_area(game_id):
     # 解構查詢結果
     game, show, host, location = game_result
     # 查詢所有該場地的區域與其區段
-    area_results = db.session.query(Area, Section)\
+    area_results = db.session.query(Area, Section, GameArea)\
         .join(Section, Area.sect_id == Section.sect_id)\
-        .filter(Area.loc_id == show.location_id).all()
-    
-    # 查詢此場次的所有 GameArea（含剩餘票數）
-    game_areas = db.session.query(GameArea)\
+        .join(GameArea, Area.area_id == GameArea.area_id)\
         .filter(GameArea.game_id == game_id).all()
-
+    
     # 對應 area_id → GameArea
-    game_area_map = {ga.area_id: ga for ga in game_areas}
     grouped_areas = defaultdict(list)
-    for area, section in area_results:
-        ga = game_area_map.get(area.area_id)
+    for area, section, game_area in area_results:
         grouped_areas[section.sect_name].append({
             'area': area,
-            'available': ga.available_seats if ga else 0,
-            'disabled': ga.disabled_available_seats if ga else 0
+            'available': game_area.available_seats,
+            'disabled': game_area.disabled_available_seats
         })
     return render_template('select_area.html', show=show, host=host, location=location, game=game, grouped_areas=grouped_areas)
 
@@ -781,8 +768,6 @@ def confirm_payment():
 
   return redirect(url_for('order_complete', order_id=order_id))
 
-if __name__ == '__main__':
-    app.run(debug=True)
 if __name__ == '__main__':
     with app.app_context():
         from models import Show
