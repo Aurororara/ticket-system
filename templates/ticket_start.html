@@ -4,10 +4,13 @@
 
 {% block content %}
 
-  <div style="max-width: 1000px; height: 400px; margin: 20px auto; overflow: hidden; border-radius: 12px;">
-    <img src="{{ url_for('static', filename='img/' ~ s.show_pic) }}" alt="Banner Image"
-      style="width: 100%; height: 100%; object-fit: cover;">
+<div class="banner-container">
+  <div class="large-banner" style="--bg-url: url('{{ s.show_pic }}');">
+    <div class="small-banner">
+      <img src="{{ s.show_pic }}" alt="Banner Image">
+    </div>
   </div>
+</div>
 
 <div class="container">
   <h2>{{ s.show_name }}</h2>

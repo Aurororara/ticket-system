@@ -122,18 +122,15 @@
  {% extends "layout.html" %}
  {% block title %}節目詳情 - {{ show.show_name }}{% endblock %}
  {% block content %}
-
- <!-- 頁首結束後，放在 container 前面！ -->
- <div class="banner-wrapper">
-  <!-- 黑色漸層遮罩 -->
-  <div class="banner-overlay"></div>
-
-
-  <!-- 主圖 -->
-  <div class="main-pic">
-    <img src="{{ show['show_pic'] }}" alt="節目圖片">
+  <!-- 圖片 -->
+<div class="banner-container">
+  <div class="large-banner" style="--bg-url: url('{{ show.show_pic }}');">
+    <div class="small-banner">
+      <img src="{{ show.show_pic }}" alt="Banner Image">
+    </div>
   </div>
 </div>
+
 <!-- 頁首 -->
 
 <!-- 主要內容 -->
