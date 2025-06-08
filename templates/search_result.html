@@ -33,9 +33,30 @@
   <p class="mt-3">找不到符合「{{ keyword }}」的節目。</p>
   {% endif %}
 
+<style>
+  .button-deepblue {
+    background-color: #3385D9;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .button-deepblue:hover {
+    background-color: #1f6ec3;
+  }
+
+  .button-deepblue:active {
+    background-color: #145399;
+  }
+</style>
+
   <!-- 回首頁按鈕 -->
   <div class="d-flex justify-content-center mt-5 mb-4">
-    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">回首頁</a>
+    <a href="{{ url_for('index') }}" class="button-deepblue">回首頁</a>
   </div>
 </div>
 {% endblock %}

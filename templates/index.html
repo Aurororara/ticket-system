@@ -3,16 +3,15 @@
 {% block title %}主頁 - NtickeTUB{% endblock %}
 
 {% block content %}
-  <div class="container">
+  <div class="container mt-5">
     <h1>歡迎來到 NtickeTUB！</h1>
 
-    <!-- 顯示登入狀態 -->
     {% if current_user.is_authenticated %}
       <p>歡迎您，{{ current_user.mem_name }}！</p>
-      <a href="{{ url_for('member_info') }}" class="btn btn-primary">我的會員</a>
+      <a href="{{ url_for('member_info') }}" class="button-blue mt-2">我的會員</a>
     {% else %}
-      <a href="{{ url_for('login') }}" class="btn btn-primary">登入</a>
+      <a href="{{ url_for('login') }}" class="button-blue mt-2">登入</a>
     {% endif %}
-
-    
+  </div>
 {% endblock %}
+

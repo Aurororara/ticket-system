@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,7 +13,7 @@
 
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar bg-light px-4" style="min-height: 60px; padding-top: 4px; padding-bottom: 4px;">
+  <nav class="navbar bg-light px-4" style="min-height: 80px; padding-top: 12px; padding-bottom: 12px;">
     <a href="{{ url_for('index') }}" style="display: flex; align-items: center;">
       <img src="{{ url_for('static', filename='file/logo3.png') }}"
            alt="NtickeTUB Logo"
@@ -36,9 +37,9 @@
           </ul>
         </div>
       {% else %}
-      <a href="{{ url_for('login') }}" class="button-blue me-2">我的會員</a>
+      <a href="{{ url_for('login') }}" class="button-deepblue me-2">我的會員</a>
       {% endif %}
-      <a href="{{ url_for('my_tickets') }}" class="button-blue">我的票券</a>
+      <a href="{{ url_for('my_tickets') }}" class="button-deepblue">我的票券</a>
     </div>
   </nav>
   
@@ -54,6 +55,12 @@
   </footer>
 
 <style>
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
   :root {
     --main-blue: #99C2EC;
     --blue-hover: #79AEE5;
@@ -70,6 +77,25 @@
     text-decoration: none;
     transition: background-color 0.2s ease;
   }
+  .button-deepblue {
+    background-color: #3385D9;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .button-deepblue:hover {
+    background-color: #1f6ec3;
+  }
+
+  .button-deepblue:active {
+    background-color: #145399;
+  }
+
   
   .button-blue:hover {
     background-color: var(--blue-hover);
