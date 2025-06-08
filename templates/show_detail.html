@@ -105,7 +105,6 @@
     }
     .buy-button a {
       display: inline-block;
-      background-color: #333;
       color: white;
       padding: 12px 24px;
       border-radius: 8px;
@@ -129,8 +128,6 @@
   <!-- 黑色漸層遮罩 -->
   <div class="banner-overlay"></div>
 
-  <!-- 背景圖 -->
-  <img src="{{ show['show_bg'] }}" class="bg-image" alt="背景圖">
 
   <!-- 主圖 -->
   <div class="main-pic">
@@ -234,13 +231,11 @@
         
         2. 若因主辦單位取消演出，將全額退票，退費方式依付款方式辦理。<br><br>
         
-        3. 若於購票後因個人因素無法出席，恕不提供退費；建議轉讓票券給親友（若活動允許）。<br><br>
+        3. 如因不可抗力因素（如天災、疫情）影響演出，主辦單位將另行公告退票處理方式。<br><br>
         
-        4. 如因不可抗力因素（如天災、疫情）影響演出，主辦單位將另行公告退票處理方式。<br><br>
+        4. 退票款項將於申請成功後 7～14 個工作天內退回原付款帳戶。<br><br>
         
-        5. 退票款項將於申請成功後 7～14 個工作天內退回原付款帳戶，不另收取手續費。<br><br>
-        
-        6. 如有退票相關問題，請聯繫客服信箱：ntubprincess@gmail.com
+        5. 如有退票相關問題，請聯繫客服信箱：ntubprincess@gmail.com
         </p>
         
   </div>
@@ -254,8 +249,7 @@
     --blue-active: #3385D9;
   }
   .button-link,
-.header-right button,
-.buy-button a {
+.header-right button{
   background-color: var(--main-blue);
   color: white;
   border: none;
@@ -264,13 +258,10 @@
   transition: background-color 0.2s ease;
 }
 
-.button-link:hover,
-.header-right button:hover,
-
-
-.buy-button a:hover {
+.header-right button:hover{
   background-color: var(--blue-hover);
 }
+
 
 
     html, body {
@@ -284,6 +275,26 @@
       margin-top: 30px;
       margin-bottom: 20px;
     }
+
+    .button-deepblue {
+  background-color: #3385D9;   /* 預設 */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.button-deepblue:hover {
+  background-color: #1f6ec3;   /* 滑過 */
+}
+
+.button-deepblue:active {
+  background-color: #145399;   /* 點擊 */
+}
+
   
     .tab-btn {
   padding: 12px 20px;
@@ -340,19 +351,13 @@
     font-weight: bold;
     }
 
-    .header-right button,
-.buy-button a {
+    .header-right button {
   background-color: var(--main-blue);
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-}
-
-.header-right button:hover,
-.buy-button a:hover {
-  background-color: var(--blue-hover);
 }
 
 
@@ -410,7 +415,7 @@
     
 
     <div class="buy-button">
-      <a href="{{ url_for('ticket_start', show_id=show['show_id']) }}">前往購票</a>
+      <a href="{{ url_for('ticket_start', show_id=show['show_id']) }}" class="button-deepblue">前往購票</a>
 
 
     </div>
