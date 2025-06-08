@@ -23,10 +23,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///your_database.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-
-
 import re
-
 
 app = Flask(__name__)
 app.config.from_object(Config)
