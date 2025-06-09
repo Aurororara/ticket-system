@@ -15,14 +15,14 @@
     <!-- 訂單資訊 -->
     <div class="text-start my-4">
       <h5>{{ show.show_name if show else '未找到節目' }}</h5>
-      <p>
+      <div>
         <i class="bi bi-calendar-event me-1"></i>
         {{ game.game_date.strftime('%Y/%m/%d') }} ({{ game.game_date.strftime('%a') }}) {{ game.game_time.strftime('%H:%M') }}
-      </p>
-      <p>
+      </div>
+      <div>
         <i class="bi bi-geo-alt me-1"></i>
         {{ location.loc_name if location else '未知地點' }}
-      </p>
+      </div>
     </div>
 
     <!-- 票券區 -->
@@ -35,7 +35,15 @@
             <div>
               <div class="fw-bold">
                 <i class="bi bi-ticket-perforated me-1"></i>
-                {{ ticket.area.area_name }} - 座位 {{ ticket.seat_no }}
+                {{ ticket.area.area_name }} - {{ ticket.seat_no }}
+              </div>
+              <div class="small text-muted">
+                票種：
+                {% if ticket.is_disabled %}
+                身障票
+                {% else %}
+                一般票
+                {% endif %}
               </div>
               <div class="small text-muted">
                 票價：NT$
@@ -68,7 +76,7 @@
 
     <!-- 回首頁按鈕 -->
     <div class="d-flex justify-content-center">
-      <button class="btn btn-dark" onclick="location.href='/'">回首頁</button>
+      <button class="button-deepblue" onclick="location.href='/'">回首頁</button>
     </div>
   </div>
 </div>

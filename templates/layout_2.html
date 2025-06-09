@@ -138,37 +138,39 @@
     </div>
   </div>
 
-  <!-- 篩選區塊 -->
-  <div class="container mt-4 mb-2" id="filter-section">
+ 
+  <!-- 所有節目 -->
+  <div class="container extra-margin-top">
+    <h2 class="text-center mb-3">所有節目</h2>
+    <!-- 篩選區塊 -->
+    <div class="container mt-4 mb-2" id="filter-section">
       <div class="btn-group mb-3" role="group" aria-label="排序與篩選">
         <button type="button" id="btn-upcoming" class="btn btn-primary">即將開演</button>
         <button type="button" id="btn-date-range" class="btn btn-outline-primary">依開演日期篩選</button>
       </div>
-  
+    
       <div class="container my-4">
-        <form id="date-range-form" method="get" action="{{ url_for('index') }}"
-              class="card p-4 shadow-sm mx-auto"
-              style="max-width: 600px; display: none;">
+        <form id="date-range-form" method="get" action="{{ url_for('index') }}" class="card p-4 shadow-sm mx-auto"
+          style="max-width: 600px; display: none;">
           <div class="row g-3 align-items-end">
             <div class="col-12 col-md-5">
               <label for="start_date" class="form-label fw-semibold">開始日期</label>
-              <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
+              <input type="date" id="start_date" name="start_date" class="form-control"
+                value="{{ request.args.get('start_date', '') }}">
             </div>
             <div class="col-12 col-md-5">
               <label for="end_date" class="form-label fw-semibold">結束日期</label>
-              <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
+              <input type="date" id="end_date" name="end_date" class="form-control"
+                value="{{ request.args.get('end_date', '') }}">
             </div>
             <div class="col-12 col-md-2 text-md-end text-center">
-              <button type="submit" class="btn btn-primary btn-sm w-100 w-md-auto">GO!</button>
+              <button type="submit" class="btn btn-primary btn-sm w-100 w-md-auto">查詢！</button>
             </div>
           </div>
         </form>
       </div>
-   </div>
+    </div>
 
-  <!-- 所有節目 -->
-  <div class="container extra-margin-top">
-    <h2 class="text-center mb-3">所有節目</h2>
     <div class="row row-cols-1 row-cols-md-3 g-4">
       {% for show in shows %}
       <div class="col">
@@ -251,6 +253,33 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+  <script>
+    const btnUpcoming = document.getElementById('btn-upcoming');
+    const btnDateRange = document.getElementById('btn-date-range');
+    const dateRangeForm = document.getElementById('date-range-form');
+    const filterSection = document.getElementById('filter-section');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('start_date') || urlParams.get('end_date')) {
+      btnDateRange.classList.replace('btn-outline-primary', 'btn-primary');
+      btnUpcoming.classList.replace('btn-primary', 'btn-outline-primary');
+      dateRangeForm.style.display = 'flex';
+    }
+
+    btnUpcoming.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = "{{ url_for('index') }}";
+      filterSection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    btnDateRange.addEventListener('click', (e) => {
+      e.preventDefault();
+      btnDateRange.classList.replace('btn-outline-primary', 'btn-primary');
+      btnUpcoming.classList.replace('btn-primary', 'btn-outline-primary');
+      dateRangeForm.style.display = 'flex';
+      dateRangeForm.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
 </body>
 
 </html>

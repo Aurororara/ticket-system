@@ -219,14 +219,45 @@ def member_info():
 # =======================
 @app.route('/')
 def index():
-    # 取出近期節目，依開始日期排序，取前6筆
+    # 取得前端送出的篩選參數
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    sort_by = request.args.get('sort_by', 'start_date')  # 預設排序依 start_date
+
+    query = Show.query
+
+    # 日期範圍篩選
+    if start_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            query = query.filter(Show.start_date >= start_date)
+        except ValueError:
+            pass
+
+    if end_date_str:
+        try:
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            query = query.filter(Show.start_date <= end_date)
+        except ValueError:
+            pass
+
+    # 排序
+    if sort_by == 'start_date':
+        query = query.order_by(Show.start_date.asc())
+    elif sort_by == 'ticket_start_date':
+        # 假設你有 ticket_start_date 欄位，若無則先不用這段
+        query = query.order_by(Show.ticket_start_date.asc())
+    else:
+        query = query.order_by(Show.start_date.asc())  # 預設
+
+    all_shows = query.all()
+
+    # 近期節目（輪播），不受篩選影響，還是依開始日期取前6筆
     carousel_shows = Show.query.order_by(Show.start_date.asc()).limit(6).all()
 
-    # 取出所有節目（可依需求調整數量）
-    all_shows = Show.query.order_by(Show.start_date.asc()).all()
-
-    return render_template('index.html', carousel_shows=carousel_shows, shows=all_shows)
-
+    return render_template('index.html',
+                           carousel_shows=carousel_shows,
+                           shows=all_shows)
 
 @app.route('/api/buy', methods=['POST'])
 def buy_ticket():
@@ -331,7 +362,8 @@ def lock_order(game_id, area_id):
         buyer_phone=current_user.mem_phone,
         total_price=(ticket_price * full_quantity) + (disabled_ticket_price * disabled_quantity),
         mem_id=current_user.mem_id,
-        order_status='N'
+        order_status='N',
+        createdAt= datetime.now()
     )
     db.session.add(new_order)
     db.session.flush()
@@ -352,7 +384,8 @@ def lock_order(game_id, area_id):
             is_disabled=False,
             order_id=new_order.order_id,
             game_id=game_id,
-            area_id=area_id
+            area_id=area_id,
+            createdAt= datetime.now()
         )
         db.session.add(ticket)
 
@@ -364,7 +397,8 @@ def lock_order(game_id, area_id):
             is_disabled=True,
             order_id=new_order.order_id,
             game_id=game_id,
-            area_id=area_id
+            area_id=area_id,
+            createdAt= datetime.now()
         )
         db.session.add(ticket)
 
@@ -390,18 +424,21 @@ def select_atm(order_id):
 
     # 取得訂單中所有票券與區域
     tickets = db.session.query(Ticket).filter_by(order_id=order_id).all()
-    show = None
     if tickets:
-        first_game = Game.query.get(tickets[0].game_id)
-        show = Show.query.get(first_game.show_id)
-
+        game = Game.query.get(tickets[0].game_id)
+        show = Show.query.get(game.show_id)
+        location = Location.query.get(show.location_id)
+    else:
+        game = show = location = None
     return render_template(
         'atm.html',
         order=order,
         payment=payment,
         payment_due_time=formatted_due_time,
         tickets=tickets,
-        show=show
+        show=show,
+        game=game,
+        location=location
     )
 
 # 購票creditcard方式付款
@@ -418,7 +455,10 @@ def select_creditcard(order_id):
     if tickets:
         game = Game.query.get(tickets[0].game_id)
         show = Show.query.get(game.show_id)
-    return render_template('creditcard.html', order=order, payment=payment, show=show, tickets=tickets)
+        location = Location.query.get(show.location_id)
+    else:
+        game = show = location = None
+    return render_template('creditcard.html', order=order, payment=payment, show=show, tickets=tickets, game=game, location=location)
 
 
 

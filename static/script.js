@@ -57,7 +57,7 @@ document.querySelectorAll('input[name="payment"]').forEach(radio => {
   });
 });
 
-// 信用卡確認付款模擬 跳轉
+// 信用卡付款確認模擬 跳轉
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('creditcardForm');
   if (form) {
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
   
-    // ➤ 點擊「確認付款」按鈕事件
+    // ➤ 點擊「付款確認」按鈕事件
     document.getElementById('creditcardForm').addEventListener('submit', function (e) {
       e.preventDefault()
       const cardNumber = cardNumberInput.value.trim();
