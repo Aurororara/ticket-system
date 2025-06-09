@@ -3,6 +3,7 @@
 {% block title %}我的票券 - NtickeTUB{% endblock %}
 
 {% block content %}
+<div class="container">
 <h2 style="margin-top: 20px;">個人帳務清單</h2>
 
 {% if order_data %}
@@ -14,14 +15,13 @@
           <div class="ticket-card-left">
             <div class="ticket-card-left">
               {% if item.tickets %}
-                {% set ticket = item.tickets[0][0] %}
-                {% set game = item.tickets[0][1] %}
-                {% set show = item.tickets[0][2] %}
-                {% set area = item.tickets[0][3] %}
-                <img src="{{ show.show_pic }}" alt="{{ show.show_name }}" class="ticket-image" />
-              {% else %}
-                <img src="{{ url_for('static', filename='img/default.jpg') }}" alt="無圖片" class="ticket-image" />
-              {% endif %}
+              {% set ticket = item.tickets[0][0] %}
+              {% set game = item.tickets[0][1] %}
+              {% set show = item.tickets[0][2] %}
+              <img src="{{ show.show_pic }}" alt="{{ show.show_name }}" class="ticket-image" />
+            {% else %}
+              <img src="{{ url_for('static', filename='img/default.jpg') }}" alt="無圖片" class="ticket-image" />
+            {% endif %}
             </div>
             
           </div>
@@ -32,13 +32,12 @@
               <p>訂單編號：{{ '%05d'|format(ticket.order_id) }}</p>
               <p>購買日期：{{ ticket.createdAt.strftime('%Y/%m/%d') if ticket.createdAt else '未知' }}</p>
               <p>活動日期：{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }}</p>
-              <p>活動地點：{{ area.area_name }}</p>
-            {% else %}
-              <h3 style="color: #e74c3c;">無票券資料</h3>
-              <p>訂單編號：{{ '%05d'|format(item.order.order_id) }}</p>
-              <p>購買日期：{{ item.order.createdAt.strftime('%Y/%m/%d') if item.order.createdAt else '未知' }}</p>
-              <p>活動日期：未知</p>
-              <p>活動地點：未知</p>
+              <p>票券資訊：</p>
+              <ul style="margin-top: 0;">
+                {% for t, g, s, a in item.tickets %}
+                  <li>{{ a.area_name }}｜{{ '身障票' if t.is_disabled else '一般票' }}</li>
+                {% endfor %}
+              </ul>                          {% else %}
             {% endif %}
             <p>
               退款狀態：
@@ -58,9 +57,11 @@
       </a>
     {% endfor %}
   </div>
-{% else %}
-  <p>目前沒有任何票券。</p>
-{% endif %}
+  {% else %}
+    <p>目前沒有任何票券。</p>
+  {% endif %}
+
+</div>
 
 
 <style>
@@ -91,6 +92,11 @@
   }
   .ticket-card-right h3 {
     margin-top: 0;
+  }
+  .container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
   }
 </style>
 {% endblock %}

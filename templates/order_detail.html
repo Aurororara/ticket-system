@@ -3,6 +3,7 @@
 {% block title %}訂單詳情 - NtickeTUB{% endblock %}
 
 {% block content %}
+<div class="container">
 <h2>訂單詳情</h2>
 
 <div>
@@ -40,24 +41,32 @@
   <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
     <thead style="background-color: #f0f0f0;">
       <tr>
-        <th>購買節目</th>
-        <th>場次 / 日期 / 場地</th>
-        <th>區域</th>
-        <th>座位</th>
-        <th>票種 / 價格 (NTD)</th>
+        <thead>
+          <tr>
+            <th>節目名稱</th>
+            <th>日期</th>
+            <th>場地</th>
+            <th>場次</th>
+            <th>區域</th>
+            <th>座位</th>
+            <th>票種 / 價格 (NTD)</th>
+          </tr>
+        </thead>        
       </tr>
     </thead>
     <tbody>
       {% for ticket, game, show, area, location in tickets %}
       <tr>
         <td>{{ show.show_name }}</td>
-        <td>{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }} / {{ location.loc_name if location else '未知' }} </td>
+        <td>{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }}</td>
+        <td>{{ location.loc_name }}</td>
+        <td>{{ game.session_name if game.session_name else '未知' }}</td>
         <td>{{ area.area_name }}</td>
-        <td>{{ ticket.seat_no }}</td>
-        <td>{{ ticket.ticket_type if ticket.ticket_type else '一般票' }} / {{ area.price if area.price else '未知' }}</td>
+        <td>{{ ticket.seat }}</td>
+        <td>{{ ticket.ticket_type if ticket.ticket_type else '一般票' }} / {{ area.price }}</td>
       </tr>
       {% endfor %}
-    </tbody>
+    </tbody>    
     <tfoot>
       <tr>
         <td colspan="4" style="text-align: right; font-weight: bold;">訂購張數</td>
@@ -76,6 +85,7 @@
 <div style="text-align: center; margin-top: 2rem;">
   <a href="{{ url_for('refund_detail', order_id=order.order_id) }}" class="btn-refund" style="background-color: #e74c3c; color: white; padding: 0.8rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold;">申請退款</a>
 </div>
+</div>
 
 <style>
   table th, table td {
@@ -86,6 +96,11 @@
   }
   .btn-refund:hover {
     background-color: #c0392b;
+  }
+  .container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
   }
 </style>
 {% endblock %}
