@@ -32,12 +32,6 @@
               <p>訂單編號：{{ '%05d'|format(ticket.order_id) }}</p>
               <p>購買日期：{{ ticket.createdAt.strftime('%Y/%m/%d') if ticket.createdAt else '未知' }}</p>
               <p>活動日期：{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }}</p>
-              <p>票券資訊：</p>
-              <ul style="margin-top: 0;">
-                {% for t, g, s, a in item.tickets %}
-                  <li>{{ a.area_name }}｜{{ '身障票' if t.is_disabled else '一般票' }}</li>
-                {% endfor %}
-              </ul>                          {% else %}
             {% endif %}
             <p>
               退款狀態：

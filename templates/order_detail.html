@@ -50,9 +50,7 @@
               <th>場次</th>
             {% endif %}
             <th>區域</th>
-            {% if has_session %}
-              <th>座位</th>
-            {% endif %}
+            <th>座位</th>
             <th>票種 / 價格 (NTD)</th>
           </tr>
         </thead>        
@@ -74,9 +72,24 @@
         {% if ticket.seat %}
         <td>{{ ticket.seat }}</td>
         {% endif %}
-    
-        <td>{{ ticket.ticket_type if ticket.ticket_type else '一般票' }} / {{ area.price }}</td>
-      </tr>
+        <td>
+          {% if ticket.seat_no %}
+            {{ ticket.seat_no }}
+          {% else %}
+            無座位
+          {% endif %}
+        </td>
+        <td>
+          {% if ticket.is_disabled %}
+            身障票 / {{ area.disabled_price }}
+          {% else %}
+            一般票 / {{ area.price }}
+          {% endif %}
+        </td>
+        
+        
+        
+   </tr>
       {% endfor %}
     </tbody>
     
