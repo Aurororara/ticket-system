@@ -35,6 +35,8 @@
 
     #carouselExample .carousel-indicators.custom-indicators button.active {
       background-color: #0d6efd; /* Bootstrap 主色 */
+
+    
     }
   </style>
 </head>
@@ -49,7 +51,7 @@
   <!-- 搜尋框 -->
   <form method="GET" action="{{ url_for('search') }}" class="mx-4" style="max-width: 400px; width: 100%;">
 
-    <div class="input-group" style="height: 40px;">
+    <div class="search-box" style="height: 40px;">
       <input type="search" name="keyword" class="form-control rounded-0" placeholder="搜尋你想看的節目關鍵字..." aria-label="Search" />
       <button class="btn btn-outline-primary px-2 py-1" type="submit" title="搜尋">
         <i class="bi bi-search"></i>
@@ -207,6 +209,36 @@
       --blue-active: #3385D9;
     }
   
+
+
+    .search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-box input[type="text"] {
+  padding: 8px 12px;
+  border-radius: 999px; /* 這就是圓角效果 */
+  border: 1px solid #ccc;
+  outline: none;
+  width: 300px; /* 自行調整 */
+}
+
+.search-box button {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background-color: #3385D9;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-box button:hover {
+  background-color: #1f6ec3;
+}
+
     .button-blue {
       background-color: var(--main-blue);
       color: white;

@@ -10,16 +10,16 @@ with app.app_context():
     db.create_all()
 
     # === Members ===
-    member = Member(
-        mem_name="roro",
-        mem_email="roro@ggg.com",
-        mem_pwd=generate_password_hash("Roro0606"),
-        mem_phone="0912345678",
-        birthday=date(2025, 10, 11),
-        createdAt=datetime.now(),
-        updatedAt=datetime.now()
-    )
-    db.session.add(member)
+    # member = Member(
+    #     mem_name="roro",
+    #     mem_email="roro@ggg.com",
+    #     mem_pwd=generate_password_hash("Roro0606"),
+    #     mem_phone="0912345678",
+    #     birthday=date(2025, 10, 11),
+    #     createdAt=datetime.now(),
+    #     updatedAt=datetime.now()
+    # )
+    # db.session.add(member)
 
 
     # === Hosts ===
@@ -480,7 +480,6 @@ SOUNDCHECK VIP PACKAGE套票，NT$ 5,800
                 },
             ],
         },
-        
         {
             "show_name": "2025 HYERI FANMEETING TOUR ＜Welcome to HYERI’s STUDIO＞ IN TAIPEI",
             "show_desc": """憑藉韓劇《善意的競爭》再創演藝事業高峰的韓國女演員 Girl’s Day 成員惠利，出道後的首次個人見面會巡迴《2025 HYERI FANMEETING TOUR <Welcome to HYERI’s STUDIO> IN TAIPEI》臺灣場門票甫開賣即銷售一空，經主辦單位積極與韓方爭取後，確認將加開 C 區及 D 區座位，並配合加開區域新增部分粉絲福利。加開座位門票將於 5 月 24 日上午 11 點在拓元票系統網站開賣，採實名制售票，票價為 C 區 TWD 3,600 / D 區 TWD 3,200，所有購票者皆可參與 HI-BYE 、獲得一張官方海報，C 區會獲得一張限定小卡，並擁有 1:20 團體合照及親簽海報的抽獎資格。
@@ -793,7 +792,7 @@ SPONSORED BY：台灣三星電子、星展萬事達卡DBS Mastercard、台灣大
         show = Show(
             show_name=show_info["show_name"],
             show_desc=show_info["show_desc"],
-            show_pic=show_info["show_pic"],
+            show_pic = f"/static/images/{show_info['show_pic']}",
             start_date=show_info["start_date"],
             end_date=show_info["end_date"],
             host_id=host_id,
