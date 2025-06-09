@@ -138,6 +138,34 @@
     </div>
   </div>
 
+  <!-- 篩選區塊 -->
+  <div class="container mt-4 mb-2" id="filter-section">
+      <div class="btn-group mb-3" role="group" aria-label="排序與篩選">
+        <button type="button" id="btn-upcoming" class="btn btn-primary">即將開演</button>
+        <button type="button" id="btn-date-range" class="btn btn-outline-primary">依開演日期篩選</button>
+      </div>
+  
+      <div class="container my-4">
+        <form id="date-range-form" method="get" action="{{ url_for('index') }}"
+              class="card p-4 shadow-sm mx-auto"
+              style="max-width: 600px; display: none;">
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-5">
+              <label for="start_date" class="form-label fw-semibold">開始日期</label>
+              <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
+            </div>
+            <div class="col-12 col-md-5">
+              <label for="end_date" class="form-label fw-semibold">結束日期</label>
+              <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
+            </div>
+            <div class="col-12 col-md-2 text-md-end text-center">
+              <button type="submit" class="btn btn-primary btn-sm w-100 w-md-auto">GO!</button>
+            </div>
+          </div>
+        </form>
+      </div>
+   </div>
+
   <!-- 所有節目 -->
   <div class="container extra-margin-top">
     <h2 class="text-center mb-3">所有節目</h2>

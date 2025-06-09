@@ -9,12 +9,10 @@ from models.location import Location
 from models.section import Section
 from collections import defaultdict
 from models.member import Member  # Member model，記得有繼承 UserMixin
-from datetime import datetime
 from models.location import Location
 from models.refund import Refund
-from datetime import datetime
 from models import Ticket, Order, Game, Show, Area, GameArea, Payment
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta, date
 from markupsafe import Markup
 from models.game import Game
 from flask_migrate import Migrate
@@ -452,69 +450,21 @@ def order_complete(order_id):
     # return render_template('order_complete.html')
 
 
-
-#退款表單
+# 退款表單
 @app.route('/ticket/refund/<int:order_id>', methods=['GET', 'POST'])
+@login_required
 def refund_detail(order_id):
-    order = Order.query.filter_by(order_id=order_id).first()
-    if not order:
-        message = "找不到此訂單"
-        return render_template("refund_form.html", message=message, order={
-            'order_id': 0,
-            'show': None,
-            'location': None,
-            'datetime': '未知',
-            'amount': 0
-        }), 404
+    order = Order.query.get(order_id)
+    ticket = Ticket.query.filter_by(order_id=order_id).first()
+    show = Show.query.get(ticket.game_id) if ticket else None
+    location = Location.query.get(show.location_id) if show else None
 
-    # Check if refund request already exists for this order
-    existing_refund = Refund.query.filter_by(order_id=order_id).first()
-    if existing_refund:
-        message = "此訂單已申請退款，請勿重複申請。"
-        order = Order.query.filter_by(order_id=order_id).first()
-        ticket = db.session.query(Ticket).filter_by(order_id=order_id).first()
-        show = None
-        location = None
-        datetime_str = None
-        if ticket:
-            show = Show.query.get(ticket.game_id)
-            location = Location.query.get(show.location_id) if show else None
-            datetime_str = show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') if show and show.createdAt else None
-        amount = order.total_price - 20 if order else 0
-        return render_template("refund_form.html", message=message, order={
-            'order_id': order.order_id if order else 0,
-            'show': show,
-            'location': location,
-            'datetime': datetime_str if datetime_str else '未知',
-            'amount': amount
-        }), 400
-
-    # 透過訂單編號查詢票券
-    ticket = db.session.query(Ticket).filter_by(order_id=order_id).first()
-    show = None
-    location = None
+    amount = order.total_price if order else 0
+    game = Game.query.get(ticket.game_id) if ticket else None
     datetime_str = None
-    if ticket:
-        show = Show.query.get(ticket.game_id)
-        location = Location.query.get(show.location_id) if show else None
-        datetime_str = show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') if show and show.createdAt else None
-
-    # Check if current time is at least 1 hour before show start time
-    if show and show.createdAt:
-        from datetime import datetime, timedelta, date
-        now = datetime.utcnow()
-        show_start = datetime.combine(show.createdAt, datetime.min.time()) if isinstance(show.createdAt, date) else show.createdAt
-        if now > show_start - timedelta(hours=1):
-            message = "退款申請必須在演出開始前一小時提出。"
-            return render_template("refund_form.html", message=message, order={
-                'order_id': order.order_id if order else 0,
-                'show': show,
-                'location': Location.query.get(show.location_id) if show else None,
-                'datetime': show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') if show and show.createdAt else '未知',
-                'amount': order.total_price - 20 if order else 0
-            }), 400
-
-    amount = (order.total_price if order.total_price is not None else 0) - 20  # 扣除20元手續費
+    if game and game.game_date and game.game_time:
+        show_datetime = datetime.combine(game.game_date, game.game_time)
+        datetime_str = show_datetime.strftime('%Y/%m/%d(%a) %H:%M')
 
     if request.method == 'POST':
         name = request.form.get('name')
@@ -524,77 +474,76 @@ def refund_detail(order_id):
         if not name or not email or not phone:
             message = "請填寫完整退款資訊"
             return render_template("refund_form.html", message=message, order={
-                'order_id': order.order_id if order else 0,
+                'order_id': order.order_id,
                 'show': show,
                 'location': location,
-                'datetime': datetime_str if datetime_str else '未知',
+                'datetime': datetime_str or '未知',
                 'amount': amount
-            }), 400
+            })
 
-        # Determine refund status based on date difference
-        from datetime import datetime, timedelta, date
-        now = datetime.utcnow()
-        refund_status = 'pending'
-        if show and show.createdAt:
-            show_datetime = datetime.combine(show.createdAt, datetime.min.time()) if isinstance(show.createdAt, date) else show.createdAt
-            if now > show_datetime - timedelta(days=1):
+        now = datetime.now()
+
+        if game and game.game_date and game.game_time:
+            show_datetime = datetime.combine(game.game_date, game.game_time)
+            if now < show_datetime - timedelta(days=1):
+                refund_status = 'approved'
+                message = "退款申請已完成，請留意您的信箱通知。"
+
+                refund_request = Refund(
+                    order_id=order.order_id,
+                    name=name,
+                    email=email,
+                    phone=phone,
+                    refund_status=refund_status,
+                    createdAt=now,
+                    updatedAt=now
+                )
+                db.session.add(refund_request)
+
+                order.order_status = 'C'
+                order.updatedAt = now
+
+                tickets = Ticket.query.filter_by(order_id=order.order_id).all()
+                for ticket in tickets:
+                    game_area = db.session.query(GameArea).filter_by(
+                        game_id=ticket.game_id, area_id=ticket.area_id).first()
+                    if game_area:
+                        if ticket.is_disabled:
+                            game_area.disabled_available_seats += 1
+                        else:
+                            game_area.available_seats += 1
+
+                db.session.commit()
+
+                # 成功後不再顯示表單
+                return render_template("refund_form.html", message=message, order=None)
+            else:
                 refund_status = 'rejected'
+                message = "退款申請被拒絕，請確認是否已超過演出前一天。"
+                refund_request = Refund(
+                    order_id=order.order_id,
+                    name=name,
+                    email=email,
+                    phone=phone,
+                    refund_status=refund_status,
+                    createdAt=now,
+                    updatedAt=now
+                )
+                db.session.add(refund_request)
+                db.session.commit()
 
-        refund_request = Refund(
-            order_id=order.order_id,
-            name=name,
-            email=email,
-            phone=phone,
-            refund_status=refund_status,
-            createdAt=datetime.utcnow(),
-            updatedAt=datetime.utcnow()
-        )
-        db.session.add(refund_request)
-        db.session.commit()
+                return render_template("refund_form.html", message=message, order=None)
 
-        # Add ticket quantity back to GameArea for the whale order
-        tickets = Ticket.query.filter_by(order_id=order.order_id).all()
-        for ticket in tickets:
-            game_area = db.session.query(GameArea).filter_by(game_id=ticket.game_id, area_id=ticket.area_id).first()
-            if game_area:
-                if ticket.is_disabled:
-                    game_area.disabled_available_seats += 1
-                else:
-                    game_area.available_seats += 1
-        db.session.commit()
-
-        message = "退款申請送出成功，請留意您的信箱通知。"
-        return render_template("refund_form.html", message=message, order={
-            'order_id': order.order_id,
-            'show': show,
-            'location': location,
-            'datetime': datetime_str if datetime_str else '未知',
-            'amount': amount
-        })
-
-    return render_template("refund_form.html", order={
+    # GET 預設頁面
+    return render_template("refund_form.html", message=None, order={
         'order_id': order.order_id,
         'show': show,
         'location': location,
-        'datetime': datetime_str if datetime_str else '未知',
+        'datetime': datetime_str or '未知',
         'amount': amount
     })
 
-# 管理員更新退款狀態
-@app.route('/admin/refund/<int:refund_id>/update', methods=['POST'])
-def update_refund_status(refund_id):
-    refund = Refund.query.get_or_404(refund_id)
-    new_status = request.form.get('refund_status')
-    if new_status not in ['pending', 'approved', 'rejected']:
-        return "無效的退款狀態", 400
-    refund.refund_status = new_status
-    refund.updatedAt = datetime.utcnow()
-    db.session.commit()
-    return f"退款狀態已更新為 {new_status}"
 
-@login_manager.user_loader
-def load_user(user_id):
-    return Member.query.get(int(user_id))
 
 
 # 我的票夾
@@ -674,11 +623,12 @@ def nl2br_filter(s):
 @app.route('/order/<int:order_id>')
 def order_detail(order_id):
     order = Order.query.get_or_404(order_id)
-    tickets = db.session.query(Ticket, Game, Show, Area)\
-        .join(Game, Ticket.game_id == Game.game_id)\
-        .join(Show, Game.show_id == Show.show_id)\
-        .join(Area, Ticket.area_id == Area.area_id)\
-        .filter(Ticket.order_id == order_id).all()
+    tickets = db.session.query(Ticket, Game, Show, Area, Location)\
+    .join(Game, Ticket.game_id == Game.game_id)\
+    .join(Show, Game.show_id == Show.show_id)\
+    .join(Area, Ticket.area_id == Area.area_id)\
+    .join(Location, Show.location_id == Location.loc_id)\
+    .filter(Ticket.order_id == order_id).all()
     refund = Refund.query.filter_by(order_id=order_id).first()
     refund_status = refund.refund_status if refund else None
     return render_template('order_detail.html', order=order, tickets=tickets, refund_status=refund_status)

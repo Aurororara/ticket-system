@@ -1,54 +1,69 @@
 {% extends "layout.html" %}
-
 {% block title %}退款申請 - NtickeTUB{% endblock %}
 
 {% block content %}
-<nav class="navbar navbar-light bg-light justify-content-between px-4">
-  <a class="navbar-brand" href="#">退款申請</a>
-</nav>
+<div class="refund-container">
 
-{% if message %}
-<div class="alert alert-warning mt-3 mx-4" role="alert">
-  {{ message }}
-</div>
-{% endif %}
+  {% if message %}
+  <div class="alert alert-warning mt-3" role="alert">
+    {{ message }}
+  </div>
+  {% endif %}
 
-<h2>退款資訊</h2>
+  <h2>退款資訊</h2>
 
-<div class="refund-info">
-  <p>訂單編號：<span class="highlight">{{ '%05d'|format(order.order_id) }}</span></p>
-  <p>節目名稱：{{ order.show.show_name if order.show else '未知' }}</p>
-  <p>活動地點：{{ order.show.location.loc_name if order.show and order.show.location else '未知' }}</p>
-  <p>活動時間：
-    {% if order.show and order.show.createdAt %}
-      {{ order.show.createdAt.strftime('%Y/%m/%d(%a) %H:%M') }}
-    {% else %}
-      未知
+  <div class="refund-info">
+    {% if order %}
+      <p>訂單編號：<span class="highlight">{{ '%05d'|format(order['order_id']) }}</span></p>
+      <p>節目名稱：
+        {% if order['show'] %}
+          {{ order['show'].show_name }}
+        {% else %}
+          未知
+        {% endif %}
+      </p>
+      
+      <p>活動地點：
+        {% if order['location'] %}
+          {{ order['location'].loc_name }}
+        {% else %}
+          未知
+        {% endif %}
+      </p>      
+      <p>活動時間：{{ order['datetime'] or '未知' }}</p>
+      <p>退款金額：TWD${{ order['amount'] }}</p>
     {% endif %}
-  </p>
-  <p>退款金額：TWD${{ order.total_price }}</p>
-  <p class="note">**退款需自行支付20(元)手續費，詳情請見 退票說明**</p>
+    <p class="note">**退款需自行支付20(元)手續費，詳情請見 退票說明**</p>
+  </div>
+
+  {% if not message %}
+  <form method="POST" action="{{ url_for('refund_detail', order_id=order['order_id']) }}">
+    <div class="form-group">
+      <label for="name">姓名</label>
+      <input type="text" id="name" name="name" required />
+    </div>
+    <div class="form-group">
+      <label for="email">電子郵件</label>
+      <input type="email" id="email" name="email" required />
+    </div>
+    <div class="form-group">
+      <label for="phone">電話</label>
+      <input type="tel" id="phone" name="phone" required />
+    </div>
+    <button type="submit" class="btn-submit">送出退款申請</button>
+  </form>
+  {% endif %}
+
 </div>
 
-{% if not message or message == "退款申請送出成功，請留意您的信箱通知。" %}
-<form method="POST" action="{{ url_for('refund_detail', order_id=order.order_id) }}">
-  <div class="form-group">
-    <label for="name">姓名</label>
-    <input type="text" id="name" name="name" required />
-  </div>
-  <div class="form-group">
-    <label for="email">電子郵件</label>
-    <input type="email" id="email" name="email" required />
-  </div>
-  <div class="form-group">
-    <label for="phone">電話</label>
-    <input type="tel" id="phone" name="phone" required />
-  </div>
-  <button type="submit" class="btn-submit">送出退款申請</button>
-</form>
-{% endif %}
 
 <style>
+  .refund-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
   .refund-info {
     background-color: #ddd;
     padding: 1rem;

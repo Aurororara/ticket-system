@@ -14,14 +14,26 @@
       未知
     {% endif %}
   </p>
-  <p>訂單狀態：{{ order.order_status }}</p>
+  <p>訂單狀態：
+    {% if order.order_status == 'Y' %}
+      已完成
+    {% elif order.order_status == 'N' %}
+      未付款
+    {% elif order.order_status == 'C' %}
+      已取消
+    {% else %}
+      未知
+    {% endif %}
+  </p>  
   <p>退款狀態：
-    {% if refund_status %}
-      {{ refund_status }}
+    {% if refund_status == 'approved' %}
+      已完成
+    {% elif refund_status == 'rejected' %}
+      已拒絕
     {% else %}
       無退款申請
     {% endif %}
-  </p>
+  </p>  
 </div>
 
 {% if tickets %}
@@ -36,10 +48,10 @@
       </tr>
     </thead>
     <tbody>
-      {% for ticket, game, show, area in tickets %}
+      {% for ticket, game, show, area, location in tickets %}
       <tr>
         <td>{{ show.show_name }}</td>
-        <td>{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }} / {{ show.location.loc_name if show.location else '未知' }}</td>
+        <td>{{ game.game_date.strftime('%Y/%m/%d') if game.game_date else '未知' }} / {{ location.loc_name if location else '未知' }} </td>
         <td>{{ area.area_name }}</td>
         <td>{{ ticket.seat_no }}</td>
         <td>{{ ticket.ticket_type if ticket.ticket_type else '一般票' }} / {{ area.price if area.price else '未知' }}</td>

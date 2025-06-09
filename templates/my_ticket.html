@@ -10,15 +10,24 @@
     {% for item in order_data %}
       <a href="{{ url_for('order_detail', order_id=item.order.order_id) }}" class="ticket-card-link" style="text-decoration:none; color: inherit;">
         <div class="ticket-card">
+
           <div class="ticket-card-left">
-            <img src="{{ url_for('static', filename='img/show1.jpg') }}" alt="活動圖片" class="ticket-image" />
+            <div class="ticket-card-left">
+              {% if item.tickets %}
+                {% set ticket = item.tickets[0][0] %}
+                {% set game = item.tickets[0][1] %}
+                {% set show = item.tickets[0][2] %}
+                {% set area = item.tickets[0][3] %}
+                <img src="{{ show.show_pic }}" alt="{{ show.show_name }}" class="ticket-image" />
+              {% else %}
+                <img src="{{ url_for('static', filename='img/default.jpg') }}" alt="無圖片" class="ticket-image" />
+              {% endif %}
+            </div>
+            
           </div>
+
           <div class="ticket-card-right">
             {% if item.tickets %}
-              {% set ticket = item.tickets[0][0] %}
-              {% set game = item.tickets[0][1] %}
-              {% set show = item.tickets[0][2] %}
-              {% set area = item.tickets[0][3] %}
               <h3 style="color: #e74c3c;">{{ show.show_name }}</h3>
               <p>訂單編號：{{ '%05d'|format(ticket.order_id) }}</p>
               <p>購買日期：{{ ticket.createdAt.strftime('%Y/%m/%d') if ticket.createdAt else '未知' }}</p>
@@ -33,13 +42,18 @@
             {% endif %}
             <p>
               退款狀態：
-              {% if item.refund_status %}
+              {% if item.refund_status == 'approved' %}
+                已完成
+              {% elif item.refund_status == 'rejected' %}
+                已拒絕
+              {% elif item.refund_status %}
                 {{ item.refund_status }}
               {% else %}
                 無退款申請
               {% endif %}
             </p>
           </div>
+
         </div>
       </a>
     {% endfor %}

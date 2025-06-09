@@ -480,54 +480,7 @@ SOUNDCHECK VIP PACKAGE套票，NT$ 5,800
                 },
             ],
         },
-        {
-            "show_name": "iLiFE! Zepp6venue tour -TRAVE LiFE!-",
-            "show_desc": """iLiFE! 首次海外公演 確定！
-iLiFE! Zepp6venue tour -TRAVE LiFE!-
-
-iLiFE! Zepp6venue tour -TRAVE LiFE!-
-時間：2025/06/08 (日) 18:30
-地點：Zepp New Taipei（新莊宏匯廣場8F）
-
-※ 實際時間請依現場公告為準。
-※ 為了人身安全考量，孕婦及身高未滿110公分或未滿7歲孩童，請勿購買站區票券，主辦方將有權謝絕入場。
-※ 請務必於演出日前關注主辦單位官方網站及臉書頁面，詳讀確認入場時間流程及相關規範，以免損害自身權益。
-
-
-主辦單位：Live Nation Taiwan、 HIP
-
-📍入場須配合安檢及入場須知
-為安全考量，禁止攜帶後背包、超過 37 x 25 x 11.5公分之包包和行李箱；會場內全面禁止攜帶外食和飲料(水除外)。未經主辦單位同意，禁止使用手機、行動裝置、各類相機、攝錄影機、DV、錄音機等，進行錄音、錄影、拍照、直播，並請勿攜帶各類照相與攝影設備等入場（含自拍棒），購票前請務必三思確認自己可以配合再買票。會場外設有限量置物櫃，建議輕便前往，並請提早到場進行安檢以避免耽誤觀賞演出。相關規定請於演出日前造訪LIVE NATION TAIWAN官方網站、官方臉書粉絲專頁、Instagram、Ｘ 獲得最新資訊。
-
-📍以上活動內容，主辦單位保留異動之權力。
-
-①本公司為尊重他人音樂著作財產權，秉持事先授權原則，承諾於所舉辦之演唱會演出前向權利人申請合法授權。
-②本場演出所使用音樂將向MÜST取得授權。
-""",
-            "show_pic": "25_ilifetour.jpg",
-            "start_date": date(2025, 6, 8),
-            "end_date": date(2025, 6, 8),
-            "host_name": "Live Nation",
-            "location_name": "Zepp New Taipei",
-            "sections": [
-                "1F坐區(SEATED)",
-                "1F站區",
-            ],
-            "areas": [
-                ("SS-1F坐區4300", 50, 3, 4300, 2300, "1F坐區(SEATED)"),
-                ("S-1F站區2800", 15, 3, 2800, 800, "1F站區"),
-                ("GA-1F站區1500", 15, 3, 1500, 800, "1F站區"),
-                ("GA-1F站區1000", 15, 3, 1000, 600, "1F站區"),
-            ],
-            "games": [
-                {
-                    "game_date": date(2025, 6, 8),
-                    "game_time": time(18, 30),
-                    "sale_start_time": datetime(2025, 5, 16, 12, 30, 0),
-                    "sale_end_time": datetime(2025, 6, 8, 12, 30, 0),
-                },
-            ],
-        },
+        
         {
             "show_name": "2025 HYERI FANMEETING TOUR ＜Welcome to HYERI’s STUDIO＞ IN TAIPEI",
             "show_desc": """憑藉韓劇《善意的競爭》再創演藝事業高峰的韓國女演員 Girl’s Day 成員惠利，出道後的首次個人見面會巡迴《2025 HYERI FANMEETING TOUR <Welcome to HYERI’s STUDIO> IN TAIPEI》臺灣場門票甫開賣即銷售一空，經主辦單位積極與韓方爭取後，確認將加開 C 區及 D 區座位，並配合加開區域新增部分粉絲福利。加開座位門票將於 5 月 24 日上午 11 點在拓元票系統網站開賣，採實名制售票，票價為 C 區 TWD 3,600 / D 區 TWD 3,200，所有購票者皆可參與 HI-BYE 、獲得一張官方海報，C 區會獲得一張限定小卡，並擁有 1:20 團體合照及親簽海報的抽獎資格。
@@ -840,7 +793,7 @@ SPONSORED BY：台灣三星電子、星展萬事達卡DBS Mastercard、台灣大
         show = Show(
             show_name=show_info["show_name"],
             show_desc=show_info["show_desc"],
-            show_pic=f"/static/images/{show_info['show_pic']}",
+            show_pic=show_info["show_pic"],
             start_date=show_info["start_date"],
             end_date=show_info["end_date"],
             host_id=host_id,
