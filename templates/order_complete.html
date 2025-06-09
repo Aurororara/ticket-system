@@ -15,14 +15,14 @@
     <!-- 訂單資訊 -->
     <div class="text-start my-4">
       <h5>{{ show.show_name if show else '未找到節目' }}</h5>
-      <p>
+      <div>
         <i class="bi bi-calendar-event me-1"></i>
         {{ game.game_date.strftime('%Y/%m/%d') }} ({{ game.game_date.strftime('%a') }}) {{ game.game_time.strftime('%H:%M') }}
-      </p>
-      <p>
+      </div>
+      <div>
         <i class="bi bi-geo-alt me-1"></i>
         {{ location.loc_name if location else '未知地點' }}
-      </p>
+      </div>
     </div>
 
     <!-- 票券區 -->
