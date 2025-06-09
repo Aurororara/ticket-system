@@ -56,7 +56,7 @@
 
         <td>
           {% if game.game_status == 'A' and game.sale_start_time <= now <=game.sale_end_time %} <a
-            href="{{ url_for('select_area', game_id=game.game_id) }}" class="btn btn-secondary">立即訂購</a>
+            href="{{ url_for('select_area', game_id=game.game_id) }}" class="button-deepblue">立即訂購</a>
             {% else %}
             <button class="btn btn-secondary" disabled>暫停販售</button>
             {% endif %}
@@ -77,4 +77,26 @@
     * 活動異動聲明：主辦單位保有隨時變更、終止本活動與內容之權利，如有相關異動將於官方網站公告，請參閱最新公告資訊。
   </div>
 </div>
+
+
+<style>
+  .button-deepblue {
+    background-color: #3385D9;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .button-deepblue:hover {
+    background-color: #1f6ec3;
+  }
+
+  .button-deepblue:active {
+    background-color: #145399;
+  }
+</style>
 {% endblock %}

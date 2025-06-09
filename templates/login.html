@@ -44,7 +44,7 @@
             </div>
           </div>
           <div class="d-grid">
-            <button type="submit" class="btn btn-primary">登入</button>
+            <button type="submit" class="button-deepblue">登入</button>
           </div>
         </form>
 
@@ -68,4 +68,25 @@
       }
     });
   </script>
+
+<style>
+.button-deepblue {
+  background-color: #3385D9;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.button-deepblue:hover {
+  background-color: #1f6ec3;
+}
+
+.button-deepblue:active {
+  background-color: #145399;
+}
+</style>
 {% endblock %}
