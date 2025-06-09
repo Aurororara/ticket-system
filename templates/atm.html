@@ -29,24 +29,63 @@
   </div>
 
   <!-- 訂單資訊 -->
-  <div class="border p-3 mb-4">
-    <div class="text-end small mt-2">訂單編號：{{ order.order_id }}</div>
-    <h6>票券</h6>
-    {% for ticket in tickets %}
-    <div class="d-flex justify-content-between">
-      <span>{{ ticket.area.area_name }} {{ show.show_name }} {{ ticket.seat_no }}</span>
-      {% if ticket.is_disabled %}
-        <span>TWD{{ ticket.area.disabled_price }}</span>
-      {% else %}
-        <span>TWD{{ ticket.area.price }}</span>
-      {% endif %}
+  <div class="text-start my-4">
+    <h5>{{ show.show_name if show else '未找到節目' }}</h5>
+    <div>
+      <i class="bi bi-calendar-event me-1"></i>
+      {{ game.game_date.strftime('%Y/%m/%d') }} ({{ game.game_date.strftime('%a') }}) {{ game.game_time.strftime('%H:%M')
+      }}
     </div>
-    {% endfor %}
-    <div class="pt-3 mt-3 d-flex justify-content-end align-items-center bg-light p-2">
-      <div class="border-top pt-3 d-flex justify-content-between align-items-center bg-light p-2">
-        <span>項目小計</span>
-        <strong class="fs-5">TWD${{ order.total_price }}</strong>
+    <div>
+      <i class="bi bi-geo-alt me-1"></i>
+      {{ location.loc_name if location else '未知地點' }}
+    </div>
+  </div>
+  
+  <!-- 票券區 -->
+  <div class="mb-5 bg-white">
+    <div class="fs-5">票券</div>
+    <div class="row row-cols-1 g-3">
+      {% for ticket in tickets %}
+      <div class="col">
+        <div class="p-3 d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-bold">
+              {{ ticket.area.area_name }} - {{ ticket.seat_no }}
+            </div>
+            <div class="small text-muted">
+              票種：
+              {% if ticket.is_disabled %}
+              身障票
+              {% else %}
+              一般票
+              {% endif %}
+            </div>
+            <div class="small text-muted">
+              票價：NT$
+              {% if ticket.is_disabled %}
+              {{ ticket.area.disabled_price }}
+              {% else %}
+              {{ ticket.area.price }}
+              {% endif %}
+            </div>
+          </div>
+          <div class="fw-bold">
+            NT$
+            {% if ticket.is_disabled %}
+            {{ ticket.area.disabled_price }}
+            {% else %}
+            {{ ticket.area.price }}
+            {% endif %}
+          </div>
+        </div>
       </div>
+      {% endfor %}
+    </div>
+    <hr />
+    <!-- 總金額 -->
+    <div class="text-end">
+      <p class="fw-bold">總金額：NT${{ order.total_price }}</p>
     </div>
   </div>
 
@@ -55,7 +94,7 @@
     <input type="hidden" name="order_id" value="{{ order.order_id }}">
     <!-- 聯絡資訊 -->
     <div class="border p-3 mb-4">
-      <h6><i class="bi bi-person-fill me-1"></i>聯絡人資料</h6>
+      <h5><i class="bi bi-person-fill me-1"></i>聯絡人資料</h5>
       <div class="mb-2">
         <label class="form-label">*姓名</label>
         <input type="text" name="contact_name" id="contact_name" class="form-control" placeholder="請輸入姓名">
@@ -73,7 +112,7 @@
 
   <!-- 虛擬帳戶資訊 -->
   <div class="border p-3 mb-4 bg-light">
-    <h6><i class="bi bi-credit-card-2-back me-1"></i>虛擬帳戶資訊</h6>
+    <h5><i class="bi bi-credit-card-2-back me-1"></i>虛擬帳戶資訊</h5>
     <ul class="list-unstyled mb-0">
       <li>訂單編號：{{ order.order_id }}</li>
       <li>交易帳號：等候付款</li>
@@ -91,7 +130,7 @@
 
     <!-- 完成付款按鈕 -->
     <div class="d-flex justify-content-center">
-      <button class="btn btn-dark w-50" type="submit">完成付款</button>
+      <button class="button-deepblue w-50" type="submit">完成付款</button>
     </div>
     </form>
     <!-- 表單結束 -->

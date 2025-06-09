@@ -242,3 +242,43 @@ input[type="radio"]:checked+.selectable-option {
   object-fit: contain;
   border-radius: 12px;
 }
+
+ .button-deepblue {
+   background-color: #3385D9;
+   color: white;
+   border: none;
+   border-radius: 6px;
+   padding: 8px 16px;
+   cursor: pointer;
+   text-decoration: none;
+   transition: background-color 0.2s ease;
+ }
+
+ .button-deepblue:hover {
+   background-color: #1f6ec3;
+ }
+
+ .button-deepblue:active {
+   background-color: #145399;
+ }
+
+ .bg-grey {
+   background-color: #dfdfdf !important;
+ }
+
+ .line-grey{
+  border-right-color: #efefef;
+ }
+
+ /* .btn-pink {
+   color: #fff;
+   background-color: #286aad;
+   border-color: #286aad;
+ }
+
+ .btn-pink:hover,
+ .btn-pink:active:hover {
+   color: #fff;
+   background-color: #3385D9;
+   border-color: #3385D9;
+ } */

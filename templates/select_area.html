@@ -48,8 +48,8 @@
   <form id="areaForm" data-game-id="{{ game.game_id }}">
     {% for sect_name, areas in grouped_areas.items() %}
     <div class="mb-3">
-      <h6 class="bg-secondary text-white p-2">{{ sect_name }}</h6>
       <div class="list-group">
+        <label class="bg-grey list-group-item p-2 ps-4">{{ sect_name }}</label>  
         {% for area in areas %}
         {% set total_seats = (area.available or 0) + (area.disabled or 0) %}
         <label class="list-group-item {% if total_seats == 0 %}text-disabled{% endif %}">
@@ -81,7 +81,7 @@
 
 
     <!-- 下一步 -->
-    <button type="button" id="areaNextBtn" class="btn btn-dark w-100">下一步</button>
+    <button type="button" id="areaNextBtn" class="button-deepblue w-100">下一步</button>
   </form>
 
  <script>
