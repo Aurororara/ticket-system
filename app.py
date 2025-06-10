@@ -522,6 +522,7 @@ def order_complete(order_id):
 @app.route('/ticket/refund/<int:order_id>', methods=['GET', 'POST'])
 @login_required
 def refund_detail(order_id):
+    message = None
     order = Order.query.get(order_id)
     ticket = Ticket.query.filter_by(order_id=order_id).first()
     show = Show.query.get(ticket.game_id) if ticket else None
@@ -530,21 +531,27 @@ def refund_detail(order_id):
     amount = order.total_price if order else 0
     game = Game.query.get(ticket.game_id) if ticket else None
     datetime_str = None
+    form_allowed = False  # ✅ 預設為 False，確保所有分支都可以使用
+
     if game and game.game_date and game.game_time:
         show_datetime = datetime.combine(game.game_date, game.game_time)
         datetime_str = show_datetime.strftime('%Y/%m/%d(%a) %H:%M')
+        now = datetime.now()
+        form_allowed = now < show_datetime - timedelta(days=1)
+        if not form_allowed:
+            message = "此訂單已超過退款期限，無法退款。"
 
     refund = Refund.query.filter_by(order_id=order_id).first()
     if refund:
         if refund.refund_status == 'approved':
             status_display = '已完成'
         elif refund.refund_status == 'rejected':
-            status_display = '已拒絕'
+            status_display = '已超過退款期限'
         else:
-            status_display = refund.refund_status  # fallback 顯示原始狀態
+            status_display = refund.refund_status
 
         message = f"此訂單已申請退款，狀態為：{status_display}"
-        return render_template("refund_form.html", message=message, order=None)
+        return render_template("refund_form.html", message=message, order=None, refund_status=refund.refund_status, form_allowed=False)
 
     if request.method == 'POST':
         name = request.form.get('name')
@@ -559,7 +566,7 @@ def refund_detail(order_id):
                 'location': location,
                 'datetime': datetime_str or '未知',
                 'amount': amount
-            })
+            }, form_allowed=form_allowed, refund_status=None)
 
         now = datetime.now()
 
@@ -568,18 +575,22 @@ def refund_detail(order_id):
             if now < show_datetime - timedelta(days=1):
                 refund_status = 'approved'
                 message = "退款申請已完成，請留意您的信箱通知。"
+            else:
+                refund_status = 'rejected'
+                message = "退款申請被拒絕，請確認是否已超過演出前一天。"
 
-                refund_request = Refund(
-                    order_id=order.order_id,
-                    name=name,
-                    email=email,
-                    phone=phone,
-                    refund_status=refund_status,
-                    createdAt=now,
-                    updatedAt=now
-                )
-                db.session.add(refund_request)
+            refund_request = Refund(
+                order_id=order.order_id,
+                name=name,
+                email=email,
+                phone=phone,
+                refund_status=refund_status,
+                createdAt=now,
+                updatedAt=now
+            )
+            db.session.add(refund_request)
 
+            if refund_status == 'approved':
                 order.order_status = 'C'
                 order.updatedAt = now
 
@@ -593,35 +604,18 @@ def refund_detail(order_id):
                         else:
                             game_area.available_seats += 1
 
-                db.session.commit()
+            db.session.commit()
 
-                # 成功後不再顯示表單
-                return render_template("refund_form.html", message=message, order=None)
-            else:
-                refund_status = 'rejected'
-                message = "退款申請被拒絕，請確認是否已超過演出前一天。"
-                refund_request = Refund(
-                    order_id=order.order_id,
-                    name=name,
-                    email=email,
-                    phone=phone,
-                    refund_status=refund_status,
-                    createdAt=now,
-                    updatedAt=now
-                )
-                db.session.add(refund_request)
-                db.session.commit()
+            return render_template("refund_form.html", message=message, order=None, refund_status=refund_status, form_allowed=False)
 
-                return render_template("refund_form.html", message=message, order=None, form_allowed=False)
-
-    # GET 預設頁面
-    return render_template("refund_form.html", message=None, order={
+    return render_template("refund_form.html", message=message, order={
         'order_id': order.order_id,
         'show': show,
         'location': location,
         'datetime': datetime_str or '未知',
         'amount': amount
-    })
+    }, form_allowed=form_allowed, refund_status=None)
+
 
 
 

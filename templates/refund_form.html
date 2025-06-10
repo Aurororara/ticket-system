@@ -31,7 +31,7 @@
         {% endif %}
       </p>      
       <p>活動時間：{{ order['datetime'] or '未知' }}</p>
-      <p>退款金額：TWD${{ order['amount'] }}</p>
+      <p>退款金額：TWD${{ order['amount'] - 20}}</p>
     {% endif %}
     <p class="note">**退款需自行支付20(元)手續費，詳情請見 退票說明**</p>
   </div>
