@@ -235,3 +235,49 @@ if (document.getElementById('paymentForm')) {
     }
   });
 }
+//email是否註冊過
+document.addEventListener('DOMContentLoaded', function () {
+  const emailInput = document.getElementById('email');
+  const emailExistMsg = document.getElementById('emailExist');
+
+  emailInput.addEventListener('blur', function () {
+    const emailVal = emailInput.value.trim();
+    if (!emailVal) {
+      emailExistMsg.style.display = 'none';
+      return;
+    }
+
+    fetch(`/check_email?email=${encodeURIComponent(emailVal)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.exists) {
+          emailExistMsg.style.display = 'block';
+        } else {
+          emailExistMsg.style.display = 'none';
+        }
+      });
+  });
+});
+
+// 即時檢查電話是否存在
+const phoneInput = document.getElementById('phone');
+const phoneExistMsg = document.getElementById('phoneExist');
+
+phoneInput.addEventListener('blur', function () {
+  const phoneVal = phoneInput.value.trim();
+  if (!phoneVal) {
+    phoneExistMsg.style.display = 'none';
+    return;
+  }
+
+  fetch(`/check_exist?phone=${encodeURIComponent(phoneVal)}`)
+    .then(response => response.json())
+    .then(data => {
+      phoneExistMsg.style.display = data.exists ? 'block' : 'none';
+    });
+});
+
+// 限制只能輸入數字
+phoneInput.addEventListener('input', function () {
+  this.value = this.value.replace(/\D/g, '');
+});
