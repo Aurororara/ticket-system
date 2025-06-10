@@ -3,17 +3,50 @@
 {% block title %}註冊 - NtickeTUB{% endblock %}
 
 {% block content %}
-<div class="container d-flex justify-content-center py-5">
-  <div class="card shadow-lg rounded-4" style="max-width: 550px; width: 100%;">
-    <div class="card-body">
-      <h3 class="card-title text-center mb-4">加入會員</h3>
+<style>
+  .input-group .form-control {
+    border-right: none;
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
+
+  .input-group .btn-toggle-password {
+    background-color: #f1f1f1;
+    border-left: none;
+    border-radius: 0 0.5rem 0.5rem 0;
+    box-shadow: none;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    padding: 0;
+    transition: background-color 0.2s ease;
+  }
+
+  .input-group .btn-toggle-password:hover {
+    background-color: #e0e0e0;
+  }
+
+  .input-group .btn-toggle-password:focus {
+    outline: none;
+    box-shadow: none;
+  }
+</style>
+
+<div class="container py-4 d-flex justify-content-center">
+  <div class="card shadow rounded-4" style="max-width: 400px; width: 100%;">
+    <div class="card-body px-4 py-3">
+
+      <h3 class="fw-bold text-center mb-3" style="color:#007bff;">創建帳戶</h3>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           <div class="mb-3">
             {% for category, message in messages %}
-              <div class="alert alert-{{ category }}" role="alert">
+              <div class="alert alert-{{ category }} alert-dismissible fade show py-1" role="alert" style="font-size: 0.9rem;">
                 {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.2rem;"></button>
               </div>
             {% endfor %}
           </div>
@@ -22,67 +55,63 @@
 
       <form method="POST" action="{{ url_for('register') }}" novalidate>
 
-        <div class="mb-3">
-          <label for="name" class="form-label">用戶姓名</label>
-          <input type="text" class="form-control rounded-3" id="name" name="name" placeholder="請輸入用戶名稱" required autocomplete="name">
+        <div class="mb-2">
+          <label for="name" class="form-label fw-semibold small">用戶姓名</label>
+          <input type="text" class="form-control form-control-md rounded-3" id="name" name="name" placeholder="請輸入用戶名稱" required autocomplete="name" autofocus>
         </div>
 
-        <div class="mb-3">
-          <label for="email" class="form-label">電子郵件信箱</label>
+        <div class="mb-2 position-relative">
+          <label for="email" class="form-label fw-semibold small">電子郵件信箱</label>
           <input type="email" class="form-control rounded-3" id="email" name="email" placeholder="請輸入電子郵件" required autocomplete="email">
-          <div id="emailExist" class="form-text text-danger" style="display: none;">此 Email 已被註冊</div>
+          <div id="emailExist" class="form-text text-danger small fst-italic position-absolute" style="bottom: -18px; left: 0; display: none;">此 Email 已被註冊</div>
         </div>
 
-        <div class="mb-3">
-          <label for="phone" class="form-label">電話號碼</label>
-          <input type="tel" class="form-control rounded-3" id="phone" name="phone" placeholder="請輸入手機號碼（09xxxxxxxx）" pattern="^09\\d{8}$" maxlength="10" title="請輸入有效的台灣手機號碼（09開頭，共10碼）" required autocomplete="tel">
-          <div id="phoneExist" class="form-text text-danger" style="display: none;">此電話號碼已被註冊</div>
+        <div class="mb-2 position-relative">
+          <label for="phone" class="form-label fw-semibold small">電話號碼</label>
+          <input type="tel" class="form-control form-control-md rounded-3" id="phone" name="phone" placeholder="請輸入手機號碼（09xxxxxxxx）" pattern="^09\\d{8}$" maxlength="10" title="請輸入有效的台灣手機號碼（09開頭，共10碼）" required autocomplete="tel">
+          <div id="phoneExist" class="form-text text-danger small fst-italic position-absolute" style="bottom: -18px; left: 0; display: none;">此電話號碼已被註冊</div>
         </div>
 
-        <div class="mb-3">
-          <label for="birthday" class="form-label">出生年月日</label>
-          <input type="date" class="form-control rounded-3" id="birthday" name="birthday" required autocomplete="bday">
+        <div class="mb-2">
+          <label for="birthday" class="form-label fw-semibold small">出生年月日</label>
+          <input type="date" class="form-control form-control-md rounded-3" id="birthday" name="birthday" required autocomplete="bday" max="{{ today }}">
         </div>
 
-        <div class="mb-3">
-          <label for="password" class="form-label">設定密碼</label>
-          <div class="input-group">
-            <input type="password" class="form-control rounded-3" id="password" name="password"
+        <div class="mb-2">
+          <label for="password" class="form-label fw-semibold small">設定密碼</label>
+          <div class="input-group shadow-sm">
+            <input type="password" class="form-control" id="password" name="password"
                    placeholder="輸入密碼"
                    pattern="(?=.*[a-z])(?=.*[A-Z]).{8,}"
                    title="密碼必須至少8碼，包含大小寫字母"
                    required autocomplete="new-password">
-            <button type="button" class="btn btn-light border" id="togglePasswordReg" aria-label="切換密碼顯示">👁️</button>
+            <button type="button" class="btn btn-toggle-password" id="togglePasswordReg">👁️</button>
           </div>
-          <small class="form-text text-muted">密碼需包含大小寫英文字母且至少8位數</small>
+          <small class="form-text text-muted fst-italic" style="font-size: 0.8rem;">密碼需包含大小寫英文字母且至少8位數</small>
         </div>
 
         <div class="mb-3">
-          <label for="confirm_password" class="form-label">確認密碼</label>
-          <div class="input-group">
-            <input type="password" class="form-control rounded-3" id="confirm_password" name="confirm_password" placeholder="請再次輸入密碼" required autocomplete="new-password">
-            <button type="button" class="btn btn-light border" id="toggleConfirmPasswordReg" aria-label="切換確認密碼顯示">👁️</button>
+          <label for="confirm_password" class="form-label fw-semibold small">確認密碼</label>
+          <div class="input-group shadow-sm">
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="請再次輸入密碼" required autocomplete="new-password">
+            <button type="button" class="btn btn-toggle-password" id="toggleConfirmPasswordReg">👁️</button>
           </div>
-          <small id="passwordMatch" class="form-text text-danger" style="display: none;">密碼不一致</small>
+          <small id="passwordMatch" class="form-text text-danger fst-italic" style="display: none; font-size: 0.8rem;">密碼不一致</small>
         </div>
 
-        <div class="d-grid">
-          <button type="submit" id="submitBtn" class="btn btn-success rounded-3">註冊</button>
-        </div>
+        <button type="submit" id="submitBtn" class="btn btn-primary btn-md w-100 rounded-4 fw-semibold shadow-sm">註冊</button>
       </form>
 
-      <div class="text-center mt-3">
-        已經是會員？<a href="{{ url_for('login') }}" class="text-decoration-underline">登入會員</a>
+      <div class="text-center mt-3 text-muted" style="font-size: 0.9rem;">
+        已經是會員？<a href="{{ url_for('login') }}" class="text-primary text-decoration-underline">立即登入</a>
       </div>
+
     </div>
   </div>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('birthday').setAttribute('max', today);
-
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm_password');
     const matchMessage = document.getElementById('passwordMatch');
@@ -109,15 +138,13 @@
     });
 
     document.getElementById('togglePasswordReg').addEventListener('click', function () {
-      const pwdInput = password;
-      pwdInput.type = (pwdInput.type === 'password') ? 'text' : 'password';
-      this.textContent = (pwdInput.type === 'text') ? '🙈' : '👁️';
+      password.type = (password.type === 'password') ? 'text' : 'password';
+      this.textContent = (password.type === 'text') ? '🙈' : '👁️';
     });
 
     document.getElementById('toggleConfirmPasswordReg').addEventListener('click', function () {
-      const confirmPwdInput = confirmPassword;
-      confirmPwdInput.type = (confirmPwdInput.type === 'password') ? 'text' : 'password';
-      this.textContent = (confirmPwdInput.type === 'text') ? '🙈' : '👁️';
+      confirmPassword.type = (confirmPassword.type === 'password') ? 'text' : 'password';
+      this.textContent = (confirmPassword.type === 'text') ? '🙈' : '👁️';
     });
 
     emailInput.addEventListener('blur', function () {

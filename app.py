@@ -17,6 +17,7 @@ from markupsafe import Markup
 from models.game import Game
 from flask_migrate import Migrate
 import re
+from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -49,7 +50,6 @@ with app.app_context():
 def register():
     def validate_password(password):
         # 至少8碼，包含至少一個大寫與一個小寫字母
-        # 密碼至少8碼，包含至少一個大寫與一個小寫字母
         pattern = r'^(?=.*[a-z])(?=.*[A-Z]).{8,}$'
         return re.match(pattern, password)
 
@@ -61,13 +61,13 @@ def register():
 
         if not birthday_str:
             flash('請填寫出生年月日', 'danger')
-            return render_template('register.html')
+            return render_template('register.html', today=datetime.utcnow().date().isoformat())
 
         try:
             birthday = datetime.strptime(birthday_str, '%Y-%m-%d').date()
         except ValueError:
             flash('日期格式錯誤，請使用YYYY-MM-DD格式', 'danger')
-            return render_template('register.html')
+            return render_template('register.html', today=datetime.utcnow().date().isoformat())
 
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
@@ -75,16 +75,16 @@ def register():
         # 密碼格式驗證
         if not validate_password(password):
             flash('密碼必須至少8碼且包含大小寫字母', 'danger')
-            return render_template('register.html')
+            return render_template('register.html', today=datetime.utcnow().date().isoformat())
 
         if password != confirm_password:
             flash('密碼不一致，請重新輸入', 'danger')
-            return render_template('register.html')
+            return render_template('register.html', today=datetime.utcnow().date().isoformat())
 
         # 檢查電子郵件是否已註冊
         if Member.query.filter_by(mem_email=email).first():
             flash('此電子郵件已被註冊', 'danger')
-            return render_template('register.html')
+            return render_template('register.html', today=datetime.utcnow().date().isoformat())
 
         # 密碼雜湊
         hashed_pwd = generate_password_hash(password)
@@ -106,14 +106,27 @@ def register():
         login_user(new_member)
         flash('註冊成功，歡迎加入！', 'success')
         return redirect(url_for('index'))
-    return render_template('register.html')
+
+    # GET 請求
+    today = datetime.utcnow().date().isoformat()
+    return render_template('register.html', today=today)
+
+
 
 #搜尋節目
 @app.route('/search')
 def search():
-    keyword = request.args.get('keyword', '')
-    # 範例：搜尋節目
-    shows = Show.query.filter(Show.show_name.contains(keyword)).all() if keyword else []
+    keyword = request.args.get('keyword', '').strip()
+    if keyword:
+        shows=Show.query.join(Host).filter(
+            db.or_(
+                Show.show_name.contains(keyword),
+                Host.host_name.contains(keyword)
+            )
+        ).all()
+    else:
+        show=[]
+
     return render_template('search_result.html', keyword=keyword, shows=shows)
 
 

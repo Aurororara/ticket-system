@@ -3,29 +3,60 @@
 {% block title %}會員資料 - NtickeTUB{% endblock %}
 
 {% block content %}
+<style>
+  .profile-card {
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.6s ease-in-out;
+  }
+  .form-control[readonly] {
+    background-color: #f8f9fa;
+    font-weight: 500;
+    border: 1px solid #dee2e6;
+  }
+  .form-label {
+    font-weight: 600;
+    color: #495057;
+  }
+  .btn-pill {
+    border-radius: 50px;
+    transition: all 0.3s ease;
+  }
+  .btn-pill:hover {
+    transform: scale(1.05);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
 <div class="container d-flex justify-content-center align-items-center vh-100">
-  <div class="card shadow-lg" style="max-width: 550px; width: 100%;">
+  <div class="card profile-card p-4" style="max-width: 550px; width: 100%;">
     <div class="card-body">
-      <h3 class="card-title text-center mb-4 fw-bold">會員資料</h3>
+      <h3 class="card-title text-center mb-4 fw-bold text-primary">
+        <i class="bi bi-person-circle me-2"></i>會員資料
+      </h3>
       <form>
         <div class="mb-3">
           <label for="name" class="form-label">用戶名稱</label>
-          <input type="text" class="form-control bg-light text-muted" id="name" name="name" value="{{ current_user.mem_name }}" readonly>
+          <input type="text" class="form-control" id="name" value="{{ current_user.mem_name }}" readonly>
         </div>
         <div class="mb-3">
           <label for="phone" class="form-label">電話號碼</label>
-          <input type="text" class="form-control bg-light text-muted" id="phone" name="phone" value="{{ current_user.mem_phone }}" readonly>
+          <input type="text" class="form-control" id="phone" value="{{ current_user.mem_phone }}" readonly>
         </div>
         <div class="mb-3">
           <label for="birthdate" class="form-label">出生年月日</label>
-          <input type="date" class="form-control bg-light text-muted" id="birthdate" name="birthdate" value="{{ current_user.birthday }}" readonly>
+          <input type="date" class="form-control" id="birthdate" value="{{ current_user.birthday }}" readonly>
         </div>
-        <div class="d-grid gap-2 mt-4">
-          <a href="{{ url_for('change_password') }}" class="btn btn-outline-primary rounded-pill">
-            修改密碼？
+        <div class="d-grid gap-3 mt-4">
+          <a href="{{ url_for('change_password') }}" class="btn btn-outline-primary btn-pill">
+            <i class="bi bi-key me-1"></i> 修改密碼
           </a>
-          <a href="{{ url_for('index') }}" class="btn btn-secondary rounded-pill">
-            回首頁
+          <a href="{{ url_for('index') }}" class="btn btn-secondary btn-pill">
+            <i class="bi bi-house me-1"></i> 回首頁
           </a>
         </div>
       </form>
