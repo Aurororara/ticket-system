@@ -2,12 +2,11 @@
 
 {% block title %}登入 - NtickeTUB{% endblock %}
 
-
 {% block content %}
   <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-lg" style="max-width: 400px; width: 100%;">
-      <div class="card-body">
-        <h3 class="card-title text-center mb-4">登入會員</h3>
+    <div class="card shadow-lg rounded-4" style="max-width: 400px; width: 100%;">
+      <div class="card-body px-4 py-4">
+        <h3 class="card-title text-center mb-4 fw-bold" style="color:#1a73e8;">登入會員</h3>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
@@ -33,24 +32,24 @@
 
         <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
           <div class="mb-3">
-            <label for="email" class="form-label">電子郵件信箱</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="請輸入電子郵件" required>
+            <label for="email" class="form-label fw-semibold">電子郵件信箱</label>
+            <input type="email" class="form-control rounded-3 shadow-sm" id="email" name="email" placeholder="請輸入電子郵件" required style="border: 1.5px solid #ddd; transition: border-color 0.3s ease;">
           </div>
           <div class="mb-3">
-            <label for="password" class="form-label">密碼</label>
-            <div class="input-group">
-              <input type="password" class="form-control" id="password" name="password" placeholder="請輸入密碼" required>
-              <button type="button" class="btn btn-light border" id="togglePassword" aria-label="切換密碼顯示">👁️</button>
+            <label for="password" class="form-label fw-semibold">密碼</label>
+            <div class="input-group shadow-sm" style="border: 1.5px solid #ddd; border-radius: 0.5rem; overflow: hidden; transition: border-color 0.3s ease;">
+              <input type="password" class="form-control border-0" id="password" name="password" placeholder="請輸入密碼" required style="box-shadow:none;">
+              <button type="button" class="btn btn-toggle-password" id="togglePassword" aria-label="切換密碼顯示">👁️</button>
             </div>
           </div>
           <div class="d-grid">
-            <button type="submit" class="button-deepblue">登入</button>
+            <button type="submit" class="btn btn-primary btn-lg rounded-4 fw-semibold shadow">登入</button>
           </div>
         </form>
 
-        <div class="text-center mt-3">
-          <p class="mb-0 d-inline">還不是會員？</p>
-          <a href="{{ url_for('register') }}" class="text-decoration-underline ms-1">加入會員</a>
+        <div class="text-center mt-3" style="font-size: 0.95rem; color: #555;">
+          <span>還不是會員？</span>
+          <a href="{{ url_for('register') }}" class="text-primary text-decoration-underline ms-1">加入會員</a>
         </div>
       </div>
     </div>
@@ -70,23 +69,58 @@
   </script>
 
 <style>
-.button-deepblue {
-  background-color: #3385D9;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-}
+  /* input focus border */
+  input.form-control:focus {
+    border-color: #1a73e8 !important;
+    box-shadow: 0 0 5px rgba(26, 115, 232, 0.4);
+    outline: none;
+  }
 
-.button-deepblue:hover {
-  background-color: #1f6ec3;
-}
+  /* input group hover and focus */
+  .input-group:focus-within {
+    border-color: #1a73e8 !important;
+    box-shadow: 0 0 8px rgba(26, 115, 232, 0.5);
+  }
 
-.button-deepblue:active {
-  background-color: #145399;
-}
+  /* 密碼切換按鈕風格和註冊頁一樣 */
+  .btn-toggle-password {
+    background-color: #f1f1f1;
+    border-left: none;
+    border-radius: 0 0.5rem 0.5rem 0;
+    box-shadow: none;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: none;
+  }
+  .btn-toggle-password:hover {
+    background-color: #e0e0e0;
+  }
+  .btn-toggle-password:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* 登入按鈕 */
+  .btn-primary {
+    background: linear-gradient(45deg, #1a73e8, #1761c9);
+    border: none;
+    transition: background 0.3s ease;
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(45deg, #1761c9, #1450a6);
+    box-shadow: 0 6px 15px rgba(20, 80, 166, 0.6);
+  }
+  .btn-primary:active {
+    background: #0c47b7;
+    box-shadow: 0 2px 6px rgba(12, 71, 183, 0.8);
+  }
 </style>
 {% endblock %}

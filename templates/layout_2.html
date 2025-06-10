@@ -173,24 +173,30 @@
       </div>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      {% for show in shows %}
-      <div class="col">
-        <a href="{{ url_for('show_detail', show_id=show.show_id) }}" class="text-decoration-none text-dark">
-          <div class="card h-100">
-            <img src="{{ show.show_pic }}" class="card-img-top" alt="{{ show.show_name }}"
-              style="height: 200px; object-fit: cover;" />
-            <div class="card-body">
-              <h5 class="card-title">{{ show.show_name }}</h5>
-              <p class="card-text event-date">
-                {{ show.start_date.strftime('%Y/%m/%d') if show.start_date else '未知' }}
-                {% if show.end_date %} ~ {{ show.end_date.strftime('%Y/%m/%d') }} {% endif %}
-              </p>
-            </div>
-          </div>
-        </a>
+   <div class="row row-cols-1 row-cols-md-3 g-4">
+  {% for show in shows %}
+  <div class="col">
+    <a href="{{ url_for('show_detail', show_id=show.show_id) }}" class="text-decoration-none text-dark">
+      <div class="card h-100">
+        <img src="{{ show.show_pic }}" class="card-img-top" alt="{{ show.show_name }}"
+          style="height: 200px; object-fit: cover;" />
+        <div class="card-body">
+          <h5 class="card-title">{{ show.show_name }}</h5>
+          <p class="card-text event-date">
+            {% if show.start_date %}
+              {{ show.start_date.strftime('%Y/%m/%d') }}
+              {% if show.end_date and show.end_date != show.start_date %}
+                ~ {{ show.end_date.strftime('%Y/%m/%d') }}
+              {% endif %}
+            {% else %}
+              未知
+            {% endif %}
+          </p>
+        </div>
       </div>
-      {% endfor %}
+    </a>
+  </div>
+  {% endfor %}
     </div>
   </div>
 
