@@ -550,7 +550,7 @@ def refund_detail(order_id):
         else:
             status_display = refund.refund_status
 
-        message = f"此訂單已申請退款，狀態為：{status_display}"
+        message = f"此訂單已申請退款"
         return render_template("refund_form.html", message=message, order=None, refund_status=refund.refund_status, form_allowed=False)
 
     if request.method == 'POST':
