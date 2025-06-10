@@ -116,9 +116,17 @@ def register():
 #搜尋節目
 @app.route('/search')
 def search():
-    keyword = request.args.get('keyword', '')
-    # 範例：搜尋節目
-    shows = Show.query.filter(Show.show_name.contains(keyword)).all() if keyword else []
+    keyword = request.args.get('keyword', '').strip()
+    if keyword:
+        shows=Show.query.join(Host).filter(
+            db.or_(
+                Show.show_name.contains(keyword),
+                Host.host_name.contains(keyword)
+            )
+        ).all()
+    else:
+        show=[]
+
     return render_template('search_result.html', keyword=keyword, shows=shows)
 
 
