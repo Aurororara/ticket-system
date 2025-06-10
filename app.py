@@ -506,6 +506,18 @@ def refund_detail(order_id):
         show_datetime = datetime.combine(game.game_date, game.game_time)
         datetime_str = show_datetime.strftime('%Y/%m/%d(%a) %H:%M')
 
+    refund = Refund.query.filter_by(order_id=order_id).first()
+    if refund:
+        if refund.refund_status == 'approved':
+            status_display = '已完成'
+        elif refund.refund_status == 'rejected':
+            status_display = '已拒絕'
+        else:
+            status_display = refund.refund_status  # fallback 顯示原始狀態
+
+        message = f"此訂單已申請退款，狀態為：{status_display}"
+        return render_template("refund_form.html", message=message, order=None)
+
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
@@ -572,7 +584,7 @@ def refund_detail(order_id):
                 db.session.add(refund_request)
                 db.session.commit()
 
-                return render_template("refund_form.html", message=message, order=None)
+                return render_template("refund_form.html", message=message, order=None, form_allowed=False)
 
     # GET 預設頁面
     return render_template("refund_form.html", message=None, order={
