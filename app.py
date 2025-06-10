@@ -117,6 +117,21 @@ def search():
     return render_template('search_result.html', keyword=keyword, shows=shows)
 
 
+#只能註冊一次
+@app.route('/check_exist')
+def check_exist():
+    email = request.args.get('email')
+    phone = request.args.get('phone')
+    exists = False
+
+    if email:
+        exists = db.session.query(Member.mem_id).filter_by(mem_email=email).first() is not None
+    elif phone:
+        exists = db.session.query(Member.mem_id).filter_by(mem_phone=phone).first() is not None
+
+    return jsonify({'exists': exists})
+
+
 # =======================
 # 登入管理初始化
 # =======================

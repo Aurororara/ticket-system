@@ -20,7 +20,7 @@
         {% endif %}
       {% endwith %}
 
-      <form method="POST" action="{{ url_for('register') }}">
+      <form method="POST" action="{{ url_for('register') }}" novalidate>
 
         <div class="mb-3">
           <label for="name" class="form-label">用戶姓名</label>
@@ -30,11 +30,13 @@
         <div class="mb-3">
           <label for="email" class="form-label">電子郵件信箱</label>
           <input type="email" class="form-control rounded-3" id="email" name="email" placeholder="請輸入電子郵件" required autocomplete="email">
+          <div id="emailExist" class="form-text text-danger" style="display: none;">此 Email 已被註冊</div>
         </div>
-        
+
         <div class="mb-3">
           <label for="phone" class="form-label">電話號碼</label>
-          <input type="tel" class="form-control rounded-3" id="phone" name="phone" placeholder="請輸入手機號碼（09xxxxxxxx）" pattern="^09\d{8}$" maxlength="10" title="請輸入有效的台灣手機號碼（09開頭，共10碼）" required autocomplete="tel">
+          <input type="tel" class="form-control rounded-3" id="phone" name="phone" placeholder="請輸入手機號碼（09xxxxxxxx）" pattern="^09\\d{8}$" maxlength="10" title="請輸入有效的台灣手機號碼（09開頭，共10碼）" required autocomplete="tel">
+          <div id="phoneExist" class="form-text text-danger" style="display: none;">此電話號碼已被註冊</div>
         </div>
 
         <div class="mb-3">
@@ -65,7 +67,7 @@
         </div>
 
         <div class="d-grid">
-          <button type="submit" class="btn btn-success rounded-3">註冊</button>
+          <button type="submit" id="submitBtn" class="btn btn-success rounded-3">註冊</button>
         </div>
       </form>
 
@@ -78,46 +80,83 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // 限制生日不能選未來
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('birthday').setAttribute('max', today);
 
-    // 密碼一致檢查
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm_password');
     const matchMessage = document.getElementById('passwordMatch');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const emailInput = document.getElementById('email');
+    const emailExistMsg = document.getElementById('emailExist');
+    let emailValid = true;
+
+    const phoneInput = document.getElementById('phone');
+    const phoneExistMsg = document.getElementById('phoneExist');
+    let phoneValid = true;
+
+    function updateSubmitState() {
+      const passwordsMatch = password.value === confirmPassword.value;
+      const isValid = passwordsMatch && emailValid && phoneValid;
+      submitBtn.disabled = !isValid;
+    }
 
     confirmPassword.addEventListener('input', function () {
-      if (password.value !== confirmPassword.value) {
-        matchMessage.style.display = 'block';
-      } else {
-        matchMessage.style.display = 'none';
-      }
+      const match = password.value === confirmPassword.value;
+      matchMessage.style.display = match ? 'none' : 'block';
+      updateSubmitState();
     });
 
-    // 密碼顯示切換 - 密碼欄
     document.getElementById('togglePasswordReg').addEventListener('click', function () {
-      const pwdInput = document.getElementById('password');
-      if (pwdInput.type === 'password') {
-        pwdInput.type = 'text';
-        this.textContent = '🙈';
-      } else {
-        pwdInput.type = 'password';
-        this.textContent = '👁️';
-      }
+      const pwdInput = password;
+      pwdInput.type = (pwdInput.type === 'password') ? 'text' : 'password';
+      this.textContent = (pwdInput.type === 'text') ? '🙈' : '👁️';
     });
 
-    // 密碼顯示切換 - 確認密碼欄
     document.getElementById('toggleConfirmPasswordReg').addEventListener('click', function () {
-      const confirmPwdInput = document.getElementById('confirm_password');
-      if (confirmPwdInput.type === 'password') {
-        confirmPwdInput.type = 'text';
-        this.textContent = '🙈';
-      } else {
-        confirmPwdInput.type = 'password';
-        this.textContent = '👁️';
-      }
+      const confirmPwdInput = confirmPassword;
+      confirmPwdInput.type = (confirmPwdInput.type === 'password') ? 'text' : 'password';
+      this.textContent = (confirmPwdInput.type === 'text') ? '🙈' : '👁️';
     });
+
+    emailInput.addEventListener('blur', function () {
+      checkExist('email', emailInput.value.trim(), emailExistMsg, (valid) => {
+        emailValid = !valid;
+        updateSubmitState();
+      });
+    });
+
+    phoneInput.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '');
+    });
+
+    phoneInput.addEventListener('blur', function () {
+      checkExist('phone', phoneInput.value.trim(), phoneExistMsg, (valid) => {
+        phoneValid = !valid;
+        updateSubmitState();
+      });
+    });
+
+    function checkExist(type, value, msgElement, callback) {
+      if (!value) {
+        msgElement.style.display = 'none';
+        callback(false);
+        return;
+      }
+
+      fetch(`/check_exist?${type}=${encodeURIComponent(value)}`)
+        .then(response => response.json())
+        .then(data => {
+          const exists = data.exists;
+          msgElement.style.display = exists ? 'block' : 'none';
+          callback(exists);
+        })
+        .catch(() => {
+          msgElement.style.display = 'none';
+          callback(false);
+        });
+    }
   });
 </script>
 {% endblock %}
