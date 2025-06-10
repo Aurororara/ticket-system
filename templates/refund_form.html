@@ -15,21 +15,8 @@
   <div class="refund-info">
     {% if order %}
       <p>訂單編號：<span class="highlight">{{ '%05d'|format(order['order_id']) }}</span></p>
-      <p>節目名稱：
-        {% if order['show'] %}
-          {{ order['show'].show_name }}
-        {% else %}
-          未知
-        {% endif %}
-      </p>
-      
-      <p>活動地點：
-        {% if order['location'] %}
-          {{ order['location'].loc_name }}
-        {% else %}
-          未知
-        {% endif %}
-      </p>      
+      <p>節目名稱：{{ order['show'].show_name if order['show'] else '未知' }}</p>
+      <p>活動地點：{{ order['location'].loc_name if order['location'] else '未知' }}</p>
       <p>活動時間：{{ order['datetime'] or '未知' }}</p>
       <p>退款金額：TWD${{ order['amount'] - 20}}</p>
     {% endif %}

@@ -93,54 +93,59 @@
   {% endif %}
   {% endwith %}
 
-  <!-- 幻燈片 -->
-  <div class="container mt-5">
-    <h2 class="text-center mb-3">近期節目</h2>
-    <div class="position-relative mx-auto" style="max-width: 800px;">
-      <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+    <!-- 幻燈片 -->
+    <div class="container mt-5">
+      <h2 class="text-center mb-3">近期節目</h2>
+      <div class="position-relative mx-auto" style="max-width: 800px;">
+        <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
 
-        <!-- 圓點 -->
-        <div class="carousel-indicators custom-indicators">
-          {% for show in carousel_shows %}
-          <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="{{ loop.index0 }}"
-            {% if loop.first %}class="active" aria-current="true"{% endif %}
-            aria-label="Slide {{ loop.index }}"></button>
-          {% endfor %}
-        </div>
-
-        <!-- 幻燈片內容 -->
-        <div class="carousel-inner">
-          {% for show in carousel_shows %}
-          <div class="carousel-item {% if loop.first %}active{% endif %}">
-            <a href="{{ url_for('show_detail', show_id=show.show_id) }}">
-              <img src="{{ show.show_pic }}" class="d-block w-100" alt="{{ show.show_name }}"
-                style="width: 100%; height: 400px; object-fit: cover;" />
-            </a>
-            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
-              <h5>{{ show.show_name }}</h5>
-              <p>
-                {{ show.start_date.strftime('%Y/%m/%d') if show.start_date else '未知' }}
-                {% if show.end_date %} ~ {{ show.end_date.strftime('%Y/%m/%d') }} {% endif %}
-              </p>
-            </div>
+          <!-- 圓點 -->
+          <div class="carousel-indicators custom-indicators">
+            {% for show in carousel_shows %}
+            <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="{{ loop.index0 }}"
+              {% if loop.first %}class="active" aria-current="true"{% endif %}
+              aria-label="Slide {{ loop.index }}"></button>
+            {% endfor %}
           </div>
-          {% endfor %}
-        </div>
 
-        <!-- 左右按鈕 -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
+          <!-- 幻燈片內容 -->
+          <div class="carousel-inner">
+            {% for show in carousel_shows %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+              <a href="{{ url_for('show_detail', show_id=show.show_id) }}">
+                <img src="{{ show.show_pic }}" class="d-block w-100" alt="{{ show.show_name }}"
+                  style="width: 100%; height: 400px; object-fit: cover;" />
+              </a>
+              <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                <h5>{{ show.show_name }}</h5>
+                <p>
+                  {% if show.start_date and show.end_date and show.start_date == show.end_date %}
+                    {{ show.start_date.strftime('%Y/%m/%d') }}
+                  {% else %}
+                    {{ show.start_date.strftime('%Y/%m/%d') if show.start_date else '未知' }}
+                    {% if show.end_date %} ~ {{ show.end_date.strftime('%Y/%m/%d') }} {% endif %}
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+
+          <!-- 左右按鈕 -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
- 
+  
   <!-- 所有節目 -->
   <div class="container extra-margin-top">
     <h2 class="text-center mb-3">所有節目</h2>

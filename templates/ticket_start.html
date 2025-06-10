@@ -59,7 +59,7 @@
           {% if game.game_status == 'A' and game.sale_start_time <= now <=game.sale_end_time %} <a
             href="{{ url_for('select_area', game_id=game.game_id) }}" class="button-deepblue">立即訂購</a>
             {% else %}
-            <button class="btn btn-secondary" disabled>暫停販售</button>
+            <button class="btn btn-secondary" disabled>尚未販售</button>
             {% endif %}
         </td>
       </tr>
